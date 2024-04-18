@@ -13,6 +13,9 @@ build/
 .settings
 .springBeans
 .sts4-cache
+.env
+src/main/resources/env.yml
+
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
