@@ -78,7 +78,6 @@ public class RabbitMQConfig {
     public void configureQueueForRoom(String roomId) {
         Queue queue = new Queue(roomId, true);  // Create a durable queue with the room ID as the queue name
         amqpAdmin.declareQueue(queue);  // Declare the queue in RabbitMQ
-
         Binding binding = BindingBuilder.bind(queue).to(exchange()).with(roomId);
         amqpAdmin.declareBinding(binding);  // Declare the binding in RabbitMQ
     }

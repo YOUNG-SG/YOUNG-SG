@@ -7,6 +7,9 @@ import com.d208.AIclerk.config.ReddisConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 @Service
 public class RoomServiceImpl implements RoomService {
     @Autowired
@@ -18,6 +21,8 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public MeetingRoom createRoom(MeetingRoom room, String ownerId) {
+
+        room.setStartTime(LocalTime.now());
         // Save room in MySQL
         MeetingRoom savedRoom = meetingRoomRepository.save(room);
         // Create room in Redis with initial status and add owner as a member

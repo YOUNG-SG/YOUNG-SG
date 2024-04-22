@@ -31,7 +31,7 @@ public class RabbitMqServiceImpl implements RabbitMqService {
     public ResponseEntity<String> sendMessage(MessageDto messageDto) {
         try {
             log.info("Message send: {}", messageDto.toString());
-            this.rabbitTemplate.convertAndSend(exchangeName, routingKey, messageDto);
+            this.rabbitTemplate.convertAndSend(exchangeName, routingKey, messageDto); //exchange는 미리 설정해놓고..
             return ResponseEntity.ok("Message sent successfully");
         } catch (Exception e) {
             log.error("Error sending message: {}", e.getMessage());
