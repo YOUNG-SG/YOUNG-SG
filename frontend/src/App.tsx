@@ -1,11 +1,11 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import HasNavbarLayout from "@pages/@Layout/HasNavbarLayout";
-import MainPage from "@pages/Main/MainPage";
-import ProfilePage from "@pages/Profile/ProfilePage";
-import MeetingDetailPage from "@pages/MeetingDetail/MeetingDetailPage";
-import LoginPage from "@pages/Login/LoginPage";
-import KakaoLoginPage from "@pages/Login/KakaoLoginPage";
+import HasNavbarLayout from "@/pages/@Layout/HasNavbarLayout";
+import MainPage from "@/pages/Main/MainPage";
+import ProfilePage from "@/pages/Profile/ProfilePage";
+import MeetingDetailPage from "@/pages/MeetingDetail/MeetingDetailPage";
+import LoginPage from "@/pages/Login/LoginPage";
+import KakaoLoginPage from "@/pages/Login/KakaoLoginPage";
 import "./App.css";
 
 const router = createBrowserRouter([

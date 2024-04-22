@@ -10,9 +10,7 @@
     /* 절대경로 */
     "baseUrl": "src",
     "paths": {
-      "@/*": ["*"],
-      "@components/*": ["components/*"],
-      "@pages/*": ["pages/*"]
+      "@/*": ["*"]
     },
 
     /* Bundler mode */

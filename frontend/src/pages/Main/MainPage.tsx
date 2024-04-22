@@ -1,7 +1,10 @@
+import CreateMeeting from "@/components/Main/CreateMeeting";
+
 const MainPage = () => {
   return (
-    <div>
-      <div>메인</div>
+    // <div className="flex justify-center items-center w-full h-full">
+    <div className="flex justify-center items-center h-full">
+      <CreateMeeting />
     </div>
   );
 };
