@@ -1,26 +1,31 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import HasNavbarLayout from "@pages/@Layout/HasNavbarLayout";
+import MainPage from "@pages/Main/MainPage";
+import ProfilePage from "@pages/Profile/ProfilePage";
+import MeetingDetailPage from "@pages/MeetingDetail/MeetingDetailPage";
+import LoginPage from "@pages/Login/LoginPage";
 import "./App.css";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    // element: <HasNavbarLayout />,
+    element: <HasNavbarLayout />,
     children: [
       // 메인페이지
       {
         index: true,
-        // element: <MainPage />,
+        element: <MainPage />,
       },
       // 프로필
       {
         path: "/profile",
-        // element: <ProfilePage />,
+        element: <ProfilePage />,
       },
       // 회의 상세
       {
         path: "/meeting/:id",
-        // element: <MeetingDetailPage />,
+        element: <MeetingDetailPage />,
       },
     ],
   },
@@ -32,7 +37,7 @@ const router = createBrowserRouter([
   // 로그인
   {
     path: "/login",
-    // element: <LoginPage />,
+    element: <LoginPage />,
   },
 ]);
 
@@ -42,7 +47,6 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-      <div>YOUNG 서기</div>
     </QueryClientProvider>
   );
 }
