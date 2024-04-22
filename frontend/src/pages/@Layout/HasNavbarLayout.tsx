@@ -1,4 +1,4 @@
-import Navbar from "@components/@common/Navbar";
+import Navbar from "@/components/@common/Navbar";
 import { Navigate, Outlet } from "react-router";
 
 const HasNavbarLayout = () => {
@@ -8,7 +8,9 @@ const HasNavbarLayout = () => {
   if (token) {
     return (
       <div className="flex w-full h-full">
-        <Outlet />
+        <div style={{ width: "calc(100% - 80px)" }}>
+          <Outlet />
+        </div>
         <Navbar />
       </div>
     );
