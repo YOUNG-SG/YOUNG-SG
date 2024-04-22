@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MeetingRoomRepository extends JpaRepository<MeetingRoom, Long> {
+
+    boolean existsByInviteCode(String inviteCode); //초대코드 중복검사
+
 }
