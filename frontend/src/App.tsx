@@ -2,7 +2,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import HasNavbarLayout from "@/pages/@Layout/HasNavbarLayout";
 import MainPage from "@/pages/Main/MainPage";
-import ProfilePage from "@/pages/Profile/ProfilePage";
+import MyPage from "@/pages/MyPage/MyPage";
 import MeetingDetailPage from "@/pages/MeetingDetail/MeetingDetailPage";
 import LoginPage from "@/pages/Login/LoginPage";
 import KakaoLoginPage from "@/pages/Login/KakaoLoginPage";
@@ -20,8 +20,8 @@ const router = createBrowserRouter([
       },
       // 프로필
       {
-        path: "/profile",
-        element: <ProfilePage />,
+        path: "/mypage",
+        element: <MyPage />,
       },
       // 회의 상세
       {

@@ -16,7 +16,7 @@ const Navbar = () => {
         src="src/assets/@test/profile.jpg"
         className="w-[50px] h-[50px] rounded-full object-cover cursor-pointer"
         onClick={() => {
-          navigate("/profile");
+          navigate("/mypage");
         }}
       />
     </nav>
