@@ -1,6 +1,7 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./App.css";
+import MeetingOn from "./pages/MeetingOn/MeetingOnPage";
 
 const router = createBrowserRouter([
   {
@@ -27,7 +28,7 @@ const router = createBrowserRouter([
   // 회의 진행
   {
     path: "/meeting/on/:id",
-    // element: <MeetingOnPage />,
+    element: <MeetingOn />,
   },
   // 로그인
   {
