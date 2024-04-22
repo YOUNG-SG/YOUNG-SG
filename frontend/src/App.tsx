@@ -5,6 +5,7 @@ import MainPage from "@pages/Main/MainPage";
 import ProfilePage from "@pages/Profile/ProfilePage";
 import MeetingDetailPage from "@pages/MeetingDetail/MeetingDetailPage";
 import LoginPage from "@pages/Login/LoginPage";
+import KakaoLoginPage from "@pages/Login/KakaoLoginPage";
 import "./App.css";
 
 const router = createBrowserRouter([
@@ -38,6 +39,11 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  // 로그인 콜백
+  {
+    path: "/oauth/callback/kakao",
+    element: <KakaoLoginPage />,
   },
 ]);
 
