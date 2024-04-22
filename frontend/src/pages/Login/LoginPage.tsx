@@ -1,8 +1,10 @@
+import Login from "@/components/Login/Login";
+
 const LoginPage = () => {
   return (
-    <>
-      <div>로그인</div>
-    </>
+    <div className="flex justify-center items-center h-full">
+      <Login />
+    </div>
   );
 };
 
