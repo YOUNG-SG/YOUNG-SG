@@ -1,42 +1,44 @@
-import { useCallback, useEffect, useState } from "react";
-import {
-  OpenVidu,
-  Session as OVSession,
-  Publisher,
-  Subscriber,
-} from "openvidu-browser";
-import axios, { AxiosError } from "axios";
-import Session from "./Session";
-import Form from "./Form";
+import React, { useState, useCallback } from "react";
+import { OpenVidu } from "openvidu-browser";
+import useSessionStore from "../../store/sessionStore";
+import Form from "./OpenVidu/Form";
+import Session from "./OpenVidu/Session";
 
-function Meeting() {
-  const [session, setSession] = useState<OVSession | "">("");
-  const [sessionId, setSessionId] = useState<string>("");
-  const [subscriber, setSubscriber] = useState<Subscriber | null>(null);
-  const [publisher, setPublisher] = useState<Publisher | null>(null);
-  const [OV, setOV] = useState<OpenVidu | null>(null);
-
+function Meeting2() {
+  const {
+    sessionId,
+    session,
+    publisher,
+    subscriber,
+    publisherOptions,
+    setSessionId,
+    setSession,
+    setPublisher,
+    setSubscriber,
+    setPublisherOptions,
+    setIsAudioEnabled
+    toggleScreenShare,
+  } = useSessionStore();
   const OPENVIDU_SERVER_URL = "https://youngseogi.duckdns.org";
   const OPENVIDU_SERVER_SECRET = "MYSECRET";
+
+  const [OV, setOV] = useState<OpenVidu | null>(null);
 
   const leaveSession = useCallback(() => {
     if (session) session.disconnect();
 
     setOV(null);
-    setSession("");
+    setSession(null);
     setSessionId("");
     setSubscriber(null);
     setPublisher(null);
+    setIsAudioEnabled(true); // 세션 종료 시 오디오 상태 초기화
   }, [session]);
 
   const joinSession = () => {
     const OVs = new OpenVidu();
     setOV(OVs);
     setSession(OVs.initSession());
-  };
-
-  const exitsession = (session: any, subscriber: any) => {
-    session.unsubscribe(subscriber);
   };
 
   useEffect(() => {
@@ -155,27 +157,48 @@ function Meeting() {
       .catch(() => {});
   }, [session, OV, sessionId, OPENVIDU_SERVER_URL]);
 
+  // 오디오 토글 기능 추가
+  const toggleAudio = () => {
+    if (publisher) {
+      const newAudioState = !isAudioEnabled;
+      publisher.publishAudio(newAudioState);
+      setIsAudioEnabled(newAudioState); // 오디오 상태 업데이트
+    }
+  };
+
+  const toggleVideo = () => {
+    if (publisher) {
+      const newVideoState = !isVideoEnabled;
+      publisher.publishVideo(newVideoState);
+      setIsVideoEnabled(newVideoState);
+    }
+  };
+
+  const handleScreenShareToggle = useCallback(() => {
+    toggleScreenShare();
+    if (session && publisher) {
+      session.unpublish(publisher);
+      const newPublisher = session.initPublisher(undefined, {
+        audioSource: publisher.audioSource,
+        videoSource: publisher.videoSource,
+        publishAudio: publisher.stream.audioActive,
+        publishVideo: publisher.stream.videoActive,
+        mirror: false,
+      });
+      session.publish(newPublisher);
+    }
+  }, [session, publisher, toggleScreenShare]);
+
   return (
     <div>
-      <h1>진행화면</h1>
-      <>
-        {!session && (
-          <Form
-            joinSession={joinSession}
-            sessionId={sessionId}
-            sessionIdChangeHandler={sessionIdChangeHandler}
-          />
-        )}
-        {session && (
-          <Session
-            publisher={publisher as Publisher}
-            subscriber={subscriber as Subscriber}
-          />
-        )}
-        <button onClick={() => exitsession(session, subscriber)}></button>
-      </>
+      <h1>Meeting Room</h1>
+      {!session && <Form />}
+      {session && <Session publisher={publisher} subscriber={subscriber} />}
+      <button onClick={handleScreenShareToggle}>
+        {publisher?.videoSource === "screen" ? "Stop Sharing" : "Share Screen"}
+      </button>
     </div>
   );
 }
 
-export default Meeting;
+export default Meeting2;

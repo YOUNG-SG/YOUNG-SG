@@ -1,4 +1,4 @@
-import Meeting from "../../components/MeetingOn/OpenVidu/Meeting";
+import Meeting from "../../components/MeetingOn/Meeting";
 
 const MeetingOn = () => {
   return (
