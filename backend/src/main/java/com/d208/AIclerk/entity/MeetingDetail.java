@@ -16,7 +16,10 @@ public class MeetingDetail {
     @Column(name = "meeting_detail_id")
     private Long id;
 
-    @Column(name = "summary")
+    @Column(name = "title", columnDefinition = "TEXT")
+    private String title;
+
+    @Column(name = "summary", columnDefinition = "TEXT")
     private String summary;
 
     @ManyToOne(fetch = FetchType.LAZY)
