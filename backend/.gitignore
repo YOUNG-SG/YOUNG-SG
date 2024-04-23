@@ -4,8 +4,9 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-
+gcs_cloud.json
 ### STS ###
+src/main/resources/env.yml
 .apt_generated
 .classpath
 .factorypath
@@ -13,13 +14,10 @@ build/
 .settings
 .springBeans
 .sts4-cache
-.env
-backend/src/main/resources/env.yml
-
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-
+.env
 ### IntelliJ IDEA ###
 .idea
 *.iws
