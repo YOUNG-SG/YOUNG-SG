@@ -46,7 +46,7 @@ public class OpenAiUtil {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readTree(response);
         JsonNode contentNode = rootNode.path("choices").get(0).path("message").path("content");
-        
+
         return contentNode.asText();
     }
 
