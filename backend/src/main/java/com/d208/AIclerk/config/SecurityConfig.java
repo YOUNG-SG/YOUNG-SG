@@ -1,6 +1,7 @@
 package com.d208.AIclerk.config;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,6 +23,8 @@ public class SecurityConfig {
 
         return http.build();
 =======
+=======
+>>>>>>> 916214828916ac98687b79acbc3a9cf80e681fe9
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,6 +43,9 @@ public class SecurityConfig {
                         permitAll().anyRequest().authenticated());
 
         return httpSecurity.build();
+<<<<<<< HEAD
+>>>>>>> 916214828916ac98687b79acbc3a9cf80e681fe9
+=======
 >>>>>>> 916214828916ac98687b79acbc3a9cf80e681fe9
     }
 }
