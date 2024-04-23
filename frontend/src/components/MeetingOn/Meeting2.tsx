@@ -1,59 +1,48 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { OpenVidu } from "openvidu-browser";
-import useSessionStore from "../../store/sessionStore";
-import Form from "./OpenVidu/Form";
+import axios, { AxiosError } from "axios";
 import Session from "./OpenVidu/Session";
+import Form from "./OpenVidu/Form";
+import Dictaphone from "./OpenVidu/Dictaphone";
+import useMeetingStore from "../../store/sessionStore2";
 
-function Meeting2() {
+function Meeting() {
   const {
-    sessionId,
     session,
-    publisher,
-    subscriber,
-    publisherOptions,
-    setSessionId,
     setSession,
-    setPublisher,
+    sessionId,
+    setSessionId,
+    subscriber,
     setSubscriber,
-    setPublisherOptions,
-    setIsAudioEnabled
-    toggleScreenShare,
-  } = useSessionStore();
+    publisher,
+    setPublisher,
+    isAudioEnabled,
+    setIsAudioEnabled,
+    isVideoEnabled,
+    setIsVideoEnabled,
+  } = useMeetingStore();
   const OPENVIDU_SERVER_URL = "https://youngseogi.duckdns.org";
   const OPENVIDU_SERVER_SECRET = "MYSECRET";
 
-  const [OV, setOV] = useState<OpenVidu | null>(null);
-
   const leaveSession = useCallback(() => {
     if (session) session.disconnect();
-
-    setOV(null);
     setSession(null);
     setSessionId("");
     setSubscriber(null);
     setPublisher(null);
-    setIsAudioEnabled(true); // 세션 종료 시 오디오 상태 초기화
+    setIsAudioEnabled(true);
+    setIsVideoEnabled(true);
   }, [session]);
 
-  const joinSession = () => {
-    const OVs = new OpenVidu();
-    setOV(OVs);
-    setSession(OVs.initSession());
-  };
+  const joinSession = useCallback(() => {
+    const OV = new OpenVidu();
+    setSession(OV.initSession());
+  }, []);
 
   useEffect(() => {
     window.addEventListener("beforeunload", leaveSession);
-
-    return () => {
-      window.removeEventListener("beforeunload", leaveSession);
-    };
+    return () => window.removeEventListener("beforeunload", leaveSession);
   }, [leaveSession]);
-
-  const sessionIdChangeHandler = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setSessionId(event.target.value);
-  };
 
   useEffect(() => {
     if (session === "") return;
@@ -157,48 +146,46 @@ function Meeting2() {
       .catch(() => {});
   }, [session, OV, sessionId, OPENVIDU_SERVER_URL]);
 
-  // 오디오 토글 기능 추가
-  const toggleAudio = () => {
+  const toggleAudio = useCallback(() => {
     if (publisher) {
-      const newAudioState = !isAudioEnabled;
-      publisher.publishAudio(newAudioState);
-      setIsAudioEnabled(newAudioState); // 오디오 상태 업데이트
+      publisher.publishAudio(!isAudioEnabled);
+      setIsAudioEnabled(!isAudioEnabled);
     }
-  };
+  }, [publisher, isAudioEnabled]);
 
-  const toggleVideo = () => {
+  const toggleVideo = useCallback(() => {
     if (publisher) {
-      const newVideoState = !isVideoEnabled;
-      publisher.publishVideo(newVideoState);
-      setIsVideoEnabled(newVideoState);
+      publisher.publishVideo(!isVideoEnabled);
+      setIsVideoEnabled(!isVideoEnabled);
     }
-  };
-
-  const handleScreenShareToggle = useCallback(() => {
-    toggleScreenShare();
-    if (session && publisher) {
-      session.unpublish(publisher);
-      const newPublisher = session.initPublisher(undefined, {
-        audioSource: publisher.audioSource,
-        videoSource: publisher.videoSource,
-        publishAudio: publisher.stream.audioActive,
-        publishVideo: publisher.stream.videoActive,
-        mirror: false,
-      });
-      session.publish(newPublisher);
-    }
-  }, [session, publisher, toggleScreenShare]);
+  }, [publisher, isVideoEnabled]);
 
   return (
     <div>
-      <h1>Meeting Room</h1>
-      {!session && <Form />}
-      {session && <Session publisher={publisher} subscriber={subscriber} />}
-      <button onClick={handleScreenShareToggle}>
-        {publisher?.videoSource === "screen" ? "Stop Sharing" : "Share Screen"}
-      </button>
+      <h1>진행화면</h1>
+      <>
+        {!session && (
+          <Form
+            joinSession={joinSession}
+            sessionId={sessionId}
+            sessionIdChangeHandler={(event) => setSessionId(event.target.value)}
+          />
+        )}
+        {session && <Session publisher={publisher} subscriber={subscriber} />}
+        {publisher && (
+          <>
+            <button onClick={toggleAudio}>
+              {isAudioEnabled ? "음소거" : "소리모드"}
+            </button>
+            <button onClick={toggleVideo}>
+              {isVideoEnabled ? "화면 off" : "화면 on"}
+            </button>
+          </>
+        )}
+      </>
+      <Dictaphone />
     </div>
   );
 }
 
-export default Meeting2;
+export default Meeting;
