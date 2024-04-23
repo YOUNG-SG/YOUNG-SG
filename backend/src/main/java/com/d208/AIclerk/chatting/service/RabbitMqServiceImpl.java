@@ -16,33 +16,31 @@ import org.springframework.stereotype.Service;
 @Service
 public class RabbitMqServiceImpl implements RabbitMqService {
 
-    @Value("${rabbitmq.queue.name}")
-    private String queueName;
 
-    @Value("${rabbitmq.exchange.name}")
+    @Value("${spring.rabbitmq.exchange.name}")
     private String exchangeName;
 
-    @Value("${rabbitmq.routing.key}")
-    private String routingKey;
 
     private final RabbitTemplate rabbitTemplate;
 
+
     @Override
-    public ResponseEntity<String> sendMessage(MessageDto messageDto) {
+    public void sendMessage(String roomId, MessageDto messageDto) {
         try {
             log.info("Message send: {}", messageDto.toString());
-            this.rabbitTemplate.convertAndSend(exchangeName, routingKey, messageDto); //exchange는 미리 설정해놓고..
-            return ResponseEntity.ok("Message sent successfully");
+            this.rabbitTemplate.convertAndSend(exchangeName, roomId, messageDto); //exchange는 미리 설정해놓고..
+            ResponseEntity.ok("Message sent successfully" + roomId);
         } catch (Exception e) {
             log.error("Error sending message: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send message");
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send message");
         }
     }
 
 
-    @RabbitListener(queues = "${rabbitmq.queue.name}")
-    @Override
-    public void receiveMessage(MessageDto messageDto) {
-        log.info("Received message: {}", messageDto.toString());
-    }
+    /**
+     *3
+     * 수정바람..! 문제생김  ??
+     *
+     * */
+
 }

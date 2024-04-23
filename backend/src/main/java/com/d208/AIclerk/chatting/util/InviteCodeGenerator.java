@@ -1,4 +1,4 @@
-package com.d208.AIclerk.chatting.service;
+package com.d208.AIclerk.chatting.util;
 
 import com.d208.AIclerk.chatting.repository.MeetingRoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +11,7 @@ import java.util.Random;
 public class InviteCodeGenerator {
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
     @Autowired
     private MeetingRoomRepository meetingRoomRepository;
 
