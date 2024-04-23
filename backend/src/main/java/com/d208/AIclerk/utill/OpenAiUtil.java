@@ -46,15 +46,7 @@ public class OpenAiUtil {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode rootNode = mapper.readTree(response);
         JsonNode contentNode = rootNode.path("choices").get(0).path("message").path("content");
-
-//        String[] parts = contentNode.asText().split("\r?\n+");
-//        Map<String, String> resultMap = new HashMap<>();
-//        resultMap.put("title", parts[0]); // 첫 번째 줄을 제목으로 가정
-//        resultMap.put("content", parts[1]); // 두 번째 줄을 주제로 가정
-//
-//        log.info("(내용) {}", resultMap.put("content", parts[1]));
-//        log.info("(제목) {}", resultMap.put("title", parts[0]));
-
+        
         return contentNode.asText();
     }
 
