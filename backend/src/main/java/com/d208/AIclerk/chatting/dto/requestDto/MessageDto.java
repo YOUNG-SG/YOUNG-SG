@@ -14,6 +14,6 @@ import lombok.ToString;
 @NoArgsConstructor
 public class MessageDto {
 
-    private String title;
+    private String sender;
     private String content;
 }

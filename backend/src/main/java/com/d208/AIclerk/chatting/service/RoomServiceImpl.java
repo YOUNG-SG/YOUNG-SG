@@ -1,59 +1,83 @@
-package com.d208.AIclerk.chatting.service;
+    package com.d208.AIclerk.chatting.service;
 
-import com.d208.AIclerk.chatting.util.InviteCodeGenerator;
-import com.d208.AIclerk.entity.MeetingRoom;
-import com.d208.AIclerk.chatting.repository.MeetingRoomRepository;
-import com.d208.AIclerk.config.ReddisConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import java.time.LocalTime;
+    import com.d208.AIclerk.chatting.util.InviteCodeGenerator;
+    import com.d208.AIclerk.config.RedisConfig;
+    import com.d208.AIclerk.entity.MeetingRoom;
+    import com.d208.AIclerk.chatting.repository.RoomRepository;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
 
-@Service
-public class RoomServiceImpl implements RoomService {
+    import java.time.LocalTime;
 
-    private final MeetingRoomRepository meetingRoomRepository;
-    private final ReddisConfig redisService;
-    private final InviteCodeGenerator inviteCodeGenerator;
+    @Service
+    public class RoomServiceImpl implements RoomService {
 
-    @Autowired
-    public RoomServiceImpl(MeetingRoomRepository meetingRoomRepository,
-                           ReddisConfig redisService,
-                           InviteCodeGenerator inviteCodeGenerator) {
+        private final RoomRepository roomRepository;
+        private final InviteCodeGenerator inviteCodeGenerator;
+        private final RedisConfig redisConfig;
 
-        this.meetingRoomRepository = meetingRoomRepository;
-        this.redisService = redisService;
-        this.inviteCodeGenerator = inviteCodeGenerator;
+        @Autowired
+        public RoomServiceImpl(RoomRepository RoomRepository, InviteCodeGenerator inviteCodeGenerator, RedisConfig redisConfig) {
+            this.roomRepository = RoomRepository;
+            this.inviteCodeGenerator = inviteCodeGenerator;
+            this.redisConfig = redisConfig;
+        }
+
+        /**
+         * 새로운 회의방을 생성하고 데이터베이스에 저장
+         * @param room 회의방 정보
+         * @param ownerId 방장의 식별자
+         * @return 저장된 회의방 객체
+         */
+        @Override
+        public MeetingRoom createRoom(MeetingRoom room, String ownerId) {
+            room.setInviteCode(inviteCodeGenerator.generateInviteCode());
+            MeetingRoom savedRoom = roomRepository.save(room);
+            redisConfig.createRoom(savedRoom.getId().toString(), ownerId);
+            return savedRoom;
+        }
+
+        /**
+         * 회의방에 사용자를 추가
+         * @param roomId 회의방 식별자
+         * @param memberId 참여자의 식별자
+         */
+        public void joinRoom(String roomId, String memberId) {
+            redisConfig.addRoomMember(roomId, memberId);
+        }
+
+        /**
+         * 회의 시작 로직 구현
+         */
+        public void startMeeting(String roomId) {
+            MeetingRoom room = roomRepository.findById(Long.parseLong(roomId))
+                    .orElseThrow(() -> new IllegalArgumentException("예외처리방 ID: " + roomId));
+            room.setStartTime(LocalTime.now());
+            roomRepository.save(room);
+            redisConfig.startMeeting(roomId);
+        }
+
+        /**
+         * 회의방에서 사용자가 나갈 때 처리 로직
+         *
+         * @param roomId   회의방 식별자
+         * @param memberId 나가려는 사용자의 식별자
+         */
+        public void leaveRoom(String roomId, String memberId) {
+            redisConfig.leaveRoom(roomId, memberId);
+
+        }
+
+        /**
+         * 회의 종료 로직
+         * @param roomId 종료할 회의방의 식별자
+         */
+        public void endMeeting(String roomId) {
+            MeetingRoom room = roomRepository.findById(Long.parseLong(roomId))
+                    .orElseThrow(() -> new IllegalArgumentException("예외처리방 ID: " + roomId));
+            room.setEndTime(LocalTime.now());
+            roomRepository.save(room);
+            redisConfig.endMeeting(roomId);
+
+        }
     }
-
-
-    @Override
-    public MeetingRoom createRoom(MeetingRoom room, String ownerId) {
-        //방생성 로직
-        String inviteCode = inviteCodeGenerator.generateInviteCode();
-        room.setInviteCode(inviteCode);
-        // Save room in MySQL
-        MeetingRoom savedRoom = meetingRoomRepository.save(room);
-        // Redis에 참여자, 방장 상태 임시로 저장
-        redisService.createRoom(savedRoom.getTitle(), ownerId, "0");
-        // 해당 룸에 대하여 Routing Key를 설정
-        return savedRoom;
-    }
-
-
-    // 방 접속, Redis에 참여자 정보 추가
-    public void joinRoom(String roomId, String memberId) {
-        redisService.joinRoom(roomId, memberId);
-    }
-
-    public void startMeeting() {
-        // Meeting start logic
-    }
-
-    public void leaveRoom() {
-        // Leave room logic
-    }
-
-    public void exitMeeting() {
-        // Exit meeting logic
-    }
-}

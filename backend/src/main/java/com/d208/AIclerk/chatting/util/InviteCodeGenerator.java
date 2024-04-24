@@ -1,6 +1,6 @@
 package com.d208.AIclerk.chatting.util;
 
-import com.d208.AIclerk.chatting.repository.MeetingRoomRepository;
+import com.d208.AIclerk.chatting.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ public class InviteCodeGenerator {
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     @Autowired
-    private MeetingRoomRepository meetingRoomRepository;
+    private RoomRepository meetingRoomRepository;
 
     public String generateInviteCode() {
         Random random = new Random();
