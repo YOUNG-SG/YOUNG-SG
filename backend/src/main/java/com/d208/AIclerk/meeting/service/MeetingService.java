@@ -5,4 +5,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface MeetingService {
     ResponseEntity<String> sendText(OpenAiApiRequestDto dto) throws Exception;
+
 }
