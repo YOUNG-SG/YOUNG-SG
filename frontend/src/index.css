@@ -33,6 +33,10 @@
 
 * {
   font-family: "regular";
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 body {
