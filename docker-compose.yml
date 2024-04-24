@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: dockerfile
+    image: frontend
+    restart: always
+    user: root
+    privileged: true
+    ports:
+      - "5173:5173"
+    volumes:
+      - /home/ubuntu/docker/jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    image: frontend
+    ports:
+      - "8080:8080"
