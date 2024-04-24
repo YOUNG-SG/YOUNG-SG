@@ -1,7 +1,7 @@
 const TimelineMeeting = () => {
   return (
     <>
-      <div></div>
+      <div>타임라인</div>
     </>
   );
 };

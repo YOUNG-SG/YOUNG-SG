@@ -46,7 +46,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="w-[240px] h-full py-[30px] flex flex-col items-center bg-[#777777] bg-opacity-30">
+    <div className="min-w-[240px] h-full py-[40px] flex flex-col items-center bg-[#777777] bg-opacity-30">
       <EditBtn />
       <div className="relative">
         <img
@@ -83,7 +83,7 @@ const Profile = () => {
           <span className="text-[20px] font-[#CCCCCC]">님</span>
         </div>
       )}
-      <u className="text-[14px] fixed bottom-[30px]">로그아웃</u>
+      <u className="text-[14px] fixed bottom-[40px]">로그아웃</u>
     </div>
   );
 };
