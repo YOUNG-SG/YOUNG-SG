@@ -6,7 +6,7 @@ import Form from "./OpenVidu/Form";
 import Dictaphone from "./OpenVidu/Dictaphone";
 import useMeetingStore from "../../store/sessionStore2";
 
-function Meeting() {
+function Meeting2() {
   const {
     session,
     setSession,
@@ -21,6 +21,7 @@ function Meeting() {
     isVideoEnabled,
     setIsVideoEnabled,
   } = useMeetingStore();
+
   const OPENVIDU_SERVER_URL = "https://youngseogi.duckdns.org";
   const OPENVIDU_SERVER_SECRET = "MYSECRET";
 
@@ -36,6 +37,7 @@ function Meeting() {
 
   const joinSession = useCallback(() => {
     const OV = new OpenVidu();
+    setOV(OV);
     setSession(OV.initSession());
   }, []);
 
@@ -45,17 +47,7 @@ function Meeting() {
   }, [leaveSession]);
 
   useEffect(() => {
-    if (session === "") return;
-
-    session.on("streamDestroyed", (event) => {
-      if (subscriber && event.stream.streamId === subscriber.stream.streamId) {
-        setSubscriber(null);
-      }
-    });
-  }, [subscriber, session]);
-
-  useEffect(() => {
-    if (session === "") return;
+    if (session === null) return;
 
     session.on("streamCreated", (event) => {
       const subscribers = session.subscribe(event.stream, "");
@@ -188,4 +180,4 @@ function Meeting() {
   );
 }
 
-export default Meeting;
+export default Meeting2;

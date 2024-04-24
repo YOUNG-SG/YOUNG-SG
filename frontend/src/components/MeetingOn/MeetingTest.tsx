@@ -1,24 +1,28 @@
-import { useCallback, useEffect, useState } from "react";
-import {
-  OpenVidu,
-  Session as OVSession,
-  Publisher,
-  Subscriber,
-} from "openvidu-browser";
-import axios, { AxiosError } from "axios";
-import Session from "./OpenVidu/Session";
+import React, { useEffect, useCallback } from "react";
+import useMeetingStore from "../../store/meetingStore";
 import Form from "./OpenVidu/Form";
+import Session from "./OpenVidu/Session";
 import Dictaphone from "./OpenVidu/Dictaphone";
+import { OpenVidu, Publisher, Subscriber } from "openvidu-browser";
+import axios, { AxiosError } from "axios";
 
-function Meeting() {
-  const [session, setSession] = useState<OVSession | "">("");
-  const [sessionId, setSessionId] = useState<string>("");
-  const [subscriber, setSubscriber] = useState<Subscriber | null>(null);
-  const [publisher, setPublisher] = useState<Publisher | null>(null);
-
-  const [isAudioEnabled, setIsAudioEnabled] = useState(true);
-  const [isVideoEnabled, setIsVideoEnabled] = useState(true);
-  const [OV, setOV] = useState<OpenVidu | null>(null);
+const MeetingTest = () => {
+  const {
+    session,
+    setSession,
+    sessionId,
+    setSessionId,
+    subscriber,
+    setSubscriber,
+    publisher,
+    setPublisher,
+    isAudioEnabled,
+    setIsAudioEnabled,
+    isVideoEnabled,
+    setIsVideoEnabled,
+    OV,
+    setOV,
+  } = useMeetingStore();
 
   const OPENVIDU_SERVER_URL = "https://youngseogi.duckdns.org";
   const OPENVIDU_SERVER_SECRET = "MYSECRET";
@@ -27,7 +31,7 @@ function Meeting() {
     if (session) session.disconnect();
 
     setOV(null);
-    setSession("");
+    setSession(null);
     setSessionId("");
     setSubscriber(null);
     setPublisher(null);
@@ -56,7 +60,7 @@ function Meeting() {
   };
 
   useEffect(() => {
-    if (session === "") return;
+    if (session === null) return;
 
     session.on("streamDestroyed", (event) => {
       if (subscriber && event.stream.streamId === subscriber.stream.streamId) {
@@ -66,7 +70,7 @@ function Meeting() {
   }, [subscriber, session]);
 
   useEffect(() => {
-    if (session === "") return;
+    if (session === null) return;
 
     session.on("streamCreated", (event) => {
       const subscribers = session.subscribe(event.stream, "");
@@ -86,7 +90,6 @@ function Meeting() {
             },
           },
         );
-
         return (response.data as { id: string }).id;
       } catch (error) {
         const errorResponse = (error as AxiosError)?.response;
@@ -94,7 +97,6 @@ function Meeting() {
         if (errorResponse?.status === 409) {
           return sessionIds;
         }
-
         return "";
       }
     };
@@ -142,7 +144,7 @@ function Meeting() {
                 videoSource: undefined,
                 publishAudio: true,
                 publishVideo: true,
-                mirror: true,
+                mirror: false,
               });
 
               setPublisher(publishers);
@@ -157,7 +159,6 @@ function Meeting() {
       .catch(() => {});
   }, [session, OV, sessionId, OPENVIDU_SERVER_URL]);
 
-  // 오디오 토글 기능 추가
   const toggleAudio = () => {
     if (publisher) {
       const newAudioState = !isAudioEnabled;
@@ -175,38 +176,40 @@ function Meeting() {
   };
 
   return (
-    <div>
-      <h1>진행화면</h1>
-      <>
-        {!session && (
-          <Form
-            joinSession={joinSession}
-            sessionId={sessionId}
-            sessionIdChangeHandler={sessionIdChangeHandler}
-          />
-        )}
-        {session && (
-          <Session
-            publisher={publisher as Publisher}
-            subscriber={subscriber as Subscriber}
-          />
-        )}
-        {publisher && (
-          <button onClick={toggleAudio}>
-            {isAudioEnabled ? "음소거" : "소리모드"}
-          </button>
-        )}
-        {publisher && (
-          <button onClick={toggleVideo}>
-            {isVideoEnabled ? "화면 off" : "화면 on"}
-          </button>
-        )}
-      </>
+    <>
       <div>
-        <Dictaphone />
+        <h1>진행화면</h1>
+        <>
+          {!session && (
+            <Form
+              joinSession={joinSession}
+              sessionId={sessionId}
+              sessionIdChangeHandler={sessionIdChangeHandler}
+            />
+          )}
+          {session && (
+            <Session
+              publisher={publisher as Publisher}
+              subscriber={subscriber as Subscriber}
+            />
+          )}
+          {publisher && (
+            <button onClick={toggleAudio}>
+              {isAudioEnabled ? "음소거" : "소리모드"}
+            </button>
+          )}
+          {publisher && (
+            <button onClick={toggleVideo}>
+              {isVideoEnabled ? "화면 off" : "화면 on"}
+            </button>
+          )}
+        </>
+        <div>
+          <Dictaphone />
+        </div>
       </div>
-    </div>
+    </>
   );
-}
+};
 
-export default Meeting;
+export default MeetingTest;
