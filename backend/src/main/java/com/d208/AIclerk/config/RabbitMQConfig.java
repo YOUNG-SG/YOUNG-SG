@@ -32,7 +32,9 @@ public class RabbitMQConfig {
     @Value("${spring.rabbitmq.exchange.name}")
     private String exchangeName;
 
-    // 직접 AmqpAdmin을 생성하고 관리
+    @Value("${spring.rabbitmq.queue.name}")
+    private String queueName;  // 전역 큐 이름
+
     @Bean
     public AmqpAdmin amqpAdmin(ConnectionFactory connectionFactory) {
         return new RabbitAdmin(connectionFactory);
@@ -41,6 +43,17 @@ public class RabbitMQConfig {
     @Bean
     public DirectExchange exchange() {
         return new DirectExchange(exchangeName);
+    }
+
+    @Bean
+    public Queue queue() {
+        return new Queue(queueName, true);
+    }
+
+    @Bean
+    public Binding binding(Queue queue, DirectExchange exchange) {
+        // '#': 모든 라우팅 키를 수용하도록 설정
+        return BindingBuilder.bind(queue).to(exchange).with("#");  // 모든 메시지를 하나의 큐로 라우트
     }
 
     @Bean
@@ -63,3 +76,4 @@ public class RabbitMQConfig {
         return new Jackson2JsonMessageConverter();
     }
 }
+
