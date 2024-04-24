@@ -4,6 +4,7 @@ import com.d208.AIclerk.meeting.dto.requestDto.CreateCommentRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
 import com.d208.AIclerk.meeting.dto.response.CommentDeleteResponse;
 import com.d208.AIclerk.meeting.dto.response.CreateCommentResponse;
+import com.d208.AIclerk.meeting.dto.response.MeetingDetailResponse;
 import com.d208.AIclerk.meeting.service.MeetingService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,12 @@ public class MeetingController {
     @Operation(summary = "책 코멘트 삭제", description = "책 코멘트 삭제")
     public ResponseEntity<CommentDeleteResponse> deleteComment(@PathVariable("commentId") Long commentId) {
         return meetingService.deleteComment(commentId);
+    }
+
+    @GetMapping("/detail/{detailId}")
+    @Operation(summary = "회의 상세 페이지", description = "회의 종료 후 생성되는 상세페이지")
+    public ResponseEntity<MeetingDetailResponse> readMeetingDetail(@PathVariable("detailId") Long detailId){
+        return meetingService.readMeetingDetail(detailId);
     }
 
 }

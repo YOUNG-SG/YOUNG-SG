@@ -8,6 +8,8 @@ import com.d208.AIclerk.meeting.dto.requestDto.CreateCommentRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
 import com.d208.AIclerk.meeting.dto.response.CommentDeleteResponse;
 import com.d208.AIclerk.meeting.dto.response.CreateCommentResponse;
+import com.d208.AIclerk.meeting.dto.response.MeetingDetailResponse;
+import com.d208.AIclerk.meeting.dto.responseDto.CommentResponseDto;
 import com.d208.AIclerk.meeting.repository.CommentRepository;
 import com.d208.AIclerk.meeting.repository.MeetingDetailRepository;
 import com.d208.AIclerk.utill.OpenAiUtil;
@@ -19,7 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -120,6 +124,38 @@ public class MeetingServiceImpl implements MeetingService {
 
         CommentDeleteResponse response = new CommentDeleteResponse("댓글 삭제 성공");
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Override
+    public ResponseEntity<MeetingDetailResponse> readMeetingDetail(Long detailId) {
+
+        // 요약 내용
+
+        // 다음 회의
+
+        // 참여자 목록
+
+        // 파일 다운로드 링크
+
+        // 댓글 리스트
+        List<Comment> comments = commentRepository.findAllByDetailId(detailId);
+
+        // CommentResponseDto 리스트로 변환
+        List<CommentResponseDto> commentResponseDtoList = comments.stream()
+                .map(comment -> new CommentResponseDto(
+
+                        comment.getId(),
+                        comment.getUser().getId(),
+                        comment.getUser().getNickname(),
+                        comment.getUser().getImage(),
+                        comment.getContent(),
+                        comment.getCreateAt()
+                ))
+                .toList();
+
+
+//        MeetingDetailResponse response = new MeetingDetailResponse("상세 페이지 조회 성공", )
+        return null;
     }
 
 }
