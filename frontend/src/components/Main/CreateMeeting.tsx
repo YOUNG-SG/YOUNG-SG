@@ -9,9 +9,9 @@ const CreateMeeting = () => {
   console.log(meetingName);
 
   return (
-    <div className="w-[1100px] h-[600px] bg-[#EEEEEE] bg-opacity-20 rounded-lg backdrop-blur-10 flex flex-col justify-center items-center gap-[30px]">
+    <div className="w-[1100px] h-[600px] bg-e-20 rounded-lg backdrop-blur-10 flex flex-col justify-center items-center gap-[30px]">
       <div className="text-[36px] font-bold">회의 생성</div>
-      <div className="w-[900px] h-[400px] bg-[#EEEEEE] bg-opacity-20 rounded-lg backdrop-blur-10 flex flex-col justify-center items-center gap-[90px]">
+      <div className="w-[900px] h-[400px] bg-e-20 rounded-lg backdrop-blur-10 flex flex-col justify-center items-center gap-[90px]">
         <div className="flex items-center">
           <label htmlFor="meetingName" className="text-[30px] font-b pr-[40px]">
             회의명
@@ -20,7 +20,7 @@ const CreateMeeting = () => {
           <input
             type="text"
             id="meetingName"
-            className="w-[550px] h-[55px] rounded-lg text-[20px] px-[16px] bg-[#EEEEEE] bg-opacity-30 focus:outline-none"
+            className="w-[550px] h-[55px] rounded-lg text-[20px] px-[16px] bg-e-30 focus:outline-none"
             onChange={(event) => {
               setMeetingName(event.target.value);
             }}

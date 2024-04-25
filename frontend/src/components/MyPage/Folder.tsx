@@ -1,9 +1,6 @@
 const Folder = () => {
   return (
-    <div
-      className="w-full min-h-[160px] p-[40px] rounded-2xl bg-[#EEEEEE] bg-opacity-20"
-      onClick={() => {}}
-    >
+    <div className="w-full min-h-[160px] p-[40px] rounded-2xl bg-e-20" onClick={() => {}}>
       {/* FIXME 회의명 글자 넘치는 경우 ... */}
       <div className="text-[32px] font-extrabold">자율 PJT 개발 회의</div>
       <div className="flex justify-between text-[#CCCCCC]">
