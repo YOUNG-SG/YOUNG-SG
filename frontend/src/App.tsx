@@ -27,7 +27,7 @@ const router = createBrowserRouter([
   },
   // 회의 진행
   {
-    path: "/meeting/on/:id",
+    path: "/meeting/on/:sessionId",
     element: <MeetingOn />,
   },
   // 로그인

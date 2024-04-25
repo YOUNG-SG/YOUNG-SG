@@ -5,6 +5,7 @@ import Video from "./Video";
 interface SessionProps {
   subscriber: Subscriber;
   publisher: Publisher;
+  // screenPublisher: Publisher;
 }
 
 function Session({ subscriber, publisher }: SessionProps) {

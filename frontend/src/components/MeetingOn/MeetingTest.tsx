@@ -10,18 +10,26 @@ const MeetingTest = () => {
   const {
     session,
     setSession,
+    screenSession,
+    setScreenSession,
     sessionId,
     setSessionId,
     subscriber,
     setSubscriber,
+    // screenSubscriber,
+    setScreenSubscriber,
     publisher,
     setPublisher,
+    // screenPublisher,
+    setScreenPublisher,
     isAudioEnabled,
     setIsAudioEnabled,
     isVideoEnabled,
     setIsVideoEnabled,
     OV,
     setOV,
+    screenOV,
+    setScreenOV,
   } = useMeetingStore();
 
   const OPENVIDU_SERVER_URL = "https://youngseogi.duckdns.org";
@@ -39,10 +47,23 @@ const MeetingTest = () => {
     setIsVideoEnabled(true);
   }, [session]);
 
+  // const leaveScreenSession = useCallback(() => {
+  //   if (screenSession) screenSession.disconnect();
+
+  //   setScreenOV(null);
+  //   setScreenSession(null);
+  // }, [screenSession]);
+
   const joinSession = () => {
     const OVs = new OpenVidu();
     setOV(OVs);
     setSession(OVs.initSession());
+  };
+
+  const joinScreenSession = () => {
+    const screenOVs = new OpenVidu();
+    setScreenOV(screenOVs);
+    setScreenSession(screenOVs.initSession());
   };
 
   useEffect(() => {
@@ -59,6 +80,63 @@ const MeetingTest = () => {
     setSessionId(event.target.value);
   };
 
+  // 세션 생성, 토큰 생성, 토큰 가져오기 함수
+  const createSession = async (sessionIds: string): Promise<string> => {
+    try {
+      const data = JSON.stringify({ customSessionId: sessionIds });
+      const response = await axios.post(
+        `${OPENVIDU_SERVER_URL}/openvidu/api/sessions`,
+        data,
+        {
+          headers: {
+            Authorization: `Basic ${btoa(`OPENVIDUAPP:${OPENVIDU_SERVER_SECRET}`)}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      return (response.data as { id: string }).id;
+    } catch (error) {
+      const errorResponse = (error as AxiosError)?.response;
+
+      if (errorResponse?.status === 409) {
+        return sessionIds;
+      }
+      return "";
+    }
+  };
+
+  const createToken = (sessionIds: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const data = {};
+      axios
+        .post(
+          `${OPENVIDU_SERVER_URL}/openvidu/api/sessions/${sessionIds}/connection`,
+          data,
+          {
+            headers: {
+              Authorization: `Basic ${btoa(`OPENVIDUAPP:${OPENVIDU_SERVER_SECRET}`)}`,
+
+              "Content-Type": "application/json",
+            },
+          },
+        )
+        .then((response) => {
+          resolve((response.data as { token: string }).token);
+        })
+        .catch((error) => reject(error));
+    });
+  };
+
+  const getToken = async (): Promise<string> => {
+    try {
+      const sessionIds = await createSession(sessionId);
+      const token = await createToken(sessionIds);
+      return token;
+    } catch (error) {
+      throw new Error("Failed to get token.");
+    }
+  };
+
   useEffect(() => {
     if (session === null) return;
 
@@ -70,68 +148,23 @@ const MeetingTest = () => {
   }, [subscriber, session]);
 
   useEffect(() => {
+    if (screenSession === null) return;
+
+    screenSession.on("streamDestroyed", (event) => {
+      if (subscriber && event.stream.streamId === subscriber.stream.streamId) {
+        setSubscriber(null);
+      }
+    });
+  }, [subscriber, screenSession]);
+
+  // 유저 화면 세션
+  useEffect(() => {
     if (session === null) return;
 
     session.on("streamCreated", (event) => {
       const subscribers = session.subscribe(event.stream, "");
       setSubscriber(subscribers);
     });
-
-    const createSession = async (sessionIds: string): Promise<string> => {
-      try {
-        const data = JSON.stringify({ customSessionId: sessionIds });
-        const response = await axios.post(
-          `${OPENVIDU_SERVER_URL}/openvidu/api/sessions`,
-          data,
-          {
-            headers: {
-              Authorization: `Basic ${btoa(`OPENVIDUAPP:${OPENVIDU_SERVER_SECRET}`)}`,
-              "Content-Type": "application/json",
-            },
-          },
-        );
-        return (response.data as { id: string }).id;
-      } catch (error) {
-        const errorResponse = (error as AxiosError)?.response;
-
-        if (errorResponse?.status === 409) {
-          return sessionIds;
-        }
-        return "";
-      }
-    };
-
-    const createToken = (sessionIds: string): Promise<string> => {
-      return new Promise((resolve, reject) => {
-        const data = {};
-        axios
-          .post(
-            `${OPENVIDU_SERVER_URL}/openvidu/api/sessions/${sessionIds}/connection`,
-            data,
-            {
-              headers: {
-                Authorization: `Basic ${btoa(`OPENVIDUAPP:${OPENVIDU_SERVER_SECRET}`)}`,
-
-                "Content-Type": "application/json",
-              },
-            },
-          )
-          .then((response) => {
-            resolve((response.data as { token: string }).token);
-          })
-          .catch((error) => reject(error));
-      });
-    };
-
-    const getToken = async (): Promise<string> => {
-      try {
-        const sessionIds = await createSession(sessionId);
-        const token = await createToken(sessionIds);
-        return token;
-      } catch (error) {
-        throw new Error("Failed to get token.");
-      }
-    };
 
     getToken()
       .then((token) => {
@@ -158,6 +191,37 @@ const MeetingTest = () => {
       })
       .catch(() => {});
   }, [session, OV, sessionId, OPENVIDU_SERVER_URL]);
+
+  // 화면 공유 세션
+  useEffect(() => {
+    if (screenSession === null) return;
+
+    screenSession.on("streamCreated", (event) => {
+      const screenSubscribers = screenSession.subscribe(event.stream, "");
+      setScreenSubscriber(screenSubscribers);
+    });
+
+    getToken()
+      .then((token) => {
+        screenSession
+          .connect(token)
+          .then(() => {
+            if (screenOV) {
+              const screenPublishers = screenOV.initPublisher(undefined, {
+                videoSource: "screen",
+              });
+
+              setScreenPublisher(screenPublishers);
+              screenSession
+                .publish(screenPublishers)
+                .then(() => {})
+                .catch(() => {});
+            }
+          })
+          .catch(() => {});
+      })
+      .catch(() => {});
+  }, [screenSession, screenOV, sessionId, OPENVIDU_SERVER_URL]);
 
   const toggleAudio = () => {
     if (publisher) {
@@ -190,6 +254,7 @@ const MeetingTest = () => {
           {session && (
             <Session
               publisher={publisher as Publisher}
+              // screenPublisher={screenPublisher}
               subscriber={subscriber as Subscriber}
             />
           )}
@@ -203,6 +268,7 @@ const MeetingTest = () => {
               {isVideoEnabled ? "화면 off" : "화면 on"}
             </button>
           )}
+          {publisher && <button onClick={joinScreenSession}>공유 on</button>}
         </>
         <div>
           <Dictaphone />
