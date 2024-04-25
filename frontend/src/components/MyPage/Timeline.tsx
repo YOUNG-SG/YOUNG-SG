@@ -6,6 +6,7 @@ const Timeline = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [expanded, setExpanded] = useState(false);
+  console.log(expanded);
 
   const ExpandBtn: React.FC<{ btnName: string; handleExpand: () => void }> = (props) => {
     return (
