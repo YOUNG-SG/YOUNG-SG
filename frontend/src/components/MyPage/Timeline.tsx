@@ -11,7 +11,7 @@ const Timeline = () => {
   const ExpandBtn: React.FC<{ btnName: string; handleExpand: () => void }> = (props) => {
     return (
       <div
-        className="w-[160px] h-[48px] bg-[#EEEEEE] bg-opacity-30 rounded-lg flex justify-center items-center text-[18px] mb-[16px]"
+        className="w-[160px] h-[48px] bg-e-30 rounded-lg flex justify-center items-center text-[18px] mb-[16px]"
         onClick={props.handleExpand}
       >
         {props.btnName}

@@ -7,7 +7,7 @@ const HasNavbarLayout = () => {
 
   if (token) {
     return (
-      <div className="flex w-full h-full">
+      <div className="w-full h-full flex justify-between">
         <div style={{ width: "calc(100% - 80px)" }}>
           <Outlet />
         </div>
