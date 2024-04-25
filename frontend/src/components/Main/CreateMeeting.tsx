@@ -6,6 +6,7 @@ const CreateMeeting = () => {
   // const navigate = useNavigate();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [meetingName, setMeetingName] = useState("");
+  console.log(meetingName);
 
   return (
     <div className="w-[1100px] h-[600px] bg-[#EEEEEE] bg-opacity-20 rounded-lg backdrop-blur-10 flex flex-col justify-center items-center gap-[30px]">
