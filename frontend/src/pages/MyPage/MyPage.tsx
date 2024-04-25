@@ -2,7 +2,7 @@ import { useState } from "react";
 import Profile from "@/components/MyPage/Profile";
 import FolderList from "@/components/MyPage/FolderList";
 import FolderDetail from "@/components/MyPage/FolderDetail";
-import TimelineMeeting from "@/components/MyPage/TimelineMeeting";
+import Timeline from "@/components/MyPage/Timeline";
 
 const MyPage = () => {
   const [select, setSelect] = useState("folder");
@@ -10,7 +10,10 @@ const MyPage = () => {
   return (
     <div className="flex h-screen">
       <Profile />
-      <div className="w-full h-full flex flex-col px-[50px] py-[40px]">
+      <div
+        className="w-full h-full flex flex-col px-[50px] py-[40px]"
+        // style={{ width: "calc(100% - 240px)" }}
+      >
         <nav className="flex gap-[20px] min-h-[50px] text-[30px] font-extrabold">
           <div
             className={
@@ -41,7 +44,7 @@ const MyPage = () => {
             </>
           ) : (
             <>
-              <TimelineMeeting />
+              <Timeline />
             </>
           )}
         </div>
