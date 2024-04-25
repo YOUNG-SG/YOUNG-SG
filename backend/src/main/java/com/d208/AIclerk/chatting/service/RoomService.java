@@ -10,7 +10,7 @@ public interface RoomService {
 
     MeetingRoom createRoom(MeetingRoom room, String ownerId);
 
-    void leaveRoom(String roomId, String userId);
+    boolean leaveRoom(String roomId, Long userId);
 
     void joinRoom(String roomId, String userId);
 

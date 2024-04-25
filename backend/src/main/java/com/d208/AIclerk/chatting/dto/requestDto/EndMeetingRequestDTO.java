@@ -9,5 +9,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EndMeetingRequestDTO {
+
+    private String title;
+    private long userId;
     
 }

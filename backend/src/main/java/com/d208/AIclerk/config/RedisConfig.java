@@ -48,12 +48,13 @@ public class RedisConfig {
     /**
      * 채팅방 정보 업데이트 (방장 변경 또는 상태 변경) //방장이 알아서 나가쇼, 회의시작
      */
-    public void leaveRoom(String roomId, String memberId) {
+    public void leaveRoom(String roomId, Long memberId) {
         /*방장이 나가쇼 */
         String currentOwner = (String) hashOperations.get("room:" + roomId, "owner");
-        if (memberId.equals(currentOwner)) {
+        if (currentOwner.equals(memberId)) {
             /* 아무나 방장이 되는거임 */
             List<String> members = listOperations.range("room:" + roomId + ":members", 0, -1);
+            assert members != null;
             members.remove(memberId);
             if (!members.isEmpty()) {
                 Collections.shuffle(members);
@@ -77,7 +78,8 @@ public class RedisConfig {
 
 
     public void startMeeting(String roomId) {
-        hashOperations.put("room:" + roomId, "status", 1); // Set room status to in meeting
+        hashOperations.put("room:" + roomId, "status", 1);
+        // Set room status to in meeting
     }
 
     public void endMeeting(String roomId) {

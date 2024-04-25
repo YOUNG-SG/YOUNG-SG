@@ -1,5 +1,7 @@
 package com.d208.AIclerk.chatting.controller;
 
+import com.d208.AIclerk.chatting.dto.requestDto.CreateRecordRequestDTO;
+import com.d208.AIclerk.chatting.dto.requestDto.EndMeetingRequestDTO;
 import com.d208.AIclerk.chatting.dto.requestDto.MessageDto;
 import com.d208.AIclerk.entity.MeetingRoom;
 import com.d208.AIclerk.chatting.service.RoomService;
@@ -45,28 +47,37 @@ public class RoomController {
     }
 
 
-    @PostMapping("/{roomId}/join")
+    @PostMapping("/api/meeting/join/{roomId}")
     public ResponseEntity<String> joinRoom(@PathVariable String roomId, @RequestParam String userId) {
         roomService.joinRoom(roomId, userId);
         return ResponseEntity.ok("방참여완료...");
     }
 
-    @PostMapping("/{roomId}/startMeeting")
-    public ResponseEntity<String> startMeeting(@PathVariable String roomId) {
-        roomService.startMeeting(roomId);
+    @PostMapping("/api/meeting/record/create")
+    public ResponseEntity<String> startMeeting(@RequestBody CreateRecordRequestDTO request) {
+        roomService.startMeeting(request.getRoomId());
         return ResponseEntity.ok("미팅시작.,..");
     }
 
-    @PostMapping("/{roomId}/endMeeting")
-    public ResponseEntity<String> endMeeting(@PathVariable String roomId) {
+    /**
+    미팅종료되면 로직이 필요함- > 미팅이 종료되면 생성된 word파일을 유저이메일에게 s3업로드 s3다운로드 각각 보내는 작업이필요
+    */
+    @PostMapping("/api/meeting/record/end")
+    public ResponseEntity<String> endMeeting(@RequestBody String roomId) {
         roomService.endMeeting(roomId);
         return ResponseEntity.ok("미팅종료...");
     }
 
-    @PostMapping("/{roomId}/leave")
-    public ResponseEntity<String> leaveRoom(@PathVariable String roomId, @RequestParam String userId) {
-        roomService.leaveRoom(roomId, userId);
-        return ResponseEntity.ok("누간가 나갓슴...");
+    @PostMapping("/api/meeting/leave")
+    public ResponseEntity<String> exitMeeting(@RequestBody EndMeetingRequestDTO request) {
+        boolean result = roomService.leaveRoom(request.getTitle(), request.getUserId());
+        if (result) {
+            return ResponseEntity.ok("잘가쇼.");
+        } else {
+            return ResponseEntity.badRequest().body("방나가기 실패했쇼.");
+        }
     }
+
+
 }
 

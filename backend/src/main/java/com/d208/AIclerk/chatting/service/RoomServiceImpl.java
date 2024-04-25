@@ -22,13 +22,13 @@
             this.inviteCodeGenerator = inviteCodeGenerator;
             this.redisConfig = redisConfig;
         }
-
         /**
          * 새로운 회의방을 생성하고 데이터베이스에 저장
          * @param room 회의방 정보
          * @param ownerId 방장의 식별자
          * @return 저장된 회의방 객체
          */
+
         @Override
         public MeetingRoom createRoom(MeetingRoom room, String ownerId) {
             room.setInviteCode(inviteCodeGenerator.generateInviteCode());
@@ -36,6 +36,7 @@
             redisConfig.createRoom(savedRoom.getId().toString(), ownerId);
             return savedRoom;
         }
+
 
         /**
          * 회의방에 사용자를 추가
@@ -63,11 +64,10 @@
          * @param roomId   회의방 식별자
          * @param memberId 나가려는 사용자의 식별자
          */
-        public void leaveRoom(String roomId, String memberId) {
+        public boolean leaveRoom(String roomId, Long memberId) {
             redisConfig.leaveRoom(roomId, memberId);
-
+            return true;
         }
-
         /**
          * 회의 종료 로직
          * @param roomId 종료할 회의방의 식별자
@@ -78,6 +78,5 @@
             room.setEndTime(LocalTime.now());
             roomRepository.save(room);
             redisConfig.endMeeting(roomId);
-
         }
     }
