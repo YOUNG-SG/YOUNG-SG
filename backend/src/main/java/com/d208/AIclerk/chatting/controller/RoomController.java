@@ -24,7 +24,10 @@ public class RoomController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @PostMapping
+    /**
+     * 회의생성
+     */
+    @PostMapping("/api/main/create-meeting ")
     public ResponseEntity<MeetingRoom> createRoom(@RequestBody MeetingRoom room, @RequestParam String ownerId) {
         MeetingRoom createdRoom = roomService.createRoom(room, ownerId);
         return ResponseEntity.ok(createdRoom);
