@@ -210,6 +210,15 @@ const MeetingTest = () => {
               const screenPublishers = screenOV.initPublisher(undefined, {
                 videoSource: "screen",
               });
+              screenPublishers.once("accessAllowed", () => {
+                screenPublishers.stream
+                  .getMediaStream()
+                  .getVideoTracks()[0]
+                  .addEventListener("ended", () => {
+                    console.log("stop sharing button");
+                    screenSession.unpublish(screenPublishers);
+                  });
+              });
 
               setScreenPublisher(screenPublishers);
               screenSession
