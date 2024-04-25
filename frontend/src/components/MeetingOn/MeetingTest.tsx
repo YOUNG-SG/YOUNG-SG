@@ -45,6 +45,13 @@ const MeetingTest = () => {
     setPublisher(null);
     setIsAudioEnabled(true); // 세션 종료 시 오디오 상태 초기화
     setIsVideoEnabled(true);
+
+    if (screenSession) screenSession.disconnect();
+
+    setScreenOV(null);
+    setScreenSession(null);
+    setScreenPublisher(null);
+    setScreenSubscriber(null);
   }, [session]);
 
   // const leaveScreenSession = useCallback(() => {
