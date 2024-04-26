@@ -21,7 +21,7 @@ public class Comment {
     @Column(name = "content")
     private String content;
 
-    @Column
+    @Column(name = "create_at")
     private LocalDateTime createAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,6 +31,5 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "detail_id")
     private MeetingDetail meetingDetail;
-
 
 }
