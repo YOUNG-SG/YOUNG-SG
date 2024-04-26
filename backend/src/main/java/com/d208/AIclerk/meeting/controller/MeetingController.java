@@ -44,8 +44,8 @@ public class MeetingController {
 
     @GetMapping("/detail/{detailId}")
     @Operation(summary = "회의 상세 페이지", description = "회의 종료 후 생성되는 상세페이지")
-    public ResponseEntity<MeetingDetailResponse> readMeetingDetail(@PathVariable("detailId") Long detailId){
-        return meetingService.readMeetingDetail(detailId);
+    public ResponseEntity<MeetingDetailResponse> readMeetingDetail(@PathVariable("roomId") Long roomId){
+        return meetingService.readMeetingDetail(roomId);
     }
 
 }

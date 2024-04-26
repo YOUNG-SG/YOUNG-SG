@@ -1,6 +1,8 @@
 package com.d208.AIclerk.exception.handler;
 
+import com.d208.AIclerk.entity.MeetingDetail;
 import com.d208.AIclerk.exception.meeting.CommentException;
+import com.d208.AIclerk.exception.meeting.MeetingDetailException;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +26,13 @@ public class MeetingGlobalExceptionHandler {
 
     @ExceptionHandler(CommentException.class) //예외처리 핸들러
     public ResponseEntity<String> handleCommentException(CommentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .headers(JSON_HEADERS)
+                .body(stringToGson(e.getMessage()));
+    }
+
+    @ExceptionHandler(MeetingDetailException.class) //예외처리 핸들러
+    public ResponseEntity<String> handleMeetingDetailException(MeetingDetailException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .headers(JSON_HEADERS)
                 .body(stringToGson(e.getMessage()));
