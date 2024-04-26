@@ -32,7 +32,7 @@ const Comments = () => {
           }}
         ></textarea>
         <div
-          className="flex-[1] flex bg-[#000000] bg-opacity-50 justify-center items-center rounded-lg cursor-pointer"
+          className="flex-[1] flex bg-[#000000] bg-opacity-50 hover:bg-opacity-30 justify-center items-center rounded-lg cursor-pointer"
           onClick={() => {
             console.log(content);
           }}
