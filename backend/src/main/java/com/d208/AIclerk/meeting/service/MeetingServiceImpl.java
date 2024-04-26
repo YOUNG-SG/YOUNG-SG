@@ -3,9 +3,8 @@ package com.d208.AIclerk.meeting.service;
 
 import com.d208.AIclerk.entity.Comment;
 import com.d208.AIclerk.entity.MeetingDetail;
-import com.d208.AIclerk.entity.User;
 import com.d208.AIclerk.exception.meeting.CommentException;
-import com.d208.AIclerk.exception.meeting.MeetingDetailException;
+import com.d208.AIclerk.exception.meeting.MeetingDetailNotFoundException;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateCommentRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
 import com.d208.AIclerk.meeting.dto.response.CommentDeleteResponse;
@@ -25,9 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -92,7 +88,7 @@ public class MeetingServiceImpl implements MeetingService {
 //        }
 
         MeetingDetail meetingDetail = meetingDetailRepository.findById(dto.getMeetingId())
-                .orElseThrow(MeetingDetailException::meetingDetailNotFoundException);
+                .orElseThrow(MeetingDetailNotFoundException::meetingDetailNotFoundException);
 
         // 댓글 작성 안하거나 길이가 넘을 때
         if (dto.getContent() == null || dto.getContent().isEmpty() || dto.getContent().length() > 200) {
@@ -138,7 +134,7 @@ public class MeetingServiceImpl implements MeetingService {
     public ResponseEntity<MeetingDetailResponse> readMeetingDetail(Long roomId) {
 
         MeetingDetail meetingDetail = meetingDetailRepository.findById(roomId)
-                .orElseThrow(MeetingDetailException::meetingDetailNotFoundException);
+                .orElseThrow(MeetingDetailNotFoundException::meetingDetailNotFoundException);
 
         // 요약 내용
 
