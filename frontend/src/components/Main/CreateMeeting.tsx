@@ -27,7 +27,7 @@ const CreateMeeting = () => {
           />
         </div>
         <div
-          className="flex justify-center items-center w-[280px] h-[50px] text-[24px] text-[#333333] font-bold bg-[#EEEEEE] bg-opacity-80 rounded-lg shadow-md cursor-pointer"
+          className="flex justify-center items-center w-[280px] h-[50px] text-[24px] text-[#333333] font-bold bg-[#EEEEEE] bg-opacity-80 hover:bg-opacity-70 rounded-lg shadow-md cursor-pointer"
           // [API] 회의생성API & 회의코드 저장 & navigate 회의진행 페이지
           onClick={() => {
             // navigate("회의진행")
