@@ -148,7 +148,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         // 파일 다운로드 링크
 
-        // 댓글 리스트
+        // 댓글 리스트 (일부 수정이 필요함)
         List<Comment> comments = commentRepository.findAllByMeetingDetail_Id(meetingDetail.getId());
 
 
