@@ -3,6 +3,7 @@ package com.d208.AIclerk.meeting.service;
 
 import com.d208.AIclerk.entity.Comment;
 import com.d208.AIclerk.entity.MeetingDetail;
+import com.d208.AIclerk.entity.User;
 import com.d208.AIclerk.exception.meeting.CommentException;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateCommentRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
@@ -10,6 +11,7 @@ import com.d208.AIclerk.meeting.dto.response.CommentDeleteResponse;
 import com.d208.AIclerk.meeting.dto.response.CreateCommentResponse;
 import com.d208.AIclerk.meeting.dto.response.MeetingDetailResponse;
 import com.d208.AIclerk.meeting.dto.responseDto.CommentResponseDto;
+import com.d208.AIclerk.meeting.dto.responseDto.MeetingDetailResponseDto;
 import com.d208.AIclerk.meeting.repository.CommentRepository;
 import com.d208.AIclerk.meeting.repository.MeetingDetailRepository;
 import com.d208.AIclerk.utill.OpenAiUtil;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,6 +90,8 @@ public class MeetingServiceImpl implements MeetingService {
 //            throw CommentException.commentExistException();
 //        }
 
+        MeetingDetail meetingDetail = meetingDetailRepository.findById(dto.getMeetingId())
+                .orElseThrow(() -> new RuntimeException("MeetingDetail not found with id: " + dto.getMeetingId()));
         // 댓글 작성 안하거나 길이가 넘을 때
         if (dto.getContent() == null || dto.getContent().isEmpty() || dto.getContent().length() > 200) {
             throw CommentException.commentLengthException();
@@ -94,6 +99,7 @@ public class MeetingServiceImpl implements MeetingService {
 
 
         Comment comment = Comment.builder()
+                .meetingDetail(meetingDetail)
                 .content(dto.getContent())
                 .createAt(LocalDateTime.now())
                 .build();
@@ -137,25 +143,32 @@ public class MeetingServiceImpl implements MeetingService {
 
         // 파일 다운로드 링크
 
+        log.info("(MeetingServiceImpl) 1");
         // 댓글 리스트
-        List<Comment> comments = commentRepository.findAllByDetailId(detailId);
+        List<Comment> comments = commentRepository.findAllByMeetingDetail_Id(detailId);
 
+
+        log.info("(댓글들) {}", comments);
         // CommentResponseDto 리스트로 변환
         List<CommentResponseDto> commentResponseDtoList = comments.stream()
                 .map(comment -> new CommentResponseDto(
-
                         comment.getId(),
-                        comment.getUser().getId(),
-                        comment.getUser().getNickname(),
-                        comment.getUser().getImage(),
+                        comment.getUser() != null ? comment.getUser().getId() : null, // null 검사 추가
+                        comment.getUser() != null ? comment.getUser().getNickname() : "익명", // null 대체값 사용
+                        comment.getUser() != null ? comment.getUser().getImage() : "default_image.png",
                         comment.getContent(),
                         comment.getCreateAt()
                 ))
                 .toList();
 
+        log.info("(MeetingServiceImpl) 댓글리스트{}", commentResponseDtoList);
 
-//        MeetingDetailResponse response = new MeetingDetailResponse("상세 페이지 조회 성공", )
-        return null;
+        MeetingDetailResponseDto dto = new MeetingDetailResponseDto();
+        dto.setCommentList(commentResponseDtoList);
+
+
+        MeetingDetailResponse response = new MeetingDetailResponse("상세 페이지 조회 성공", dto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }
