@@ -11,52 +11,47 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
-@RequiredArgsConstructor
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired //(2)
-    UserRepository userRepository;
+    private final JWTUtil jwtUtil;
 
-    @Override //(3)
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    public JwtFilter(JWTUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
-        //(4)
-        String jwtHeader = ((HttpServletRequest)request).getHeader(JwtProperties.HEADER_STRING);
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
+        final String jwtHeader = request.getHeader("Authorization");
 
-        //(5)
-        if(jwtHeader == null || !jwtHeader.startsWith(JwtProperties.TOKEN_PREFIX)) {
-            filterChain.doFilter(request, response);
-            return;
+        String email = null;
+        String jwtToken = null;
+
+        if (jwtHeader != null && jwtHeader.startsWith("Bearer ")) {
+            jwtToken = jwtHeader.substring(7);
+            try {
+                email = jwtUtil.extractClaims(jwtToken).getSubject();
+            } catch (Exception e) {
+                logger.error("JWT 토큰을 가져오거나 토큰이 만료되었습니다");
+                request.setAttribute("exception", e.getMessage());
+            }
         }
 
-        //(6)
-        String token = jwtHeader.replace(JwtProperties.TOKEN_PREFIX, "");
-
-        Long userCode = null;
-
-        //(7)
-        try {
-            userCode = com.auth0.jwt.JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token)
-                    .getClaim("id").asLong();
-
-        } catch (TokenExpiredException e) {
-            e.printStackTrace();
-            request.setAttribute(JwtProperties.HEADER_STRING, "토큰이 만료되었습니다.");
-        } catch (JWTVerificationException e) {
-            e.printStackTrace();
-            request.setAttribute(JwtProperties.HEADER_STRING, "유효하지 않은 토큰입니다.");
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                    email, null, new ArrayList<>());
+            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         }
 
-        //(8)
-        request.setAttribute("userCode", userCode);
-
-        //(9)
-        filterChain.doFilter(request, response);
+        chain.doFilter(request, response);
     }
 }

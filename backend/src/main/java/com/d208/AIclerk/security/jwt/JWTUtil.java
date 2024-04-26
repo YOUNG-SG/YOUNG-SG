@@ -33,6 +33,22 @@ public class JWTUtil {
                 .compact();
     }
 
+
+    // 토큰에서 클레임 추출
+    public Claims extractClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    // 토큰이 만료되었는지 확인
+    public boolean isTokenExpired(String token) {
+        final Date expiration = extractClaims(token).getExpiration();
+        return expiration.before(new Date());
+    }
+
     public static Map<String, Object> validateToken(String token) {
 
         Map<String, Object> claim = null;

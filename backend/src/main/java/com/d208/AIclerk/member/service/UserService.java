@@ -51,7 +51,7 @@ public class UserService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", ClientKey);
-        params.add("redirect_uri", "https://localhost:8080/oauth/callback/kakao");
+        params.add("redirect_uri", "https://localhost:5173/oauth/callback/kakao");
         params.add("code", code);
         params.add("client_secret", SecretKey);
 
@@ -201,4 +201,7 @@ public class UserService {
         return user;
     }
 
+    public Optional<User> findByEmail(String email) {
+        return Optional.ofNullable(userRepository.findByEmail(email));
+    }
 }

@@ -11,10 +11,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Optional;
@@ -58,12 +57,20 @@ public class UserController {
 
 
     @GetMapping("/me")
-    ResponseEntity<Object> getCurrentUser(HttpServletRequest request) {
-        Optional<User> user = userService.getUser(request);
-        if (user.isPresent()) {
-            return ResponseEntity.ok().body(user.get());
+    public ResponseEntity<Object> getCurrentUser(Authentication authentication) {
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String email = userDetails.getUsername();  // 사용자의 이메일을 식별자로 사용
+            Optional<User> user = userService.findByEmail(email);
+
+            if (user.isPresent()) {
+                return ResponseEntity.ok().body(user.get());
+            } else {
+                return ResponseEntity.badRequest().body("User not found");
+            }
         } else {
-            return ResponseEntity.badRequest().body("User not found");
+            return ResponseEntity.badRequest().body("No user logged in");
         }
     }
+
 }
