@@ -4,17 +4,13 @@ import com.d208.AIclerk.entity.MeetingRoom;
 
 public interface RoomService {
 
-    /*
-     * ResponseEntity로 변경할것 .
-     * */
+    MeetingRoom createRoom(MeetingRoom room, long ownerId);
 
-    MeetingRoom createRoom(MeetingRoom room, String ownerId);
+    boolean leaveRoom(long roomId, long userId);
 
-    boolean leaveRoom(String roomId, Long userId);
+    void joinRoom(long roomId, long userId);
 
-    void joinRoom(String roomId, String userId);
+    void startMeeting(long roomId);
 
-    void startMeeting(String roomId);
-
-    void endMeeting(String roomId);
+    void endMeeting(long roomId);
 }

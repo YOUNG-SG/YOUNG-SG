@@ -10,15 +10,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateRecordRequestDTO {
-    private List<UserRecordInfo> userList;
-    private String message;
-    private String roomId;
+//    private List<UserRecordInfo> userList;
+//    private String message;
+    private Long roomId;
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UserRecordInfo {
-        private Long userId;
-        private String nickname;
-    }
+//    @Data
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    public static class UserRecordInfo {
+//        private Long userId;
+//        private String nickname;
+//    }
 }

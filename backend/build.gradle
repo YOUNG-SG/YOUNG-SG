@@ -39,6 +39,9 @@ dependencies {
 	// openAPI swagger 의존성
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
+	// RabbitMQ
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
 //	// Apache POI for working with Word documents
 //	implementation 'org.apache.poi:poi:5.2.3'
 //	implementation 'org.apache.poi:poi-ooxml:5.2.3'
