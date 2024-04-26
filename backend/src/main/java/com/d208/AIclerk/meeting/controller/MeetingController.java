@@ -23,10 +23,9 @@ public class MeetingController {
 
     @PostMapping("/send-text")
     @Operation(summary = "텍스트 요약", description = "텍스트 요약 후 db에 저장")
-    public ResponseEntity<String> sendText(@RequestBody OpenAiRequestDto dto) throws Exception {
-
-        return meetingService.sendText(dto);
-
+    public ResponseEntity<String> summaryText(@RequestBody OpenAiRequestDto dto) throws Exception {
+        log.info("(MeetingController) 시작");
+        return meetingService.summaryText(dto);
     }
 
     @PostMapping("/comment")

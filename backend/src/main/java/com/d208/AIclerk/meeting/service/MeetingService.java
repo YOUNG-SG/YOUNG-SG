@@ -8,7 +8,7 @@ import com.d208.AIclerk.meeting.dto.response.MeetingDetailResponse;
 import org.springframework.http.ResponseEntity;
 
 public interface MeetingService {
-    ResponseEntity<String> sendText(OpenAiRequestDto dto) throws Exception;
+    ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception;
 
     ResponseEntity<CreateCommentResponse> createComment(CreateCommentRequestDto dto);
 
