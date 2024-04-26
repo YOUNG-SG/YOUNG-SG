@@ -3,7 +3,6 @@ import { StreamManager } from "openvidu-browser";
 
 interface Props {
   streamManager: StreamManager;
-  // streamManager2: StreamManager;
 }
 
 function Video({ streamManager }: Props) {
@@ -16,15 +15,9 @@ function Video({ streamManager }: Props) {
     }
   }, [streamManager]);
 
-  // useEffect(() => {
-  //   if (streamManager2 && videoRef.current) {
-  //     streamManager2.addVideoElement(videoRef.current);
-  //   }
-  // }, [streamManager2]);
-
   return (
     <video
-      className=""
+      // className="w-80 h-60"
       autoPlay={autoplay}
       ref={videoRef}
       style={{ width: "100%" }}

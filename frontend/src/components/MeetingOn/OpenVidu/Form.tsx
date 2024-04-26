@@ -21,7 +21,7 @@ function Form({ joinSession, sessionId, sessionIdChangeHandler }: FormProps) {
             type="text"
             value={sessionId}
             onChange={sessionIdChangeHandler}
-            minLength={8}
+            minLength={6}
             maxLength={20}
             required
           />

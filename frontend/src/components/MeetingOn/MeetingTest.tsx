@@ -182,8 +182,8 @@ const MeetingTest = () => {
               const publishers = OV.initPublisher(undefined, {
                 audioSource: undefined,
                 videoSource: undefined,
-                publishAudio: true,
-                publishVideo: true,
+                publishAudio: false,
+                publishVideo: false,
                 mirror: false,
               });
 
@@ -267,24 +267,43 @@ const MeetingTest = () => {
               sessionIdChangeHandler={sessionIdChangeHandler}
             />
           )}
-          {session && (
-            <Session
-              publisher={publisher as Publisher}
-              // screenPublisher={screenPublisher}
-              subscriber={subscriber as Subscriber}
-            />
-          )}
-          {publisher && (
-            <button onClick={toggleAudio}>
-              {isAudioEnabled ? "음소거" : "소리모드"}
-            </button>
-          )}
-          {publisher && (
-            <button onClick={toggleVideo}>
-              {isVideoEnabled ? "화면 off" : "화면 on"}
-            </button>
-          )}
-          {publisher && <button onClick={joinScreenSession}>공유 on</button>}
+          <div className="h-screen">
+            {/* 세션 연결 후 화면 */}
+            <div className="flex flex-col items-center justify-center ">
+              {session && (
+                <Session
+                  publisher={publisher as Publisher}
+                  // screenPublisher={screenPublisher}
+                  subscriber={subscriber as Subscriber}
+                />
+              )}
+            </div>
+            {/* 버튼들 */}
+            <div className="flex justify-center items-center">
+              {publisher && (
+                <>
+                  <button
+                    className="h-20 w-20 rounded-full bg-gray-500"
+                    onClick={toggleAudio}
+                  >
+                    {isAudioEnabled ? "음소거" : "소리모드"}
+                  </button>
+                  <button
+                    className="h-20 w-20 rounded-full bg-gray-500"
+                    onClick={toggleVideo}
+                  >
+                    {isVideoEnabled ? "화면 off" : "화면 on"}
+                  </button>
+                  <button
+                    className="h-20 w-20 rounded-full bg-gray-500"
+                    onClick={joinScreenSession}
+                  >
+                    공유 on
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
         </>
         <div>
           <Dictaphone />

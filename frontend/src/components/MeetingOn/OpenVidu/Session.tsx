@@ -5,17 +5,30 @@ import Video from "./Video";
 interface SessionProps {
   subscriber: Subscriber;
   publisher: Publisher;
-  // screenPublisher: Publisher;
 }
 
 function Session({ subscriber, publisher }: SessionProps) {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
-
+  const [mainSubscriber, setMainSubscriber] = useState<Subscriber | null>();
+  // useEffect(() => {
+  //   if (!subscribers) {
+  //     setSubscribers((preSubscriber) => [...preSubscriber, subscriber]);
+  //   }
+  // }, []);
   useEffect(() => {
     if (subscriber) {
+      // console.log("여기입니까", subscribers);
       setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
     }
+    // if (!mainSubscriber) {
+    //   setMainSubscriber(subscriber);
+    // }
   }, [subscriber]);
+
+  const handleClickSubscriber = (subscriberItem: Subscriber) => {
+    console.log("change main subscriber to: ", subscriberItem.stream.streamId);
+    setMainSubscriber(subscriberItem);
+  };
 
   const adjustGridPlacement = (subscriberCount: number) => {
     if (subscriberCount <= 1) {
@@ -26,20 +39,25 @@ function Session({ subscriber, publisher }: SessionProps) {
 
   const renderSubscribers = () => {
     const gridPlacement = adjustGridPlacement(subscribers.length);
+    console.log("여기?", subscribers);
 
     return (
       <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: gridPlacement === "center" ? "1fr" : "1fr 1fr",
-          gap: "20px",
-        }}
+        className={`flex flex-row justify-center gap-5 mb-5 cursor-pointer ${gridPlacement}`}
+        // style={{
+        //   display: "grid",
+        //   gridTemplateColumns: gridPlacement === "center" ? "1fr" : "1fr 1fr",
+        //   gap: "20px",
+        // }}
       >
         <div>
           <Video streamManager={publisher} />
         </div>
         {subscribers.map((subscriberItem) => (
-          <div key={subscriberItem.id}>
+          <div
+            key={subscriberItem.stream.streamId}
+            onClick={() => handleClickSubscriber(subscriberItem)}
+          >
             <Video streamManager={subscriberItem} />
           </div>
         ))}
@@ -47,7 +65,20 @@ function Session({ subscriber, publisher }: SessionProps) {
     );
   };
 
-  return <>{renderSubscribers()}</>;
+  const renderMainSubscriber = () => {
+    return (
+      <div className="flex justify-center items-center">
+        {mainSubscriber && <Video streamManager={mainSubscriber} />}
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <div>{renderSubscribers()}</div>
+      <div>{renderMainSubscriber()}</div>
+    </>
+  );
 }
 
 export default Session;
