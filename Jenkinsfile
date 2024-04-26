@@ -47,9 +47,9 @@ pipeline {
         stage('Build Back Docker Image') {
             steps {
                 echo '백엔드 도커 이미지 빌드 시작!'
-                dir("./backend/ssafy_sec_proj") {
+                dir("./backend") {
                     // 빌드된 JAR 파일을 Docker 이미지로 빌드
-                    sh "docker build -t gungssam/youfootbe:latest ."
+                    sh "docker build -t yunanash/backend:latest ."
                 }
                 echo '백엔드 도커 이미지 빌드 완료!'
             }
@@ -58,11 +58,11 @@ pipeline {
         stage('Push to Docker Hub-BE') {
             steps {
                 echo '백엔드 도커 이미지를 Docker Hub에 푸시 시작!'
-                withCredentials([usernamePassword(credentialsId: 'Docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'docker_credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
                 }
-                dir("./backend/ssafy_sec_proj") {
-                    sh "docker push gungssam/youfootbe:latest"
+                dir("./backend") {
+                    sh "docker push yunanash/backend:latest"
                 }
                 echo '백엔드 도커 이미지를 Docker Hub에 푸시 완료!'
             }
@@ -74,9 +74,9 @@ pipeline {
                 // 여기에서는 SSH 플러그인이나 SSH 스크립트를 사용하여 EC2로 연결하고 Docker 컨테이너 실행
                 sshagent(['aws-key']) {
                     sh "docker rm -f backend"
-                    sh "docker rmi gungssam/youfootbe:latest"
+                    sh "docker rmi yunanash/backend:latest"
                     sh "docker image prune -f"
-                    sh "docker pull gungssam/youfootbe:latest && docker run -d -p 8080:8080 --name backend gungssam/youfootbe:latest"
+                    sh "docker pull yunanash/backend:latest && docker run -d -p 8080:8080 --name backend yunanash/backend:latest"
                 }
                 echo '백엔드 EC2에 배포 완료!'
             }
