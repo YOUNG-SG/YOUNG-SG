@@ -1,7 +1,7 @@
 package com.d208.AIclerk.exception.handler;
 
 import com.d208.AIclerk.exception.meeting.CommentException;
-import com.d208.AIclerk.exception.meeting.MeetingDetailNotFoundException;
+import com.d208.AIclerk.exception.meeting.MeetingDetailException;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -23,18 +23,18 @@ public class MeetingGlobalExceptionHandler {
         JSON_HEADERS.add(HttpHeaders.CONTENT_TYPE, "application/json");
     }
 
-    @ExceptionHandler(CommentException.class) //예외처리 핸들러
+    @ExceptionHandler(CommentException.class)
     public ResponseEntity<String> handleCommentException(CommentException e) {
         return ResponseEntity.status(e.getStatus())
                 .headers(JSON_HEADERS)
                 .body(stringToGson(e.getMessage()));
     }
 
-    @ExceptionHandler(MeetingDetailNotFoundException.class) //예외처리 핸들러
-    public ResponseEntity<String> handleMeetingDetailException(MeetingDetailNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .headers(JSON_HEADERS)
-                .body(stringToGson(e.getMessage()));
+    @ExceptionHandler(MeetingDetailException.class)
+    public ResponseEntity<String> handleMeetingDetailException(MeetingDetailException e) {
+        return ResponseEntity
+                .status(e.getStatus())
+                .body(e.getMessage());
     }
 
     public String stringToGson(String message){
