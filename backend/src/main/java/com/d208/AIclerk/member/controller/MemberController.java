@@ -1,13 +1,12 @@
 package com.d208.AIclerk.member.controller;
 
 
-import com.d208.AIclerk.entity.User;
+import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.member.dto.responseDto.SignInResponseDTO;
 import com.d208.AIclerk.member.repository.RefreshTokenRepository;
-import com.d208.AIclerk.member.service.UserService;
+import com.d208.AIclerk.member.service.MemberService;
 import com.d208.AIclerk.security.jwt.JwtProperties;
 import com.d208.AIclerk.security.jwt.RefreshToken;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -21,17 +20,17 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class UserController {
+public class MemberController {
 
-    private final UserService userService;
+    private final MemberService memberService;
     private final RefreshTokenRepository refreshTokenRepository;
     @GetMapping("/oauth/token")
     ResponseEntity signin(@RequestParam("code") String code) {
         // 인가 코드를 사용하여 OAuth 액세스 토큰을 검색
-        String oauthAccessToken = userService.getAccessToken(code).getAccess_token();
+        String oauthAccessToken = memberService.getAccessToken(code).getAccess_token();
 
         // OAuth 정보를 기반으로 사용자 정보를 저장하고 토큰을 가져옵니다
-        Map<String, String> tokens = userService.saveUserAndGetTokens(oauthAccessToken);
+        Map<String, String> tokens = memberService.saveUserAndGetTokens(oauthAccessToken);
         String accessToken = tokens.get("accessToken");
         String refreshToken = tokens.get("refreshToken");
 
@@ -61,10 +60,10 @@ public class UserController {
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String email = userDetails.getUsername();  // 사용자의 이메일을 식별자로 사용
-            Optional<User> user = userService.findByEmail(email);
+            Optional<Member> member = memberService.findByEmail(email);
 
-            if (user.isPresent()) {
-                return ResponseEntity.ok().body(user.get());
+            if (member.isPresent()) {
+                return ResponseEntity.ok().body(member.get());
             } else {
                 return ResponseEntity.badRequest().body("User not found");
             }

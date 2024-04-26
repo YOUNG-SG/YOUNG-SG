@@ -1,8 +1,9 @@
 package com.d208.AIclerk.member.service;
 
-import com.d208.AIclerk.entity.User;
+import com.d208.AIclerk.entity.Member;
+import com.d208.AIclerk.entity.MemberMeeting;
 import com.d208.AIclerk.member.repository.RefreshTokenRepository;
-import com.d208.AIclerk.member.repository.UserRepository;
+import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.security.jwt.JWTUtil;
 import com.d208.AIclerk.security.oauth.KakaoProfile;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -25,10 +27,10 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class MemberService {
 
     private final JWTUtil jwtUtil;
-    private final UserRepository userRepository; //(1)
+    private final MemberRepository memberRepository; //(1)
     private final RefreshTokenRepository refreshTokenRepository;
 
 
@@ -51,7 +53,7 @@ public class UserService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", ClientKey);
-        params.add("redirect_uri", "https://localhost:5173/oauth/callback/kakao");
+        params.add("redirect_uri", "http://localhost:5173/oauth/callback/kakao");
         params.add("code", code);
         params.add("client_secret", SecretKey);
 
@@ -82,7 +84,7 @@ public class UserService {
     }
 
 
-    public User saveUser(String token) {
+    public Member saveMember(String token) {
 
         //(1)
         KakaoProfile profile = findProfile(token);
@@ -91,11 +93,11 @@ public class UserService {
         }
 
         //(2)
-        User user = userRepository.findByEmail(profile.getKakao_account().getEmail());
+        Member member = memberRepository.findByEmail(profile.getKakao_account().getEmail());
 
         //(3)
-        if(user == null) {
-            user = User.builder()
+        if(member == null) {
+            member = Member.builder()
                     .id(profile.getId())
                     //(4)
                     .image(profile.getKakao_account().getProfile().getProfile_image_url())
@@ -104,10 +106,10 @@ public class UserService {
                     //(5)
                     .build();
 
-            userRepository.save(user);
+            memberRepository.save(member);
         }
 
-        return user;
+        return member;
     }
 
 
@@ -152,20 +154,20 @@ public class UserService {
     public Map<String, String> saveUserAndGetTokens(String token) { //(1)
         KakaoProfile profile = findProfile(token);
 
-        User user = userRepository.findByEmail(profile.getKakao_account().getEmail());
-        if(user == null) {
-            user = User.builder()
+        Member member = memberRepository.findByEmail(profile.getKakao_account().getEmail());
+        if(member == null) {
+            member = Member.builder()
                     .id(profile.getId())
                     .image(profile.getKakao_account().getProfile().getProfile_image_url())
                     .nickname(profile.getKakao_account().getProfile().getNickname())
                     .email(profile.getKakao_account().getEmail())
                     .build();
 
-            userRepository.save(user);
+            memberRepository.save(member);
         }
 
-        String accessToken = createAccessToken(user);
-        String refreshToken = createRefreshToken(user);
+        String accessToken = createAccessToken(member);
+        String refreshToken = createRefreshToken(member);
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);
@@ -175,33 +177,33 @@ public class UserService {
     }
 
 
-    public String createAccessToken(User user) {
+    public String createAccessToken(Member member) {
         int accessTokenValidityMinutes = 60; // 액세스 토큰의 유효기간을 60분으로 설정
         try {
-            return jwtUtil.createToken(user.getEmail(), accessTokenValidityMinutes);
+            return jwtUtil.createToken(member.getEmail(), accessTokenValidityMinutes);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public String createRefreshToken(User user) {
+    public String createRefreshToken(Member member) {
         int refreshTokenValidityMinutes = 1440 * 7; // 리프레시 토큰의 유효기간을 7일로 설정
         try {
-            return jwtUtil.createToken(user.getEmail(), refreshTokenValidityMinutes);
+            return jwtUtil.createToken(member.getEmail(), refreshTokenValidityMinutes);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public Optional<User> getUser(HttpServletRequest request) { //(1)
+    public Optional<Member> getMember(HttpServletRequest request) { //(1)
         Long userCode = (Long) request.getAttribute("userCode");
-        Optional<User> user = userRepository.findById(userCode);
-        return user;
+        Optional<Member> member = memberRepository.findById(userCode);
+        return member;
     }
 
-    public Optional<User> findByEmail(String email) {
-        return Optional.ofNullable(userRepository.findByEmail(email));
+    public Optional<Member> findByEmail(String email) {
+        return Optional.ofNullable(memberRepository.findByEmail(email));
     }
 }

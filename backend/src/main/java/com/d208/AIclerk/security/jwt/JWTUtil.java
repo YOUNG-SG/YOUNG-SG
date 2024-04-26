@@ -1,7 +1,7 @@
 package com.d208.AIclerk.security.jwt;
 
 
-import com.d208.AIclerk.member.repository.UserRepository;
+import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.security.exception.CustomJWTException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JWTUtil {
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     static SecretKey key = Jwts.SIG.HS256.key().build();
 

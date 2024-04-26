@@ -8,12 +8,12 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_meeting")
-public class UserMeeting {
+@Table(name = "member_meeting")
+public class MemberMeeting {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_meeting_id")
+    @Column(name = "member_meeting_id")
     private Long id;
 
     @Column(name = "folder_id")
@@ -24,7 +24,7 @@ public class UserMeeting {
     private MeetingDetail meetingDetail;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
 }
