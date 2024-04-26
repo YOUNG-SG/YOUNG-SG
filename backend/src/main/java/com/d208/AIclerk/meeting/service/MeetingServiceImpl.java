@@ -5,6 +5,7 @@ import com.d208.AIclerk.entity.Comment;
 import com.d208.AIclerk.entity.MeetingDetail;
 import com.d208.AIclerk.entity.User;
 import com.d208.AIclerk.exception.meeting.CommentException;
+import com.d208.AIclerk.exception.meeting.MeetingDetailException;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateCommentRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
 import com.d208.AIclerk.meeting.dto.response.CommentDeleteResponse;
@@ -91,7 +92,8 @@ public class MeetingServiceImpl implements MeetingService {
 //        }
 
         MeetingDetail meetingDetail = meetingDetailRepository.findById(dto.getMeetingId())
-                .orElseThrow(() -> new RuntimeException("MeetingDetail not found with id: " + dto.getMeetingId()));
+                .orElseThrow(MeetingDetailException::meetingDetailNotFoundException);
+
         // 댓글 작성 안하거나 길이가 넘을 때
         if (dto.getContent() == null || dto.getContent().isEmpty() || dto.getContent().length() > 200) {
             throw CommentException.commentLengthException();
@@ -133,7 +135,10 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     @Override
-    public ResponseEntity<MeetingDetailResponse> readMeetingDetail(Long detailId) {
+    public ResponseEntity<MeetingDetailResponse> readMeetingDetail(Long roomId) {
+
+        MeetingDetail meetingDetail = meetingDetailRepository.findById(roomId)
+                .orElseThrow(MeetingDetailException::meetingDetailNotFoundException);
 
         // 요약 내용
 
@@ -143,9 +148,8 @@ public class MeetingServiceImpl implements MeetingService {
 
         // 파일 다운로드 링크
 
-        log.info("(MeetingServiceImpl) 1");
         // 댓글 리스트
-        List<Comment> comments = commentRepository.findAllByMeetingDetail_Id(detailId);
+        List<Comment> comments = commentRepository.findAllByMeetingDetail_Id(meetingDetail.getId());
 
 
         log.info("(댓글들) {}", comments);
@@ -165,7 +169,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         MeetingDetailResponseDto dto = new MeetingDetailResponseDto();
         dto.setCommentList(commentResponseDtoList);
-
+        dto.setSummary(meetingDetail.getSummary());
 
         MeetingDetailResponse response = new MeetingDetailResponse("상세 페이지 조회 성공", dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);

@@ -14,5 +14,5 @@ public interface MeetingService {
 
     ResponseEntity<CommentDeleteResponse> deleteComment(Long commentId);
 
-    ResponseEntity<MeetingDetailResponse> readMeetingDetail(Long detailId);
+    ResponseEntity<MeetingDetailResponse> readMeetingDetail(Long roomId);
 }
