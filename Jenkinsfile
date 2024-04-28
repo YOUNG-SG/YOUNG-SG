@@ -80,7 +80,7 @@ pipeline {
                     sh "docker rm -f backend"
                     sh "docker rmi yunanash/backend:latest"
                     sh "docker image prune -f"
-                    sh "docker pull yunanash/backend:latest && docker run -d -p 8081:8080 --name backend yunanash/backend:latest"
+                    sh "docker pull yunanash/backend:latest && docker run -d -p 8080:8080 --name backend yunanash/backend:latest"
                 }
                 echo '백엔드 EC2에 배포 완료!'
             }
