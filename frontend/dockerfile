@@ -5,6 +5,9 @@ RUN npm install
 COPY ./ ./
 RUN npm run build
 
+# serve 설치
+RUN npm install -g serve
+
 # 5173 포트 노출
 EXPOSE 5173
 

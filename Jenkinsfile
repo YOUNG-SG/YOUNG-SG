@@ -98,7 +98,7 @@ pipeline {
                 echo '프론트 도커 이미지 빌드 시작!'
                 dir("./frontend") {
                     // 빌드된 파일을 Docker 이미지로 빌드
-                    sh "docker build -t gungssam/youfootfe:latest ."
+                    sh "docker build -t yunanash/frontend:latest ."
                 }
                 echo '프론트 도커 이미지 빌드 완료!'
             }
@@ -107,11 +107,11 @@ pipeline {
         stage('Push to Docker Hub-FE') {
             steps {
                 echo '프론트 도커 이미지를 Docker Hub에 푸시 시작!'
-                withCredentials([usernamePassword(credentialsId: 'Docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'docker_credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
                 }
                 dir("frontend") {
-                    sh "docker push gungssam/youfootfe:latest"
+                    sh "docker push yunanash/frontend:latest"
                 }
                 echo '프론트 도커 이미지를 Docker Hub에 푸시 완료!'
             }
@@ -123,9 +123,9 @@ pipeline {
                 // 여기에서는 SSH 플러그인이나 SSH 스크립트를 사용하여 EC2로 연결하고 Docker 컨테이너 실행
                 sshagent(['aws-key']) {
                     sh "docker rm -f frontend"
-                    sh "docker rmi gungssam/youfootfe:latest"
+                    sh "docker rmi yunanash/frontend:latest"
                     sh "docker image prune -f"
-                    sh "docker pull gungssam/youfootfe:latest && docker run -d -p 5173:5173 --name frontend gungssam/youfootfe:latest"
+                    sh "docker pull yunanash/frontend:latest && docker run -d -p 5173:5173 --name frontend yunanash/frontend:latest"
                 }
                 echo '프론트 EC2에 배포 완료!'
             }
