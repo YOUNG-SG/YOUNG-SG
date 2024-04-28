@@ -17,15 +17,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
          * sub 이 채팅방 구독합니다!!
          * pub /pub/chat/123/SendMessage [ 이방에 메시지..합니다!]
          * */
-        registry.enableSimpleBroker("/sub");
+        registry.enableSimpleBroker("/sub");  //수신임
 
-        registry.setApplicationDestinationPrefixes("/pub");
+         registry.setApplicationDestinationPrefixes("/pub"); //발신 어미사?임
     }
 
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOrigins("*");
+        registry.addEndpoint("/ws").setAllowedOrigins("*");  //서버에 연결한 endpoint ws://localhost:8000/ws
 
     }
 
