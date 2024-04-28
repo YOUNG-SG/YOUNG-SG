@@ -1,29 +1,27 @@
 package com.d208.AIclerk.member.service;
 
 import com.d208.AIclerk.entity.Member;
-import com.d208.AIclerk.entity.MemberMeeting;
+import com.d208.AIclerk.member.dto.responseDto.GetMemberResponse;
+import com.d208.AIclerk.member.dto.responseDto.GetMemberResponseDTO;
+import com.d208.AIclerk.member.dto.responseDto.SignInResponseDTO;
 import com.d208.AIclerk.member.repository.RefreshTokenRepository;
 import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.security.jwt.JWTUtil;
+import com.d208.AIclerk.security.jwt.JwtProperties;
+import com.d208.AIclerk.security.jwt.RefreshToken;
 import com.d208.AIclerk.security.oauth.KakaoProfile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +37,9 @@ public class MemberService {
 
     @Value("${KAKAO_CLIENT_SECRET}")
     String SecretKey;
+
+    private int accessTokenMinute = 60;
+    private int refreshTokenMinute = 300;
 
     public OauthToken getAccessToken(String code) {
 
@@ -96,7 +97,7 @@ public class MemberService {
         Member member = memberRepository.findByEmail(profile.getKakao_account().getEmail());
 
         //(3)
-        if(member == null) {
+        if (member == null) {
             member = Member.builder()
                     .id(profile.getId())
                     //(4)
@@ -150,12 +151,35 @@ public class MemberService {
     }
 
 
+    public ResponseEntity<GetMemberResponse> getMember() {
+
+        String userid = JWTUtil.findEmailByToken();
+        Member member = memberRepository.findByEmail(userid);
+        if (member == null) {
+            throw new RuntimeException("사용자를 찾을 수 없습니다.");
+        }
+
+
+        GetMemberResponseDTO getMemberResponseDTO = GetMemberResponseDTO.builder()
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .image(member.getImage())
+                .build();
+
+        GetMemberResponse response = GetMemberResponse.creategetMemberResponse(
+                "Success",
+                getMemberResponseDTO
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
     public Map<String, String> saveUserAndGetTokens(String token) { //(1)
         KakaoProfile profile = findProfile(token);
 
         Member member = memberRepository.findByEmail(profile.getKakao_account().getEmail());
-        if(member == null) {
+        if (member == null) {
             member = Member.builder()
                     .id(profile.getId())
                     .image(profile.getKakao_account().getProfile().getProfile_image_url())
@@ -178,9 +202,8 @@ public class MemberService {
 
 
     public String createAccessToken(Member member) {
-        int accessTokenValidityMinutes = 60; // 액세스 토큰의 유효기간을 60분으로 설정
         try {
-            return jwtUtil.createToken(member.getEmail(), accessTokenValidityMinutes);
+            return jwtUtil.createToken(member.getEmail(), accessTokenMinute);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -188,9 +211,8 @@ public class MemberService {
     }
 
     public String createRefreshToken(Member member) {
-        int refreshTokenValidityMinutes = 1440 * 7; // 리프레시 토큰의 유효기간을 7일로 설정
         try {
-            return jwtUtil.createToken(member.getEmail(), refreshTokenValidityMinutes);
+            return jwtUtil.createToken(member.getEmail(), refreshTokenMinute);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -206,4 +228,36 @@ public class MemberService {
     public Optional<Member> findByEmail(String email) {
         return Optional.ofNullable(memberRepository.findByEmail(email));
     }
+
+    // Service
+    public ResponseEntity signIn(String code) {
+        // 인가 코드를 사용하여 OAuth 액세스 토큰을 검색
+        String oauthAccessToken = getAccessToken(code).getAccess_token();
+
+        // OAuth 정보를 기반으로 사용자 정보를 저장하고 토큰 가져오기
+        Map<String, String> tokens = saveUserAndGetTokens(oauthAccessToken);
+        String accessToken = tokens.get("accessToken");
+        String refreshToken = tokens.get("refreshToken");
+
+        // 저장소에 리프레시 토큰을 저장
+        refreshTokenRepository.save(RefreshToken.builder()
+                .email(tokens.get("userEmail")) // 이메일도 토큰 맵에서 추출
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build());
+
+        // JWT를 표준 Authorization 헤더에 포함시켜 응답 헤더를 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessToken);
+
+        // 액세스 토큰과 새로 고침 토큰을 포함한 응답 객체 생성
+        SignInResponseDTO signInResponseDTO = SignInResponseDTO.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+
+        // 적절한 HTTP 헤더와 함께 토큰 응답을 반환
+        return ResponseEntity.ok().headers(headers).body(signInResponseDTO);
+    }
+
 }

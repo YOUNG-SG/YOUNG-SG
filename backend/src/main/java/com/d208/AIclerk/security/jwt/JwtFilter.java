@@ -1,16 +1,9 @@
 package com.d208.AIclerk.security.jwt;
 
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.d208.AIclerk.member.repository.MemberRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -18,6 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -38,19 +32,20 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (jwtHeader != null && jwtHeader.startsWith("Bearer ")) {
             jwtToken = jwtHeader.substring(7);
+            logger.info(jwtToken);
             try {
-                email = jwtUtil.extractClaims(jwtToken).getSubject();
+                Map<String, Object> claims = JWTUtil.validateToken(jwtToken);
+                email = (String) claims.get("iss");
             } catch (Exception e) {
-                logger.error("JWT 토큰을 가져오거나 토큰이 만료되었습니다");
+                logger.error("JWT 토큰을 가져오지 못하였거나 토큰이 만료되었습니다");
                 request.setAttribute("exception", e.getMessage());
             }
         }
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                     email, null, new ArrayList<>());
-            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-        }
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
 
         chain.doFilter(request, response);
     }
