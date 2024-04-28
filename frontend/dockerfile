@@ -2,15 +2,8 @@ FROM node:alpine as builder
 WORKDIR /frontend
 COPY package.json .
 RUN npm install
-# 빌드 수행
-COPY . .
-RUN npm run build || exit 1
-
-# 2단계: 빌드된 애플리케이션 실행
-FROM node:20.10.0
-
-# serve 설치
-RUN npm install -g serve
+COPY ./ ./
+RUN npm run build
 
 # 5173 포트 노출
 EXPOSE 5173

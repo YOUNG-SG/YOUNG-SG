@@ -1,8 +1,6 @@
 pipeline {
     agent any
 
-    tools {nodejs "nodejs"}
-
     stages {
         // stage('MM-Alarm'){
         //     steps{
@@ -88,7 +86,7 @@ pipeline {
             steps {
                 echo '프론트 빌드 및 테스트 시작!'
                 dir("./frontend") {
-                    sh "npm install"
+                    sh "npm install --legacy-peer-deps"
                     sh "npm run build"
                 }
                 echo '프론트 빌드 및 테스트 완료!'
