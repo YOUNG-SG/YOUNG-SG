@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { clickButtonStore } from "@/store/myPageStore";
 import TimelineMeeting from "@/components/MyPage/TimelineMeeting";
 import UnfoldState from "@/assets/MyPage/CaretDown.svg?react"; // 펼친 상태
-import FoldState from "@/assets/MyPage/CaretRight.svg?react"; // 접은 상태
+import FoldState from "@/assets/MyPage/CaretRight.svg?react"; // 접힌 상태
 
 const TimelineMonth = () => {
   const { isClick, setIsClick, isAllExpanded } = clickButtonStore();
