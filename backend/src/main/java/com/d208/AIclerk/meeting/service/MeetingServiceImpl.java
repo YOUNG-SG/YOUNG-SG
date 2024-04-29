@@ -6,6 +6,7 @@ import com.d208.AIclerk.entity.Folder;
 import com.d208.AIclerk.entity.MeetingDetail;
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.exception.meeting.CommentException;
+import com.d208.AIclerk.exception.meeting.FolderException;
 import com.d208.AIclerk.exception.meeting.MeetingDetailException;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateCommentRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateFolderRequestDto;
@@ -189,6 +190,9 @@ public class MeetingServiceImpl implements MeetingService {
     public ResponseEntity<CreateFolderResponse> createFolder(CreateFolderRequestDto dto) {
 
         // title 길이 조절
+        if (dto.getTitle() == null || dto.getTitle().isEmpty() || dto.getTitle().length() > 10) {
+            throw FolderException.folderTitleLengthException();
+        }
 
         // 폴더 이름을 받아와서 엔터티에 이름과 생성 날짜를 넣어준다. 끝?
         Folder newFolder = Folder.builder()
