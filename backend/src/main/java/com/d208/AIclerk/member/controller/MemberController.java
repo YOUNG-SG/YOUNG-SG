@@ -35,6 +35,6 @@ public class MemberController {
 
     @GetMapping("/mypage/profile")
     public ResponseEntity<GetMemberResponse> userProfile() {
-        return memberService.getMember();
+        return memberService.getProfile();
     }
 }

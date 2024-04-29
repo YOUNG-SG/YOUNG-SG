@@ -4,12 +4,14 @@ import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.member.dto.responseDto.GetMemberResponse;
 import com.d208.AIclerk.member.dto.responseDto.GetMemberResponseDTO;
 import com.d208.AIclerk.member.dto.responseDto.SignInResponseDTO;
+import com.d208.AIclerk.member.exception.MemberNotFoundException;
 import com.d208.AIclerk.member.repository.RefreshTokenRepository;
 import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.security.jwt.JWTUtil;
 import com.d208.AIclerk.security.jwt.JwtProperties;
 import com.d208.AIclerk.security.jwt.RefreshToken;
 import com.d208.AIclerk.security.oauth.KakaoProfile;
+import com.d208.AIclerk.utill.CommonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +32,7 @@ public class MemberService {
     private final JWTUtil jwtUtil;
     private final MemberRepository memberRepository; //(1)
     private final RefreshTokenRepository refreshTokenRepository;
+    private final CommonUtil commonUtil;
 
 
     @Value("${KAKAO_CLIENT_ID}")
@@ -122,13 +125,9 @@ public class MemberService {
     }
 
 
-    public ResponseEntity<GetMemberResponse> getMember() {
+    public ResponseEntity<GetMemberResponse> getProfile() {
 
-        String userid = JWTUtil.findEmailByToken();
-        Member member = memberRepository.findByEmail(userid);
-        if (member == null) {
-            throw new RuntimeException("사용자를 찾을 수 없습니다.");
-        }
+        Member member = commonUtil.getMember();
 
 
         GetMemberResponseDTO getMemberResponseDTO = GetMemberResponseDTO.builder()
@@ -190,11 +189,6 @@ public class MemberService {
         }
     }
 
-    public Optional<Member> findByEmail(String email) {
-        return Optional.ofNullable(memberRepository.findByEmail(email));
-    }
-
-    // Service
     public ResponseEntity signIn(String code) {
         // 인가 코드를 사용하여 OAuth 액세스 토큰을 검색
         String oauthAccessToken = getAccessToken(code).getAccess_token();
