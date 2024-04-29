@@ -2,7 +2,7 @@ import FolderDetailMeeting from "./FolderDetailMeeting";
 
 const FolderDetail = () => {
   return (
-    <div className="flex-[1.05] h-full bg-[#EEEEEE] bg-opacity-20 rounded-2xl" onClick={() => {}}>
+    <div className="flex-[1.05] h-full bg-e-20 rounded-2xl">
       {/* <div className="p-[40px] h-full box-border bg-[black]"> */}
       <div className="p-[40px] h-full">
         <div className="h-[24px] text-[18px] text-[#CCCCCC]">시작일 24.04.08</div>

@@ -69,7 +69,7 @@ const Profile = () => {
       {isEdit ? (
         <input
           type="text"
-          className="w-[130px] h-[35px] rounded-md text-[18px] px-[10px] bg-[#EEEEEE] bg-opacity-30 focus:outline-none"
+          className="w-[130px] h-[35px] rounded-md text-[18px] px-[10px] bg-e-30 focus:outline-none"
           value={nickname}
           onChange={(event) => {
             setNickname(event.target.value);

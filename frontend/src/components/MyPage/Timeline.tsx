@@ -1,17 +1,14 @@
+import { clickButtonStore } from "@/store/myPageStore";
 import TimelineYear from "@/components/MyPage/TimelineYear";
-import { useState } from "react";
 
 const Timeline = () => {
   // const expandList = [];
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [expanded, setExpanded] = useState(false);
-  console.log(expanded);
+  const { setIsClick, setIsAllExpanded } = clickButtonStore();
 
   const ExpandBtn: React.FC<{ btnName: string; handleExpand: () => void }> = (props) => {
     return (
       <div
-        className="w-[160px] h-[48px] bg-[#EEEEEE] bg-opacity-30 rounded-lg flex justify-center items-center text-[18px] mb-[16px]"
+        className="w-[160px] h-[48px] bg-[#EEEEEE] bg-opacity-30 hover:bg-opacity-50 rounded-lg flex justify-center items-center text-[18px] mb-[16px] cursor-pointer"
         onClick={props.handleExpand}
       >
         {props.btnName}
@@ -25,19 +22,28 @@ const Timeline = () => {
       <div className="w-full h-full">
         <div className="flex justify-end gap-[16px]">
           <ExpandBtn
-            btnName={"모두 펼치기"}
+            btnName="모두 펼치기"
             handleExpand={() => {
-              setExpanded(true);
+              setIsAllExpanded(false);
+              setIsClick(true);
             }}
           />
           <ExpandBtn
-            btnName={"모두 접기"}
+            btnName="모두 접기"
             handleExpand={() => {
-              setExpanded(false);
+              setIsAllExpanded(true);
+              setIsClick(true);
             }}
           />
         </div>
-        <TimelineYear />
+        <div
+          className="w-full overflow-scroll flex flex-col gap-[80px]"
+          style={{ height: "calc(100% - 64px)" }}
+        >
+          <TimelineYear />
+          <TimelineYear />
+          <TimelineYear />
+        </div>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 const Folder = () => {
   return (
     <div
-      className="w-full min-h-[160px] p-[40px] rounded-2xl bg-[#EEEEEE] bg-opacity-20"
+      className="w-full min-h-[160px] p-[40px] rounded-2xl bg-e-20 cursor-pointer"
       onClick={() => {}}
     >
       {/* FIXME 회의명 글자 넘치는 경우 ... */}
