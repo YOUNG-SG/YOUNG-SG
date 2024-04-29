@@ -46,6 +46,20 @@ dependencies {
 //	implementation 'org.apache.poi:poi:5.2.3'
 //	implementation 'org.apache.poi:poi-ooxml:5.2.3'
 
+
+	// JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+	implementation 'com.auth0:java-jwt:3.18.2'
+
+
+	// Google Gson
+	implementation 'com.google.code.gson:gson:2.10.1'
+	implementation 'org.json:json:20210307'
+
+
 }
 
 tasks.named('test') {

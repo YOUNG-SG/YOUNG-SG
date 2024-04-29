@@ -21,16 +21,15 @@ public class Comment {
     @Column(name = "content")
     private String content;
 
-    @Column
+    @Column(name = "create_at")
     private LocalDateTime createAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "detail_id")
     private MeetingDetail meetingDetail;
-
 
 }
