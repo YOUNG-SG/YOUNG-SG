@@ -64,7 +64,7 @@ public class RoomController {
 
 
     /**
-     미팅종료되면 로직이 필요함- > 미팅이 종료되면 생성된 word파일을 유저이메일에게
+     미팅시작되면 로직이 필요함- > 미팅이 종료되면 생성된 word파일을 STT
      */
     @PostMapping("/record/start")
     public ResponseEntity<String> startMeeting(@RequestBody CreateRecordRequestDTO request) {
