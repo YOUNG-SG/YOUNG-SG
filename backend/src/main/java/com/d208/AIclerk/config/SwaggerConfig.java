@@ -34,5 +34,13 @@ public class SwaggerConfig {
                 .build();
     }
 
+    @Bean
+    public GroupedOpenApi KakaoApi() {
+        return GroupedOpenApi.builder()
+                .group("kakao-api")
+                .pathsToMatch("/api/oauth/**")
+                .build();
+    }
+
 
 }
