@@ -24,4 +24,8 @@ public class Folder {
     @Column(name = "createAt")
     private LocalDateTime createAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
 }

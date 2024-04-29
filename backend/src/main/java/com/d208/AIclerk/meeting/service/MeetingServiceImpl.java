@@ -11,13 +11,11 @@ import com.d208.AIclerk.exception.meeting.MeetingDetailException;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateCommentRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateFolderRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
-import com.d208.AIclerk.meeting.dto.response.CommentDeleteResponse;
-import com.d208.AIclerk.meeting.dto.response.CreateCommentResponse;
-import com.d208.AIclerk.meeting.dto.response.CreateFolderResponse;
-import com.d208.AIclerk.meeting.dto.response.MeetingDetailResponse;
+import com.d208.AIclerk.meeting.dto.response.*;
 import com.d208.AIclerk.meeting.dto.responseDto.CommentResponseDto;
 import com.d208.AIclerk.meeting.dto.responseDto.MeetingDetailResponseDto;
 import com.d208.AIclerk.meeting.repository.CommentRepository;
+import com.d208.AIclerk.meeting.repository.FolderRepository;
 import com.d208.AIclerk.meeting.repository.MeetingDetailRepository;
 import com.d208.AIclerk.utill.CommonUtil;
 import com.d208.AIclerk.utill.OpenAiUtil;
@@ -42,6 +40,7 @@ public class MeetingServiceImpl implements MeetingService {
 
     private final MeetingDetailRepository meetingDetailRepository;
     private final CommentRepository commentRepository;
+    private final FolderRepository folderRepository;
 
     // OpenAi 텍스트 요약
     @Override
@@ -200,7 +199,25 @@ public class MeetingServiceImpl implements MeetingService {
                 .createAt(LocalDateTime.now())
                 .build();
 
-        return null;
+        folderRepository.save(newFolder);
+
+        CreateFolderResponse response = new CreateFolderResponse("폴더 생성 성공", true);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Override
+    public ResponseEntity<FolderResponse> readFolderList() {
+
+        Member currentMember = commonUtil.getMember();
+
+        // memberId 로 멤버의 폴더들 모두 조회
+        List<Folder> folderList = folderRepository.findAllByMemberId(currentMember.getId());
+
+        // 리스트들을 반환 해준다.
+        FolderResponse response = new FolderResponse("폴더 목록 조회 성공", folderList);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }
