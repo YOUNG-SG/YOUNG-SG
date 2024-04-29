@@ -4,6 +4,7 @@ import com.d208.AIclerk.chatting.util.RedisSubscriber;
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.member.exception.MemberNotFoundException;
 import com.d208.AIclerk.member.repository.MemberRepository;
+import com.d208.AIclerk.member.repository.ParticipantRepository;
 import com.d208.AIclerk.utill.CommonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,9 +30,10 @@ public class RedisConfig {
     private final SimpMessagingTemplate messagingTemplate;
     private final CommonUtil commonUtil;
     private  final MemberRepository memberRepository;
+    private final ParticipantRepository participantRepository;
 
     @Autowired
-    public RedisConfig(StringRedisTemplate redisTemplate, RedisSubscriber redisSubscriber, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, MemberRepository memberRepository) {
+    public RedisConfig(StringRedisTemplate redisTemplate, RedisSubscriber redisSubscriber, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, MemberRepository memberRepository, ParticipantRepository participantRepository) {
         this.redisTemplate = redisTemplate;
         this.hashOperations = redisTemplate.opsForHash();
         this.listOperations = redisTemplate.opsForList();
@@ -39,6 +41,7 @@ public class RedisConfig {
         this.messagingTemplate = messagingTemplate;
         this.commonUtil = commonUtil;
         this.memberRepository = memberRepository;
+        this.participantRepository = participantRepository;
     }
 
     public void createRoom(Long roomId, Long owner) {
@@ -54,11 +57,8 @@ public class RedisConfig {
         String roomKey = "room:" + roomId;
         String status = (String) hashOperations.get(roomKey, "status");
         List<String> memberIds = listOperations.range(roomKey + ":members", 0, -1);
-
         String ownerId = (String) hashOperations.get(roomKey, "owner");
-
         List<String> memberNicknames = new ArrayList<>();
-        
         //멤버목록이니라
         for (String memberId : memberIds) {
             Member member = memberRepository.findById(Long.parseLong(memberId))

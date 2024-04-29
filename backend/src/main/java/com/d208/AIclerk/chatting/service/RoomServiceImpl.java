@@ -4,6 +4,8 @@ import com.d208.AIclerk.chatting.util.InviteCodeGenerator;
 import com.d208.AIclerk.config.RedisConfig;
 import com.d208.AIclerk.entity.MeetingRoom;
 import com.d208.AIclerk.chatting.repository.RoomRepository;
+import com.d208.AIclerk.entity.Participant;
+import com.d208.AIclerk.member.repository.ParticipantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +20,14 @@ public class RoomServiceImpl implements RoomService {
     private final RoomRepository roomRepository;
     private final InviteCodeGenerator inviteCodeGenerator;
     private final RedisConfig redisConfig;
+    private final ParticipantRepository participantRepository;
 
     @Autowired
-    public RoomServiceImpl(RoomRepository roomRepository, InviteCodeGenerator inviteCodeGenerator, RedisConfig redisConfig) {
+    public RoomServiceImpl(RoomRepository roomRepository, InviteCodeGenerator inviteCodeGenerator, RedisConfig redisConfig, ParticipantRepository participantRepository) {
         this.roomRepository = roomRepository;
         this.inviteCodeGenerator = inviteCodeGenerator;
         this.redisConfig = redisConfig;
+        this.participantRepository = participantRepository;
     }
 
     @Override
