@@ -42,7 +42,7 @@ public class MemberServiceImpl implements MemberService{
     String SecretKey;
 
     private int accessTokenMinute = 60;
-    private int refreshTokenMinute = 300;
+    private int refreshTokenMinute = 3000;
 
     @Override
     public OauthToken getAccessToken(String code) {

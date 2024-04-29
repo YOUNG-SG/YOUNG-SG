@@ -43,4 +43,7 @@ public class MemberController {
     public ResponseEntity<GetMemberResponse> userProfile() {
         return memberService.getProfile();
     }
+
+
+    
 }
