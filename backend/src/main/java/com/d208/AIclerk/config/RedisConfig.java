@@ -73,9 +73,7 @@ public class RedisConfig {
         }
     }
 
-
-
-
+    
     public void addRoomMember(long roomId, long memberId) {
         String memberKey = "room:" + roomId + ":members";
         Member currentMember = memberRepository.findById(memberId)
