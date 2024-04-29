@@ -31,7 +31,7 @@ pipeline {
 
         stage('Add Env') {
             steps {
-                echo '백엔드 환경 설정 💨'
+                echo '백엔드 환경 설정'
                 dir('./backend') {
                     withCredentials([file(credentialsId: 'backend_env', variable: 'env')]) {
                     sh 'cp ${env}  src/main/resources/env.yml'
