@@ -53,27 +53,42 @@ public class RedisConfig {
     public void updateRoomInfo(long roomId) {
         String roomKey = "room:" + roomId;
         String status = (String) hashOperations.get(roomKey, "status");
-        List<String> members = listOperations.range(roomKey + ":members", 0, -1);
-        String owner = (String) hashOperations.get(roomKey, "owner");
+        List<String> memberIds = listOperations.range(roomKey + ":members", 0, -1);
+
+        String ownerId = (String) hashOperations.get(roomKey, "owner");
+
+        List<String> memberNicknames = new ArrayList<>();
+        
+        //멤버목록이니라
+        for (String memberId : memberIds) {
+            Member member = memberRepository.findById(Long.parseLong(memberId))
+                    .orElseThrow(() -> new MemberNotFoundException("Member not found ID: " + memberId));
+            memberNicknames.add(member.getNickname());
+        }
+
+        //어이 방장닉이니라
+        Member owner = memberRepository.findById(Long.parseLong(ownerId))
+                .orElseThrow(() -> new MemberNotFoundException("Owner not found ID: " + ownerId));
+        String ownerNickname = owner.getNickname();
 
         Map<String, Object> updateInfo = new HashMap<>();
         updateInfo.put("status", status);
-        updateInfo.put("members", members);
-        updateInfo.put("owner", owner);
-        System.out.println(updateInfo);
+        updateInfo.put("members", memberNicknames);
+        updateInfo.put("owner", ownerNickname);
 
         ObjectMapper mapper = new ObjectMapper();
         try {
             String message = mapper.writeValueAsString(updateInfo);
             messagingTemplate.convertAndSend("/sub/room/update/" + roomId, message);
-//            redisTemplate.convertAndSend("roomUpdates:" + roomId, message); //확인용이요
+//        redisTemplate.convertAndSend("roomUpdates:" + roomId, message); // For debugging
 
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
     }
 
-    
+
+
     public void addRoomMember(long roomId, long memberId) {
         String memberKey = "room:" + roomId + ":members";
         Member currentMember = memberRepository.findById(memberId)

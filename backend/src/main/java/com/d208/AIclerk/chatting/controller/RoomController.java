@@ -17,6 +17,9 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 @RestController
 @RequestMapping("/api/meeting")
 @CrossOrigin("*")
@@ -55,9 +58,12 @@ public class RoomController {
     @MessageMapping("/{roomId}/sendMessage")
     public void sendMessage(@DestinationVariable Long roomId, MessageDto message) {
         Member currentMember = commonUtil.getMember();
+        String profile = currentMember.getImage();
         String nickname = currentMember.getNickname();
 
         message.setSender(nickname);
+        message.setProfile(profile);
+        message.setSent_time(LocalTime.now());
         log.info("chat {} send by {} to room number {}", message, nickname, roomId);
         messagingTemplate.convertAndSend("/sub/chat/" + roomId, message);
         // rabbitMqService.sendMessage(roomId, message);
