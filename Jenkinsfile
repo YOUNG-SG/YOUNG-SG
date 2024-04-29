@@ -102,7 +102,7 @@ pipeline {
             steps {
                 echo '프론트 환경 설정'
                 dir('./frontend') {
-                    withCredentials([file(credentialsId: 'frontend_env', variable: 'env')]) {
+                    withCredentials([file(credentialsId: 'front_env', variable: 'env')]) {
                     sh 'cp ${env}  .env'
                     }
                 }
