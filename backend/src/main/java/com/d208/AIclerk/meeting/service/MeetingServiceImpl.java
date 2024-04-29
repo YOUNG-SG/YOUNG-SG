@@ -3,17 +3,21 @@ package com.d208.AIclerk.meeting.service;
 
 import com.d208.AIclerk.entity.Comment;
 import com.d208.AIclerk.entity.MeetingDetail;
+import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.exception.meeting.CommentException;
 import com.d208.AIclerk.exception.meeting.MeetingDetailException;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateCommentRequestDto;
+import com.d208.AIclerk.meeting.dto.requestDto.CreateFolderRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
 import com.d208.AIclerk.meeting.dto.response.CommentDeleteResponse;
 import com.d208.AIclerk.meeting.dto.response.CreateCommentResponse;
+import com.d208.AIclerk.meeting.dto.response.CreateFolderResponse;
 import com.d208.AIclerk.meeting.dto.response.MeetingDetailResponse;
 import com.d208.AIclerk.meeting.dto.responseDto.CommentResponseDto;
 import com.d208.AIclerk.meeting.dto.responseDto.MeetingDetailResponseDto;
 import com.d208.AIclerk.meeting.repository.CommentRepository;
 import com.d208.AIclerk.meeting.repository.MeetingDetailRepository;
+import com.d208.AIclerk.utill.CommonUtil;
 import com.d208.AIclerk.utill.OpenAiUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +36,7 @@ import java.util.List;
 public class MeetingServiceImpl implements MeetingService {
 
     private final OpenAiUtil openAiUtil;
+    private final CommonUtil commonUtil;
 
     private final MeetingDetailRepository meetingDetailRepository;
     private final CommentRepository commentRepository;
@@ -38,6 +44,8 @@ public class MeetingServiceImpl implements MeetingService {
     // OpenAi 텍스트 요약
     @Override
     public ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception {
+
+        Member currentMember = commonUtil.getMember();
 
         log.info("(MeetingServiceImpl) 시작");
 //        String inputText = dto.getText().replace("\n", "\\\\n");
@@ -88,6 +96,8 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     public ResponseEntity<CreateCommentResponse> createComment(CreateCommentRequestDto dto) {
 
+        Member currentMember = commonUtil.getMember();
+
         MeetingDetail meetingDetail = meetingDetailRepository.findById(dto.getMeetingId())
                 .orElseThrow(MeetingDetailException::meetingDetailNotFoundException);
 
@@ -100,6 +110,7 @@ public class MeetingServiceImpl implements MeetingService {
         Comment comment = Comment.builder()
                 .meetingDetail(meetingDetail)
                 .content(dto.getContent())
+                .member(currentMember)
                 .createAt(LocalDateTime.now())
                 .build();
 
@@ -114,14 +125,16 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     public ResponseEntity<CommentDeleteResponse> deleteComment(Long commentId) {
 
+        Member currentMember = commonUtil.getMember();
+
         // 대상 코멘트가 있는지 확인 및 수정
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(CommentException::commentNotFoundException);
 
-//        // 코멘트 주인과 접속 유저가 같은지 확인
-//        if (!Objects.equals(comment.getMemberId().getId(), currentMember.getId())) {
-//            throw CommentException.memberNotEqualException();
-//        }
+        // 코멘트 주인과 접속 유저가 같은지 확인
+        if (!Objects.equals(comment.getMember().getId(), currentMember.getId())) {
+            throw CommentException.memberNotEqualException();
+        }
 
         // 삭제
         commentRepository.delete(comment);
@@ -155,7 +168,6 @@ public class MeetingServiceImpl implements MeetingService {
         // 댓글 리스트 (일부 수정이 필요함)
         List<Comment> comments = commentRepository.findAllByMeetingDetail_Id(meetingDetail.getId());
 
-
         log.info("(댓글들) {}", comments);
         // CommentResponseDto 리스트로 변환
         List<CommentResponseDto> commentResponseDtoList = comments.stream()
@@ -177,6 +189,11 @@ public class MeetingServiceImpl implements MeetingService {
 
         MeetingDetailResponse response = new MeetingDetailResponse("상세 페이지 조회 성공", dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Override
+    public ResponseEntity<CreateFolderResponse> createFolder(CreateFolderRequestDto dto) {
+        return null;
     }
 
 }
