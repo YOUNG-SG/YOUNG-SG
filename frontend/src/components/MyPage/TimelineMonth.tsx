@@ -1,17 +1,36 @@
+import { useEffect, useState } from "react";
+import { clickButtonStore } from "@/store/myPageStore";
 import TimelineMeeting from "@/components/MyPage/TimelineMeeting";
-import { useState } from "react";
+import UnfoldState from "@/assets/MyPage/CaretDown.svg?react"; // 펼친 상태
+import FoldState from "@/assets/MyPage/CaretRight.svg?react"; // 접은 상태
 
 const TimelineMonth = () => {
-  const [isShow, setIsShow] = useState(false);
+  const { isClick, setIsClick, isAllExpanded } = clickButtonStore();
+  const [isShow, setIsShow] = useState(true);
+
+  useEffect(() => {
+    if (isClick) {
+      if (isAllExpanded) {
+        setIsShow(false);
+      } else {
+        setIsShow(true);
+      }
+    }
+  }, [isClick, isAllExpanded]);
+
   return (
-    <div className="mb-[20px]">
-      <div className="flex gap-[20px] items-center">
-        <span
-          className="w-[16px] h-[16px] ml-[34px] bg-[white] rounded-full"
+    <div>
+      <div className="flex items-center">
+        <div
+          className="w-[34px] cursor-pointer"
           onClick={() => {
             setIsShow(!isShow);
+            setIsClick(false);
           }}
-        ></span>
+        >
+          {isShow ? <UnfoldState /> : <FoldState />}
+        </div>
+        <span className="w-[16px] h-[16px] mr-[20px] bg-[white] rounded-full"></span>
         <div className="text-[22px] font-b">4월</div>
       </div>
       {/* 일 map 함수 */}
