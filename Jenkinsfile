@@ -29,7 +29,7 @@ pipeline {
             }
         }
 
-        stage('Add Env') {
+        stage('Add Back Env') {
             steps {
                 echo '백엔드 환경 설정'
                 dir('./backend') {
@@ -96,6 +96,19 @@ pipeline {
                 echo '백엔드 EC2에 배포 완료!'
             }
         }
+
+
+        stage('Add Front Env') {
+            steps {
+                echo '프론트 환경 설정'
+                dir('./frontend') {
+                    withCredentials([file(credentialsId: 'frontend_env', variable: 'env')]) {
+                    sh 'cp ${env}  .env'
+                    }
+                }
+            }
+        }
+
 
         stage('FE-Build') {
             steps {
