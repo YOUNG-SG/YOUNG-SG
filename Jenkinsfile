@@ -107,16 +107,16 @@ pipeline {
 
 
 
-        stage('Add Front Env') {
-            steps {
-                echo '프론트 환경 설정'
-                dir('./frontend') {
-                    withCredentials([file(credentialsId: 'front_env', variable: 'env')]) {
-                    sh 'cp ${env}  .env'
-                    }
-                }
-            }
-        }
+        // stage('Add Front Env') {
+        //     steps {
+        //         echo '프론트 환경 설정'
+        //         dir('./frontend') {
+        //             withCredentials([file(credentialsId: 'front_env', variable: 'env')]) {
+        //             sh 'cp ${env}  .env'
+        //             }
+        //         }
+        //     }
+        // }
 
 
         stage('FE-Build') {
