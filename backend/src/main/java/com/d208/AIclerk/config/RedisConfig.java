@@ -42,8 +42,30 @@ public class RedisConfig {
         roomInfo.put("owner", owner.toString());
         roomInfo.put("status", "0");
         hashOperations.putAll(roomKey, roomInfo);
-        listOperations.rightPush(roomKey + ":members", owner.toString());  // owner를 String으로 변환
+        listOperations.rightPush(roomKey + ":members", owner.toString());
+    }
 
+    public void updateRoomInfo(long roomId) {
+        String roomKey = "room:" + roomId;
+        String status = (String) hashOperations.get(roomKey, "status");
+        List<String> members = listOperations.range(roomKey + ":members", 0, -1);
+        String owner = (String) hashOperations.get(roomKey, "owner");
+
+        Map<String, Object> updateInfo = new HashMap<>();
+        updateInfo.put("status", status);
+        updateInfo.put("members", members);
+        updateInfo.put("owner", owner);
+        System.out.println(updateInfo);
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String message = mapper.writeValueAsString(updateInfo);
+            messagingTemplate.convertAndSend("/sub/room/update/" + roomId, message);
+//            redisTemplate.convertAndSend("roomUpdates:" + roomId, message); //확인용이요
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
 

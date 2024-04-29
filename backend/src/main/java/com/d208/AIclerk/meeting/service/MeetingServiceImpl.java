@@ -161,9 +161,9 @@ public class MeetingServiceImpl implements MeetingService {
         List<CommentResponseDto> commentResponseDtoList = comments.stream()
                 .map(comment -> new CommentResponseDto(
                         comment.getId(),
-                        comment.getUser() != null ? comment.getUser().getId() : null, // null 검사 추가
-                        comment.getUser() != null ? comment.getUser().getNickname() : "익명", // null 대체값 사용
-                        comment.getUser() != null ? comment.getUser().getImage() : "default_image.png",
+                        comment.getMember().getId(), // null 검사 추가
+                        comment.getMember().getNickname(), // null 대체값 사용
+                        comment.getMember().getImage(),
                         comment.getContent(),
                         comment.getCreateAt()
                 ))
