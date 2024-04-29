@@ -3,10 +3,7 @@ package com.d208.AIclerk.meeting.service;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateCommentRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateFolderRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
-import com.d208.AIclerk.meeting.dto.response.CommentDeleteResponse;
-import com.d208.AIclerk.meeting.dto.response.CreateCommentResponse;
-import com.d208.AIclerk.meeting.dto.response.CreateFolderResponse;
-import com.d208.AIclerk.meeting.dto.response.MeetingDetailResponse;
+import com.d208.AIclerk.meeting.dto.response.*;
 import org.springframework.http.ResponseEntity;
 
 public interface MeetingService {
@@ -19,4 +16,6 @@ public interface MeetingService {
     ResponseEntity<MeetingDetailResponse> readMeetingDetail(Long roomId);
 
     ResponseEntity<CreateFolderResponse> createFolder(CreateFolderRequestDto dto);
+
+    ResponseEntity<FolderResponse> readFolderList();
 }
