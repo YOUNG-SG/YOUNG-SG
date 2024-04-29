@@ -25,4 +25,14 @@ public class SwaggerConfig {
                 .build();
     }
 
+
+    @Bean
+    public GroupedOpenApi chatApi() {
+        return GroupedOpenApi.builder()
+                .group("chat-api")
+                .pathsToMatch("/api/meeting/**")
+                .build();
+    }
+
+
 }
