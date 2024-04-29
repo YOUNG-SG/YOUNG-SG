@@ -21,10 +21,10 @@ pipeline {
         // }
 
 
-        stage('Clone') {
+        stage('Clone-Back') {
             steps {
                 echo '클론을 시작!'
-                git branch: 'CICD', credentialsId: 'gitlab_credential', url: 'https://lab.ssafy.com/s10-final/S10P31D208.git'
+                git branch: 'be/dev', credentialsId: 'gitlab_credential', url: 'https://lab.ssafy.com/s10-final/S10P31D208.git'
                 echo '클론을 완료!'
             }
         }
@@ -96,6 +96,15 @@ pipeline {
                 echo '백엔드 EC2에 배포 완료!'
             }
         }
+
+        stage('Clone-Front') {
+            steps {
+                echo '클론을 시작!'
+                git branch: 'fe/dev', credentialsId: 'gitlab_credential', url: 'https://lab.ssafy.com/s10-final/S10P31D208.git'
+                echo '클론을 완료!'
+            }
+        }
+
 
 
         stage('Add Front Env') {
