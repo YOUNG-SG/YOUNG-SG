@@ -1,9 +1,11 @@
+import { tokenStore } from "@/store/tokenStore";
 import axios, { InternalAxiosRequestConfig } from "axios";
 
 const SetAuth = (config: InternalAxiosRequestConfig) => {
-  const token = "";
+  const token = tokenStore.getState().token;
+
   if (token) {
-    config.headers.Authorization = token;
+    config.headers.Authorization = `Bearer ${token}`;
   } else {
     console.log("토큰없음");
   }
