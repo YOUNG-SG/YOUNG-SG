@@ -31,6 +31,7 @@ public class RedisConfig {
         roomInfo.put("status", "0");
         hashOperations.putAll(roomKey, roomInfo);
         listOperations.rightPush(roomKey + ":members", owner.toString());  // owner를 String으로 변환
+
     }
 
 

@@ -18,14 +18,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
          * pub /pub/chat/123/SendMessage [ 이방에 메시지..합니다!]
          * */
         registry.enableSimpleBroker("/sub");
-
         registry.setApplicationDestinationPrefixes("/pub");
     }
 
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOrigins("*");
+        registry.addEndpoint("/wchat").setAllowedOrigins("*"); //실시간채팅
+        registry.addEndpoint("/wstat").setAllowedOrigins("*"); // 방상태정보
+        registry.addEndpoint("/wstt").setAllowedOrigins("*"); //STT ->Redis
+        registry.addEndpoint("/wmotion").setAllowedOrigins("*"); //모션인식 관련정보
 
     }
 
