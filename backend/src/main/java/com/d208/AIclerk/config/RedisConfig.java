@@ -42,10 +42,6 @@ public class RedisConfig {
         roomInfo.put("owner", owner.toString());
         roomInfo.put("status", "0");
         hashOperations.putAll(roomKey, roomInfo);
-<<<<<<< HEAD
-        listOperations.rightPush(roomKey + ":members", owner.toString());  // owner를 String으로 변환
-
-=======
         listOperations.rightPush(roomKey + ":members", owner.toString());
     }
 
@@ -70,7 +66,6 @@ public class RedisConfig {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
->>>>>>> daf8e28886ad45ffc7b399ef22baeb238a46a07f
     }
 
 
