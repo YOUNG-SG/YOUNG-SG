@@ -85,35 +85,6 @@ public class MemberService {
     }
 
 
-    public Member saveMember(String token) {
-
-        //(1)
-        KakaoProfile profile = findProfile(token);
-        if (profile == null || profile.getKakao_account() == null) {
-            throw new IllegalStateException("Failed to fetch user profile from Kakao.");
-        }
-
-        //(2)
-        Member member = memberRepository.findByEmail(profile.getKakao_account().getEmail());
-
-        //(3)
-        if (member == null) {
-            member = Member.builder()
-                    .id(profile.getId())
-                    //(4)
-                    .image(profile.getKakao_account().getProfile().getProfile_image_url())
-                    .nickname(profile.getKakao_account().getProfile().getNickname())
-                    .email(profile.getKakao_account().getEmail())
-                    //(5)
-                    .build();
-
-            memberRepository.save(member);
-        }
-
-        return member;
-    }
-
-
     //(1-1)
     public KakaoProfile findProfile(String token) {
 
@@ -217,12 +188,6 @@ public class MemberService {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public Optional<Member> getMember(HttpServletRequest request) { //(1)
-        Long userCode = (Long) request.getAttribute("userCode");
-        Optional<Member> member = memberRepository.findById(userCode);
-        return member;
     }
 
     public Optional<Member> findByEmail(String email) {
