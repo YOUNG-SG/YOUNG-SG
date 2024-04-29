@@ -3,6 +3,8 @@ package com.d208.AIclerk.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @Builder
@@ -19,6 +21,9 @@ public class Comment {
     @Column(name = "content")
     private String content;
 
+    @Column(name = "create_at")
+    private LocalDateTime createAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -26,6 +31,5 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "detail_id")
     private MeetingDetail meetingDetail;
-
 
 }
