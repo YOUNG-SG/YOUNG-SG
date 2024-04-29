@@ -2,6 +2,7 @@ package com.d208.AIclerk.meeting.service;
 
 
 import com.d208.AIclerk.entity.Comment;
+import com.d208.AIclerk.entity.Folder;
 import com.d208.AIclerk.entity.MeetingDetail;
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.exception.meeting.CommentException;
@@ -45,16 +46,9 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     public ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception {
 
-        Member currentMember = commonUtil.getMember();
-
-        log.info("(MeetingServiceImpl) 시작");
-//        String inputText = dto.getText().replace("\n", "\\\\n");
         String inputText = dto.getText();
 
-        log.info("(MeetingServiceImpl) 시작2");
-
         StringBuilder fullSummary = new StringBuilder();
-        log.info("(MeetingServiceImpl) 시작3");
 
         // 글자수 제한 확인
         final int MAX_LENGTH = 4000;
@@ -193,6 +187,15 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public ResponseEntity<CreateFolderResponse> createFolder(CreateFolderRequestDto dto) {
+
+        // title 길이 조절
+
+        // 폴더 이름을 받아와서 엔터티에 이름과 생성 날짜를 넣어준다. 끝?
+        Folder newFolder = Folder.builder()
+                .title(dto.getTitle())
+                .createAt(LocalDateTime.now())
+                .build();
+
         return null;
     }
 

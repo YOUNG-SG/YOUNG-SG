@@ -3,6 +3,8 @@ package com.d208.AIclerk.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @Builder
@@ -20,6 +22,6 @@ public class Folder {
     private String title;
 
     @Column(name = "createAt")
-    private String createAt;
+    private LocalDateTime createAt;
 
 }
