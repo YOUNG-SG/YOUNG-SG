@@ -1,17 +1,19 @@
 package com.d208.AIclerk.meeting.dto.response;
 
+import com.d208.AIclerk.entity.Folder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+import java.util.List;
+
 @Builder
-public class CreateFolderResponse {
+@Data
+@NoArgsConstructor @AllArgsConstructor
+public class FolderResponse {
 
     private String message;
 
-    private boolean data;
+    private List<Folder> data;
 }
