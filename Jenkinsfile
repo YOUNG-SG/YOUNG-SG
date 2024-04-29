@@ -100,23 +100,23 @@ pipeline {
         stage('Clone-Front') {
             steps {
                 echo '클론을 시작!'
-                git branch: 'fe/dev', credentialsId: 'gitlab_credential', url: 'https://lab.ssafy.com/s10-final/S10P31D208.git'
+                git branch: 'CICD', credentialsId: 'gitlab_credential', url: 'https://lab.ssafy.com/s10-final/S10P31D208.git'
                 echo '클론을 완료!'
             }
         }
 
 
 
-        // stage('Add Front Env') {
-        //     steps {
-        //         echo '프론트 환경 설정'
-        //         dir('./frontend') {
-        //             withCredentials([file(credentialsId: 'front_env', variable: 'env')]) {
-        //             sh 'cp ${env}  .env'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Add Front Env') {
+            steps {
+                echo '프론트 환경 설정'
+                dir('./frontend') {
+                    withCredentials([file(credentialsId: 'front_env', variable: 'env')]) {
+                    sh 'cp ${env}  .env'
+                    }
+                }
+            }
+        }
 
 
         stage('FE-Build') {
