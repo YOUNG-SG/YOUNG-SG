@@ -10,57 +10,68 @@ interface SessionProps {
 function Session({ subscriber, publisher }: SessionProps) {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [mainSubscriber, setMainSubscriber] = useState<Subscriber | null>();
-  // useEffect(() => {
-  //   if (!subscribers) {
-  //     setSubscribers((preSubscriber) => [...preSubscriber, subscriber]);
-  //   }
-  // }, []);
+
+  const [nowSubscribers, setNowSubscribers] = useState(0);
+  const maxSubscribers = 4;
+
+  const handlePreSubscribers = () => {
+    setNowSubscribers((preIndex) => {
+      const nextIndex = preIndex - maxSubscribers;
+      return nextIndex >= 0 ? nextIndex : 0;
+    });
+  };
+
+  const handleNextSubscribers = () => {
+    setNowSubscribers((preIndex) => {
+      const nextIndex = preIndex + maxSubscribers;
+      return nextIndex < subscribers.length ? nextIndex : preIndex;
+    });
+  };
+
   useEffect(() => {
     if (subscriber) {
-      // console.log("여기입니까", subscribers);
       setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
     }
-    // if (!mainSubscriber) {
-    //   setMainSubscriber(subscriber);
-    // }
-  }, [subscriber]);
+    if (!mainSubscriber) {
+      setMainSubscriber(subscriber);
+    }
+  }, [subscriber, mainSubscriber]);
 
   const handleClickSubscriber = (subscriberItem: Subscriber) => {
-    console.log("change main subscriber to: ", subscriberItem.stream.streamId);
     setMainSubscriber(subscriberItem);
   };
 
-  const adjustGridPlacement = (subscriberCount: number) => {
-    if (subscriberCount <= 1) {
-      return "center";
-    }
-    return "normal";
-  };
-
   const renderSubscribers = () => {
-    const gridPlacement = adjustGridPlacement(subscribers.length);
-    console.log("여기?", subscribers);
+    const preSubscribers = nowSubscribers > 0;
+    const nextSubscribers =
+      nowSubscribers + maxSubscribers < subscribers.length;
 
     return (
-      <div
-        className={`flex flex-row justify-center gap-5 mb-5 cursor-pointer ${gridPlacement}`}
-        // style={{
-        //   display: "grid",
-        //   gridTemplateColumns: gridPlacement === "center" ? "1fr" : "1fr 1fr",
-        //   gap: "20px",
-        // }}
-      >
+      <div className={`flex flex-row justify-center gap-5 mb-5 cursor-pointer`}>
+        {
+          <button onClick={handlePreSubscribers}>
+            {"<"} {preSubscribers}
+          </button>
+        }
         <div>
           <Video streamManager={publisher} />
         </div>
-        {subscribers.map((subscriberItem) => (
-          <div
-            key={subscriberItem.stream.streamId}
-            onClick={() => handleClickSubscriber(subscriberItem)}
-          >
-            <Video streamManager={subscriberItem} />
-          </div>
-        ))}
+        {subscribers
+          .slice(nowSubscribers, nowSubscribers + maxSubscribers)
+          .map((subscriberItem) => (
+            <div
+              className="cursor-pointer aspect-video"
+              key={subscriberItem.stream.streamId}
+              onClick={() => handleClickSubscriber(subscriberItem)}
+            >
+              <Video streamManager={subscriberItem} />
+            </div>
+          ))}
+        {
+          <button onClick={handleNextSubscribers}>
+            {">"} {nextSubscribers}
+          </button>
+        }
       </div>
     );
   };

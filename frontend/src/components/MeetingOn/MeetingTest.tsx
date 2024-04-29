@@ -3,6 +3,16 @@ import useMeetingStore from "../../store/meetingStore";
 import Form from "./OpenVidu/Form";
 import Session from "./OpenVidu/Session";
 import Dictaphone from "./OpenVidu/Dictaphone";
+import Chatting from "./OpenVidu/Chatting";
+
+import mute from "../../assets/chattingIcons/mute.png";
+import mic from "../../assets/chattingIcons/mic.png";
+import monitorOff from "../../assets/chattingIcons/turn-off.png";
+import monitorOn from "../../assets/chattingIcons/screen-options.png";
+import invite from "../../assets/chattingIcons/add-user.png";
+import disconnect from "../../assets/chattingIcons/disconnected.png";
+import screen from "../../assets/chattingIcons/screen.png";
+import bg from "../../assets/chattingIcons/bgImage.jpg";
 import { OpenVidu, Publisher, Subscriber } from "openvidu-browser";
 import axios, { AxiosError } from "axios";
 
@@ -53,13 +63,6 @@ const MeetingTest = () => {
     setScreenPublisher(null);
     setScreenSubscriber(null);
   }, [session]);
-
-  // const leaveScreenSession = useCallback(() => {
-  //   if (screenSession) screenSession.disconnect();
-
-  //   setScreenOV(null);
-  //   setScreenSession(null);
-  // }, [screenSession]);
 
   const joinSession = () => {
     const OVs = new OpenVidu();
@@ -267,41 +270,69 @@ const MeetingTest = () => {
               sessionIdChangeHandler={sessionIdChangeHandler}
             />
           )}
-          <div className="h-screen">
+          <div
+            className="h-screen flex flex-row "
+            style={{
+              backgroundImage: `url(${bg})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
             {/* 세션 연결 후 화면 */}
-            <div className="flex flex-col items-center justify-center ">
+            <div className="flex flex-col items-center justify-center">
               {session && (
                 <Session
                   publisher={publisher as Publisher}
-                  // screenPublisher={screenPublisher}
                   subscriber={subscriber as Subscriber}
                 />
               )}
+              {/* 버튼들 */}
+              <div className="flex items-center justify-center w-full">
+                <div className="justify-items-start p-4">
+                  <button className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center">
+                    <img className="h-7 w-7" src={invite} alt="" />
+                  </button>
+                </div>
+                {publisher && (
+                  <>
+                    <div className="flex gap-5 justify-items-center self-center">
+                      <button
+                        className={`h-10 w-10 rounded-full flex justify-center items-center ${isAudioEnabled ? "bg-red-500 hover:bg-red-400" : "bg-sky-500 hover:bg-sky-400"}`}
+                        onClick={toggleAudio}
+                      >
+                        {isAudioEnabled ? (
+                          <img className="h-7 w-7" src={mute} alt="" />
+                        ) : (
+                          <img className="h-7 w-7" src={mic} alt="" />
+                        )}
+                      </button>
+                      <button
+                        className={`h-10 w-10 rounded-full flex justify-center items-center ${isVideoEnabled ? "bg-red-500 hover:bg-red-400" : "bg-sky-500 hover:bg-sky-400"}`}
+                        onClick={toggleVideo}
+                      >
+                        {isVideoEnabled ? (
+                          <img className="h-7 w-7" src={monitorOff} alt="" />
+                        ) : (
+                          <img className="h-7 w-7" src={monitorOn} alt="" />
+                        )}
+                      </button>
+                      <button
+                        className={`h-10 w-10 rounded-full bg-sky-500 hover:bg-sky-400 flex justify-center items-center`}
+                        onClick={joinScreenSession}
+                      >
+                        <img className="h-7 w-7" src={screen} alt="" />
+                      </button>
+                      <button className="h-10 w-10 rounded-full bg-red-500 hover:bg-red-400 flex justify-center items-center">
+                        <img className="h-7 w-7" src={disconnect} alt="" />
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-            {/* 버튼들 */}
-            <div className="flex justify-center items-center">
-              {publisher && (
-                <>
-                  <button
-                    className="h-20 w-20 rounded-full bg-gray-500"
-                    onClick={toggleAudio}
-                  >
-                    {isAudioEnabled ? "음소거" : "소리모드"}
-                  </button>
-                  <button
-                    className="h-20 w-20 rounded-full bg-gray-500"
-                    onClick={toggleVideo}
-                  >
-                    {isVideoEnabled ? "화면 off" : "화면 on"}
-                  </button>
-                  <button
-                    className="h-20 w-20 rounded-full bg-gray-500"
-                    onClick={joinScreenSession}
-                  >
-                    공유 on
-                  </button>
-                </>
-              )}
+            <div>
+              <Chatting />
             </div>
           </div>
         </>
