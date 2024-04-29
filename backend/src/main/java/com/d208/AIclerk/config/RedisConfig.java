@@ -1,6 +1,10 @@
 package com.d208.AIclerk.config;
 
 import com.d208.AIclerk.chatting.util.RedisSubscriber;
+import com.d208.AIclerk.entity.Member;
+import com.d208.AIclerk.member.exception.MemberNotFoundException;
+import com.d208.AIclerk.member.repository.MemberRepository;
+import com.d208.AIclerk.utill.CommonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
@@ -21,19 +25,20 @@ public class RedisConfig {
     private final StringRedisTemplate redisTemplate;
     private final HashOperations<String, String, Object> hashOperations;
     private final ListOperations<String, String> listOperations;
-
-
     private final RedisSubscriber redisSubscriber;  // RedisSubscriber 주입
-
     private final SimpMessagingTemplate messagingTemplate;
+    private final CommonUtil commonUtil;
+    private  final MemberRepository memberRepository;
 
     @Autowired
-    public RedisConfig(StringRedisTemplate redisTemplate, RedisSubscriber redisSubscriber, SimpMessagingTemplate messagingTemplate) {
+    public RedisConfig(StringRedisTemplate redisTemplate, RedisSubscriber redisSubscriber, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, MemberRepository memberRepository) {
         this.redisTemplate = redisTemplate;
         this.hashOperations = redisTemplate.opsForHash();
         this.listOperations = redisTemplate.opsForList();
         this.redisSubscriber = redisSubscriber;
         this.messagingTemplate = messagingTemplate;
+        this.commonUtil = commonUtil;
+        this.memberRepository = memberRepository;
     }
 
     public void createRoom(Long roomId, Long owner) {
@@ -73,9 +78,13 @@ public class RedisConfig {
 
     public void addRoomMember(long roomId, long memberId) {
         String memberKey = "room:" + roomId + ":members";
+        Member currentMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException("404없다 ID: " + memberId));
+        String nickname = currentMember.getNickname();
         redisTemplate.opsForList().rightPush(memberKey, String.valueOf(memberId));
         // Redis Pub/Sub 메시지 발행
-        String message = roomId + ":" + memberId + "님이 입장하셨습니다.";
+
+        String message = roomId + ":" + nickname + "님이 입장하셨습니다.";
         //레디스에서 사용하는 퍼블리싱
         redisTemplate.convertAndSend("chatRoom:" + roomId, message);
         System.out.println("1");
@@ -87,6 +96,10 @@ public class RedisConfig {
 
     public void leaveRoom(Long roomId, Long memberId) {
         String roomKey = "room:" + roomId;
+        Member currentMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException("404없다 ID: " + memberId));
+        String nickname = currentMember.getNickname();
+
         String currentOwner = (String) hashOperations.get(roomKey, "owner");
         if (currentOwner.equals(memberId.toString())) {
             List<String> members = listOperations.range(roomKey + ":members", 0, -1);
@@ -97,7 +110,7 @@ public class RedisConfig {
                     String newOwner = members.get(0);
                     hashOperations.put(roomKey, "owner", newOwner);
                     listOperations.remove(roomKey + ":members", 0, memberId.toString());
-                    String message = roomId + ":" + memberId + " 방장님이 퇴장하셨습니다.";
+                    String message = roomId + ":" + nickname + " 방장님이 퇴장하셨습니다.";
                     redisTemplate.convertAndSend("chatRoom:" + roomId, message);
                     updateRoomInfo(roomId);
                 } else {
@@ -106,11 +119,12 @@ public class RedisConfig {
             }
         } else {
             listOperations.remove(roomKey + ":members", 0, memberId.toString());
-            String message = roomId + ":" + memberId + "님이 퇴장하셨습니다.";
+            String message = roomId + ":" + nickname + "님이 퇴장하셨습니다.";
             redisTemplate.convertAndSend("chatRoom:" + roomId, message);
             updateRoomInfo(roomId);
         }
     }
+
 
     public void deleteRoom(Long roomId) {
         redisTemplate.delete("room:" + roomId);

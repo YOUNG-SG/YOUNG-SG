@@ -10,7 +10,6 @@ import lombok.*;
 public class LeaveMeetingRequestDto {
 
     private long roomId;
-    private long userId;
 
 
 }

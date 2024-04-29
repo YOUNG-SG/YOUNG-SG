@@ -15,7 +15,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         /**
          * 구독 클라이언트한테 전송
          * sub 이 채팅방 구독합니다!!
-         * pub /pub/chat/123/SendMessage [ 이방에 메시지..합니다!]
+             * pub /pub/chat/123/SendMessage [ 이방에 메시지..합니다!]
          * */
         registry.enableSimpleBroker("/sub");  //수신임
 

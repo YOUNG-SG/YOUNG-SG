@@ -7,6 +7,8 @@ import com.d208.AIclerk.chatting.dto.requestDto.MessageDto;
 import com.d208.AIclerk.entity.MeetingRoom;
 import com.d208.AIclerk.chatting.service.RoomService;
 import com.d208.AIclerk.chatting.service.RabbitMqService;
+import com.d208.AIclerk.entity.Member;
+import com.d208.AIclerk.utill.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,18 +26,21 @@ public class RoomController {
     private final RoomService roomService;
     private final RabbitMqService rabbitMqService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final CommonUtil commonUtil;
 
-    public RoomController(RoomService roomService, RabbitMqService rabbitMqService, SimpMessagingTemplate messagingTemplate) {
+    public RoomController(RoomService roomService, RabbitMqService rabbitMqService, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil) {
         this.roomService = roomService;
         this.rabbitMqService = rabbitMqService;
         this.messagingTemplate = messagingTemplate;
+        this.commonUtil = commonUtil;
     }
 
     /**
      * 회의생성
      */
     @PostMapping("/create-meeting ")
-    public ResponseEntity<MeetingRoom> createRoom(@RequestBody MeetingRoom room, @RequestParam Long ownerId) {
+    public ResponseEntity<MeetingRoom> createRoom(@RequestBody MeetingRoom room) {
+        long ownerId=commonUtil.getMember().getId();
         MeetingRoom createdRoom = roomService.createRoom(room, ownerId);
         return ResponseEntity.ok(createdRoom);
     }
@@ -49,15 +54,20 @@ public class RoomController {
      */
     @MessageMapping("/{roomId}/sendMessage")
     public void sendMessage(@DestinationVariable Long roomId, MessageDto message) {
-        // 메시지를 해당 방의 모든 구독자에게 브로드캐스트
-        log.info("chat {} send by {} to room number{}", message,message.getSender(),roomId);
+        Member currentMember = commonUtil.getMember();
+        String nickname = currentMember.getNickname();
+
+        message.setSender(nickname);
+        log.info("chat {} send by {} to room number {}", message, nickname, roomId);
         messagingTemplate.convertAndSend("/sub/chat/" + roomId, message);
-//        rabbitMqService.sendMessage(roomId, message);
+        // rabbitMqService.sendMessage(roomId, message);
     }
 
 
+
     @PostMapping("/join/{roomId}")
-    public ResponseEntity<String> joinRoom(@PathVariable Long roomId, @RequestParam Long userId) {
+    public ResponseEntity<String> joinRoom(@PathVariable Long roomId) {
+        long userId=commonUtil.getMember().getId();
         roomService.joinRoom(roomId, userId);
         return ResponseEntity.ok("방참여완료...");
     }
@@ -83,13 +93,18 @@ public class RoomController {
 
     @PostMapping("/leave")
     public ResponseEntity<String> exitMeeting(@RequestBody LeaveMeetingRequestDto request) {
-        boolean result = roomService.leaveRoom(request.getRoomId(), request.getUserId());
+        Member currentMember = commonUtil.getMember();
+        String nickname = currentMember.getNickname();
+        long userId = currentMember.getId();
+
+        boolean result = roomService.leaveRoom(request.getRoomId(), userId);
         if (result) {
-            return ResponseEntity.ok("잘가쇼.");
+            return ResponseEntity.ok(nickname + "님이 퇴장하셨습니다.");
         } else {
-            return ResponseEntity.badRequest().body("방나가기 실패했쇼.");
+            return ResponseEntity.badRequest().body(nickname + "님 퇴장에 실패했습니다.");
         }
     }
+
 
 
 }
