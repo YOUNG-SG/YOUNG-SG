@@ -1,6 +1,15 @@
+import { useNavigate } from "react-router-dom";
+
 const TimelineMeeting = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="w-full h-[110px] flex gap-[20px] ml-[62px]">
+    <div
+      className="w-full h-[110px] flex gap-[20px] ml-[62px] cursor-pointer"
+      onClick={() => {
+        navigate("/meeting/1");
+      }}
+    >
       <div className="w-[100px] h-full flex flex-col justify-center items-center">
         <div className="text-[14px]">4월</div>
         <div className="text-[26px] font-bold">17일</div>

@@ -1,12 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchMyProfile } from "@/services/MyPage";
+import { useQuery } from "@tanstack/react-query";
 import testImg from "@/assets/@test/profile.jpg";
 import ChangeImage from "@/assets/MyPage/PencilSimpleLine.svg?react";
 
 // FIXME (확인) 이미지 변경시 navbar 이미지 변경
 const Profile = () => {
+  const {
+    data: myProfile,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["myProfile"],
+    queryFn: () => fetchMyProfile(),
+  });
+
   const [isEdit, setIsEdit] = useState(false);
-  const [nickname, setNickname] = useState("유미의세포");
+  const [nickname, setNickname] = useState("닉네임");
   const [image, setImage] = useState(testImg);
+
+  useEffect(() => {
+    if (myProfile) {
+      setNickname(myProfile.nickname);
+      setImage(myProfile.image);
+    }
+  }, [myProfile]);
+
+  if (isLoading) {
+    return (
+      <div className="min-w-[240px] h-full py-[40px] flex flex-col items-center bg-[#777777] bg-opacity-30"></div>
+    );
+  }
+
+  if (error) {
+    return <div>{error.message}</div>;
+  }
 
   const EditBtn = () => {
     return (
