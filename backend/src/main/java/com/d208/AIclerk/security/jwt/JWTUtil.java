@@ -5,12 +5,15 @@ import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.security.exception.CustomJWTException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
@@ -22,7 +25,8 @@ public class JWTUtil {
 
     private final MemberRepository memberRepository;
 
-    static SecretKey key = Jwts.SIG.HS256.key().build();
+    private static final String SECRET_KEY = "${JWT_SECRET_KEY}";
+    private static final SecretKey key = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
 
     public static String createToken(String email, int minute){
         return Jwts.builder()
@@ -54,6 +58,7 @@ public class JWTUtil {
         Map<String, Object> claim = null;
 
         try{
+            System.out.println(key);
             claim = Jwts.parser()
                     .verifyWith(key)
                     .build()
