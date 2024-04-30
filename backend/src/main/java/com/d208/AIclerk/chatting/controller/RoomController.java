@@ -1,9 +1,7 @@
 package com.d208.AIclerk.chatting.controller;
 
-import com.d208.AIclerk.chatting.dto.requestDto.CreateRecordRequestDTO;
-import com.d208.AIclerk.chatting.dto.requestDto.EndMeetingRequestDTO;
-import com.d208.AIclerk.chatting.dto.requestDto.LeaveMeetingRequestDto;
-import com.d208.AIclerk.chatting.dto.requestDto.MessageDto;
+import com.d208.AIclerk.chatting.dto.requestDto.*;
+import com.d208.AIclerk.chatting.dto.responseDto.CreateRoomResponseDto;
 import com.d208.AIclerk.entity.MeetingRoom;
 import com.d208.AIclerk.chatting.service.RoomService;
 import com.d208.AIclerk.chatting.service.RabbitMqService;
@@ -41,12 +39,28 @@ public class RoomController {
     /**
      * 회의생성
      */
-    @PostMapping("/create-meeting ")
-    public ResponseEntity<MeetingRoom> createRoom(@RequestBody MeetingRoom room) {
-        long ownerId=commonUtil.getMember().getId();
-        MeetingRoom createdRoom = roomService.createRoom(room, ownerId);
-        return ResponseEntity.ok(createdRoom);
+    @PostMapping("/create-meeting")
+    public ResponseEntity<CreateRoomResponseDto> createRoom(@RequestBody CreateRoomRequestDto dto) {
+        long ownerId = commonUtil.getMember().getId();  // 현재 로그인한 사용자의 ID를 가져옴
+
+        MeetingRoom room = new MeetingRoom();           // 새 MeetingRoom 객체 생성
+        room.setTitle(dto.getTitle());                  // DTO에서 제목 설정
+
+        MeetingRoom createdRoom = roomService.createRoom(room, ownerId); // 서비스에 room과 ownerId 전달
+
+        // CreateRoomResponseDto 생성하여 반환
+        CreateRoomResponseDto response = new CreateRoomResponseDto(
+                createdRoom.getInviteCode(),
+                0,  // 상태 필드는 여기서 설정합니다. 적절한 상태 코드로 변경해주세요.
+                createdRoom.getTitle(),
+                "생성햇습니다",
+                createdRoom.getId()
+
+        );
+
+        return ResponseEntity.ok(response);
     }
+
 
 
     /**

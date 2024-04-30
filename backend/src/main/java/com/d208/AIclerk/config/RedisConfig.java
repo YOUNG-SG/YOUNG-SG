@@ -45,12 +45,15 @@ public class RedisConfig {
     }
 
     public void createRoom(Long roomId, Long owner) {
+        System.out.println("방만드는거 시작할게 ㅎㅎ;;");
         String roomKey = "room:" + roomId.toString();
         Map<String, Object> roomInfo = new HashMap<>();
+        System.out.println(owner.toString());
         roomInfo.put("owner", owner.toString());
         roomInfo.put("status", "0");
         hashOperations.putAll(roomKey, roomInfo);
         listOperations.rightPush(roomKey + ":members", owner.toString());
+        System.out.println("방 정보가 Redis에 저장되었습니다: " + roomKey);
     }
 
     public void updateRoomInfo(long roomId) {

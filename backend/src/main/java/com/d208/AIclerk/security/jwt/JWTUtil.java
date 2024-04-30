@@ -11,6 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
@@ -22,9 +24,12 @@ public class JWTUtil {
 
     private final MemberRepository memberRepository;
 
-    static SecretKey key = Jwts.SIG.HS256.key().build();
+    private static final String SECRET_KEY = "abcd123aaaaaaaaaaaaaaaaaaaazvxvcvzxvxzczxvcxvzxcvcvzxvzxcvzxcv" ;
+    private static final SecretKey key = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
+
 
     public static String createToken(String email, int minute){
+        System.out.println(email);
         return Jwts.builder()
                 .signWith(key)
                 .issuer(email)
@@ -54,20 +59,20 @@ public class JWTUtil {
         Map<String, Object> claim = null;
 
         try{
+            System.out.println(key);
             claim = Jwts.parser()
                     .verifyWith(key)
                     .build()
                     .parseSignedClaims(token) // 파싱 및 검증, 실패 시 에러
                     .getPayload();
-        } catch (MalformedJwtException malformedJwtException) {
-            throw new CustomJWTException("MALFORMED_TOKEN");
-        } catch (ExpiredJwtException expiredJwtException) {
-            throw new CustomJWTException("TOKEN_EXPIRED");
-        } catch (InvalidClaimException invalidClaimException) {
-            throw new CustomJWTException("INVALID_TOKEN");
-        } catch (JwtException jwtException) {
-            throw new CustomJWTException("JWT_TOKEN_ERROR");
+            String email = (String) claim.get("iss");
+            System.out.println("Email from token: " + email);
+
+        } catch (Exception e) {
+            log.error("Error processing token: " + e.getMessage(), e);
+            // 선택적으로 여기서 예외를 다시 던지거나, 처리 로직을 계속할 수 있습니다.
         }
+
 
         return claim;
     }

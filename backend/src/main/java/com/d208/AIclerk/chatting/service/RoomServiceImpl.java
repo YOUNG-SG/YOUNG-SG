@@ -1,5 +1,7 @@
 package com.d208.AIclerk.chatting.service;
 
+import com.d208.AIclerk.chatting.dto.requestDto.CreateRecordRequestDTO;
+import com.d208.AIclerk.chatting.dto.requestDto.CreateRoomRequestDto;
 import com.d208.AIclerk.chatting.util.InviteCodeGenerator;
 import com.d208.AIclerk.config.RedisConfig;
 import com.d208.AIclerk.entity.MeetingRoom;
@@ -32,11 +34,13 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public MeetingRoom createRoom(MeetingRoom room, long ownerId) {
-        room.setInviteCode(inviteCodeGenerator.generateInviteCode());
-        MeetingRoom savedRoom = roomRepository.save(room);
-        redisConfig.createRoom(savedRoom.getId(), ownerId);
-        return savedRoom;
+        room.setInviteCode(inviteCodeGenerator.generateInviteCode()); // 초대 코드 생성 및 설정
+        MeetingRoom savedRoom = roomRepository.save(room);            // DB에 방 저장
+        redisConfig.createRoom(savedRoom.getId(), ownerId);           // Redis에 방 정보 저장
+
+        return savedRoom; // 저장된 방 객체 반환
     }
+
 
     public void joinRoom(long roomId, long memberId)
     {
