@@ -70,8 +70,10 @@ public class MeetingServiceImpl implements MeetingService {
 
         /*
         해야 할 일
-        1. 회의 방 이름 넣기
-        2. 참여자 명단 받아오기
+        1. 회의 방 이름 넣기 (meetingDetail.title)
+
+        2. 참여자 명단 받아오기 (participant)
+
         3. createFile 호출하기
          */
 
@@ -167,6 +169,7 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     public ResponseEntity<CreateFolderResponse> createFolder(CreateFolderRequestDto dto) {
 
+        Member currentMember = commonUtil.getMember();
         // title 길이 조절
         if (dto.getTitle() == null || dto.getTitle().isEmpty() || dto.getTitle().length() > 10) {
             throw FolderException.folderTitleLengthException();
@@ -176,6 +179,7 @@ public class MeetingServiceImpl implements MeetingService {
         Folder newFolder = Folder.builder()
                 .title(dto.getTitle())
                 .createAt(LocalDateTime.now())
+                .member(currentMember)
                 .build();
 
         folderRepository.save(newFolder);
@@ -218,9 +222,10 @@ public class MeetingServiceImpl implements MeetingService {
                 ))
                 .toList();
 
+
         log.info("(MeetingServiceImpl) 댓글리스트{}", commentResponseDtoList);
 
-        ReadCommentResponse response = new ReadCommentResponse("댓글 리스트 조회", commentResponseDtoList);
+        ReadCommentResponse response = new ReadCommentResponse("댓글 리스트 조회", commentResponseDtoList, commonUtil.getMember().getId());
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
