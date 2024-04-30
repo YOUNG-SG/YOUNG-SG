@@ -1,10 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import {
-  OpenVidu,
-  Session as OVSession,
-  Publisher,
-  Subscriber,
-} from "openvidu-browser";
+import { OpenVidu, Session as OVSession, Publisher, Subscriber } from "openvidu-browser";
 import axios, { AxiosError } from "axios";
 import Session from "./OpenVidu/Session";
 import Form from "./OpenVidu/Form";
@@ -49,9 +44,7 @@ function Meeting() {
     };
   }, [leaveSession]);
 
-  const sessionIdChangeHandler = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const sessionIdChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSessionId(event.target.value);
   };
 
@@ -76,16 +69,12 @@ function Meeting() {
     const createSession = async (sessionIds: string): Promise<string> => {
       try {
         const data = JSON.stringify({ customSessionId: sessionIds });
-        const response = await axios.post(
-          `${OPENVIDU_SERVER_URL}/openvidu/api/sessions`,
-          data,
-          {
-            headers: {
-              Authorization: `Basic ${btoa(`OPENVIDUAPP:${OPENVIDU_SERVER_SECRET}`)}`,
-              "Content-Type": "application/json",
-            },
+        const response = await axios.post(`${OPENVIDU_SERVER_URL}/openvidu/api/sessions`, data, {
+          headers: {
+            Authorization: `Basic ${btoa(`OPENVIDUAPP:${OPENVIDU_SERVER_SECRET}`)}`,
+            "Content-Type": "application/json",
           },
-        );
+        });
 
         return (response.data as { id: string }).id;
       } catch (error) {
@@ -103,17 +92,13 @@ function Meeting() {
       return new Promise((resolve, reject) => {
         const data = {};
         axios
-          .post(
-            `${OPENVIDU_SERVER_URL}/openvidu/api/sessions/${sessionIds}/connection`,
-            data,
-            {
-              headers: {
-                Authorization: `Basic ${btoa(`OPENVIDUAPP:${OPENVIDU_SERVER_SECRET}`)}`,
+          .post(`${OPENVIDU_SERVER_URL}/openvidu/api/sessions/${sessionIds}/connection`, data, {
+            headers: {
+              Authorization: `Basic ${btoa(`OPENVIDUAPP:${OPENVIDU_SERVER_SECRET}`)}`,
 
-                "Content-Type": "application/json",
-              },
+              "Content-Type": "application/json",
             },
-          )
+          })
           .then((response) => {
             resolve((response.data as { token: string }).token);
           })
@@ -186,20 +171,13 @@ function Meeting() {
           />
         )}
         {session && (
-          <Session
-            publisher={publisher as Publisher}
-            subscriber={subscriber as Subscriber}
-          />
+          <Session publisher={publisher as Publisher} subscriber={subscriber as Subscriber} />
         )}
         {publisher && (
-          <button onClick={toggleAudio}>
-            {isAudioEnabled ? "음소거" : "소리모드"}
-          </button>
+          <button onClick={toggleAudio}>{isAudioEnabled ? "음소거" : "소리모드"}</button>
         )}
         {publisher && (
-          <button onClick={toggleVideo}>
-            {isVideoEnabled ? "화면 off" : "화면 on"}
-          </button>
+          <button onClick={toggleVideo}>{isVideoEnabled ? "화면 off" : "화면 on"}</button>
         )}
       </>
       <div>

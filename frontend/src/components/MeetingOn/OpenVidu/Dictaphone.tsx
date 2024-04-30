@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import SpeechRecognition, {
-  useSpeechRecognition,
-} from "react-speech-recognition";
+import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 
 interface Command {
   command: string;
@@ -24,13 +22,8 @@ const Dictaphone = () => {
       callback: () => setMessage("Hi there!"),
     },
   ];
-  const {
-    transcript,
-    interimTranscript,
-    finalTranscript,
-    resetTranscript,
-    listening,
-  } = useSpeechRecognition({ commands });
+  const { transcript, interimTranscript, finalTranscript, resetTranscript, listening } =
+    useSpeechRecognition({ commands });
 
   useEffect(() => {
     if (finalTranscript !== "") {

@@ -43,8 +43,7 @@ function Session({ subscriber, publisher }: SessionProps) {
 
   const renderSubscribers = () => {
     const preSubscribers = nowSubscribers > 0;
-    const nextSubscribers =
-      nowSubscribers + maxSubscribers < subscribers.length;
+    const nextSubscribers = nowSubscribers + maxSubscribers < subscribers.length;
 
     return (
       <div className={`flex flex-row justify-center gap-5 mb-5 cursor-pointer`}>

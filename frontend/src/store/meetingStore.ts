@@ -1,10 +1,5 @@
 import { create } from "zustand";
-import {
-  OpenVidu,
-  Session as OVSession,
-  Publisher,
-  Subscriber,
-} from "openvidu-browser";
+import { OpenVidu, Session as OVSession, Publisher, Subscriber } from "openvidu-browser";
 
 interface MeetingState {
   session: OVSession | null;

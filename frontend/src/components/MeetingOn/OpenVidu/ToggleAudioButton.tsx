@@ -18,9 +18,7 @@ const ToggleAudioButton = ({
     setIsAudioEnabled(newAudioState);
   };
 
-  return (
-    <button onClick={toggleAudio}>{isAudioEnabled ? "Mute" : "Unmute"}</button>
-  );
+  return <button onClick={toggleAudio}>{isAudioEnabled ? "Mute" : "Unmute"}</button>;
 };
 
 export default ToggleAudioButton;

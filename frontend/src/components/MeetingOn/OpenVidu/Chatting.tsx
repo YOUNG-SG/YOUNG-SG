@@ -50,9 +50,7 @@ const Chatting = () => {
             </div>
             {isChatStatus && (
               <>
-                <div className="flex-1 m-1 overflow-y-auto rounded-xl">
-                  챝창 부분
-                </div>
+                <div className="flex-1 m-1 overflow-y-auto rounded-xl">챝창 부분</div>
                 <div className="flex flex-row gap-2 p-3 border-t border-gray-200 items-end">
                   <input
                     className="border rounded-xl h-7 pl-2"
@@ -67,9 +65,7 @@ const Chatting = () => {
             )}
             {!isChatStatus && (
               <>
-                <div className="flex-1 m-1 overflow-y-auto rounded-xl">
-                  요약 부분
-                </div>
+                <div className="flex-1 m-1 overflow-y-auto rounded-xl">요약 부분</div>
                 <div className="flex flex-row gap-1 p-3  border-t border-gray-200 items-end">
                   <input
                     className="pl-2 border rounded-xl h-7"
