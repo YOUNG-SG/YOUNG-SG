@@ -1,6 +1,7 @@
 package com.d208.AIclerk.member.service;
 
 import com.d208.AIclerk.entity.Member;
+import com.d208.AIclerk.member.dto.responseDto.EditMemberResponse;
 import com.d208.AIclerk.member.dto.responseDto.GetMemberResponse;
 import com.d208.AIclerk.member.dto.responseDto.GetMemberResponseDTO;
 import com.d208.AIclerk.member.dto.responseDto.SignInResponseDTO;
@@ -218,6 +219,10 @@ public class MemberServiceImpl implements MemberService{
 
         // 적절한 HTTP 헤더와 함께 토큰 응답을 반환
         return ResponseEntity.ok().headers(headers).body(signInResponseDTO);
+    }
+
+    public ResponseEntity<EditMemberResponse> editProfile(){
+        return null;
     }
 
 }

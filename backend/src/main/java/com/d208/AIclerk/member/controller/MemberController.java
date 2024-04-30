@@ -44,6 +44,11 @@ public class MemberController {
         return memberService.getProfile();
     }
 
+    @PutMapping("mypage/profile/edit")
+    @Operation(summary = "개인 정보 수정", description = "개인 정보를 편집합니다.")
+    public ResponseEntity editProfile() {
+        return null;
+    }
 
-    
+
 }
