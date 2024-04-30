@@ -159,27 +159,6 @@ public class MeetingServiceImpl implements MeetingService {
 
         // 파일 다운로드 링크
 
-        // 댓글 리스트 (일부 수정이 필요함)
-        List<Comment> comments = commentRepository.findAllByMeetingDetail_Id(meetingDetail.getId());
-
-        log.info("(댓글들) {}", comments);
-        // CommentResponseDto 리스트로 변환
-        List<CommentResponseDto> commentResponseDtoList = comments.stream()
-                .map(comment -> new CommentResponseDto(
-                        comment.getId(),
-                        comment.getMember().getId(),
-                        comment.getMember().getNickname(),
-                        comment.getMember().getImage(),
-                        comment.getContent(),
-                        comment.getCreateAt()
-                ))
-                .toList();
-
-        log.info("(MeetingServiceImpl) 댓글리스트{}", commentResponseDtoList);
-
-
-        dto.setCommentList(commentResponseDtoList);
-
 
         MeetingDetailResponse response = new MeetingDetailResponse("상세 페이지 조회 성공", dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -216,6 +195,32 @@ public class MeetingServiceImpl implements MeetingService {
 
         // 리스트들을 반환 해준다.
         FolderResponse response = new FolderResponse("폴더 목록 조회 성공", folderList);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Override
+    public ResponseEntity<ReadCommentResponse> readComment(Long detailId) {
+
+        // 댓글 리스트 (일부 수정이 필요함)
+        List<Comment> comments = commentRepository.findAllByMeetingDetail_Id(detailId);
+
+        log.info("(댓글들) {}", comments);
+        // CommentResponseDto 리스트로 변환
+        List<CommentResponseDto> commentResponseDtoList = comments.stream()
+                .map(comment -> new CommentResponseDto(
+                        comment.getId(),
+                        comment.getMember().getId(),
+                        comment.getMember().getNickname(),
+                        comment.getMember().getImage(),
+                        comment.getContent(),
+                        comment.getCreateAt()
+                ))
+                .toList();
+
+        log.info("(MeetingServiceImpl) 댓글리스트{}", commentResponseDtoList);
+
+        ReadCommentResponse response = new ReadCommentResponse("댓글 리스트 조회", commentResponseDtoList);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
