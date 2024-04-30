@@ -17,8 +17,6 @@ public class MeetingDetailResponseDto {
 
     private List<String> participants;
 
-    private List<CommentResponseDto> commentList;
-
     private String fileUrl;
 
     private String nextMeeting;

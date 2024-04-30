@@ -13,6 +13,7 @@ import com.d208.AIclerk.meeting.dto.requestDto.CreateFolderRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
 import com.d208.AIclerk.meeting.dto.response.*;
 import com.d208.AIclerk.meeting.dto.responseDto.CommentResponseDto;
+import com.d208.AIclerk.meeting.dto.responseDto.FolderResponseDto;
 import com.d208.AIclerk.meeting.dto.responseDto.MeetingDetailResponseDto;
 import com.d208.AIclerk.meeting.repository.CommentRepository;
 import com.d208.AIclerk.meeting.repository.FolderRepository;
@@ -70,8 +71,10 @@ public class MeetingServiceImpl implements MeetingService {
 
         /*
         해야 할 일
-        1. 회의 방 이름 넣기
-        2. 참여자 명단 받아오기
+        1. 회의 방 이름 넣기 (meetingDetail.title)
+
+        2. 참여자 명단 받아오기 (participant)
+
         3. createFile 호출하기
          */
 
@@ -159,27 +162,6 @@ public class MeetingServiceImpl implements MeetingService {
 
         // 파일 다운로드 링크
 
-        // 댓글 리스트 (일부 수정이 필요함)
-        List<Comment> comments = commentRepository.findAllByMeetingDetail_Id(meetingDetail.getId());
-
-        log.info("(댓글들) {}", comments);
-        // CommentResponseDto 리스트로 변환
-        List<CommentResponseDto> commentResponseDtoList = comments.stream()
-                .map(comment -> new CommentResponseDto(
-                        comment.getId(),
-                        comment.getMember().getId(),
-                        comment.getMember().getNickname(),
-                        comment.getMember().getImage(),
-                        comment.getContent(),
-                        comment.getCreateAt()
-                ))
-                .toList();
-
-        log.info("(MeetingServiceImpl) 댓글리스트{}", commentResponseDtoList);
-
-
-        dto.setCommentList(commentResponseDtoList);
-
 
         MeetingDetailResponse response = new MeetingDetailResponse("상세 페이지 조회 성공", dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -188,6 +170,7 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     public ResponseEntity<CreateFolderResponse> createFolder(CreateFolderRequestDto dto) {
 
+        Member currentMember = commonUtil.getMember();
         // title 길이 조절
         if (dto.getTitle() == null || dto.getTitle().isEmpty() || dto.getTitle().length() > 10) {
             throw FolderException.folderTitleLengthException();
@@ -197,6 +180,7 @@ public class MeetingServiceImpl implements MeetingService {
         Folder newFolder = Folder.builder()
                 .title(dto.getTitle())
                 .createAt(LocalDateTime.now())
+                .member(currentMember)
                 .build();
 
         folderRepository.save(newFolder);
@@ -211,11 +195,48 @@ public class MeetingServiceImpl implements MeetingService {
 
         Member currentMember = commonUtil.getMember();
 
+        Long totalTime = 12323L;
+
         // memberId 로 멤버의 폴더들 모두 조회
         List<Folder> folderList = folderRepository.findAllByMemberId(currentMember.getId());
 
+        List<FolderResponseDto> folderResponseDtoList = folderList.stream()
+                .map(folder -> new FolderResponseDto(
+                        folder.getId(),
+                        folder.getTitle(),
+                        totalTime
+                ))
+                .toList();
+
         // 리스트들을 반환 해준다.
-        FolderResponse response = new FolderResponse("폴더 목록 조회 성공", folderList);
+        FolderResponse response = new FolderResponse("폴더 목록 조회 성공", folderResponseDtoList);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Override
+    public ResponseEntity<ReadCommentResponse> readComment(Long detailId) {
+
+        // 댓글 리스트 (일부 수정이 필요함)
+        List<Comment> comments = commentRepository.findAllByMeetingDetail_Id(detailId);
+
+        log.info("(댓글들) {}", comments);
+        // CommentResponseDto 리스트로 변환
+        List<CommentResponseDto> commentResponseDtoList = comments.stream()
+                .map(comment -> new CommentResponseDto(
+                        comment.getId(),
+                        comment.getMember().getId(),
+                        comment.getMember().getNickname(),
+                        comment.getMember().getImage(),
+                        comment.getContent(),
+                        comment.getCreateAt()
+                ))
+                .toList();
+
+
+        log.info("(MeetingServiceImpl) 댓글리스트{}", commentResponseDtoList);
+
+        ReadCommentResponse response = new ReadCommentResponse("댓글 리스트 조회", commentResponseDtoList, commonUtil.getMember().getId());
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

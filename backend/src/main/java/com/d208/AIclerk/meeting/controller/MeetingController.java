@@ -33,11 +33,16 @@ public class MeetingController {
         return meetingService.createComment(dto);
     }
 
-    // 코멘트 삭제
     @DeleteMapping("/comment/{commentId}")
     @Operation(summary = "책 코멘트 삭제", description = "책 코멘트 삭제")
     public ResponseEntity<CommentDeleteResponse> deleteComment(@PathVariable("commentId") Long commentId) {
         return meetingService.deleteComment(commentId);
+    }
+
+    @GetMapping("/comment/{detailId}")
+    @Operation(summary = "댓글 리스트 조회", description = "댓글 리스트 조회 api")
+    public ResponseEntity<ReadCommentResponse> readComment(@PathVariable("detailId") Long detailId) {
+        return meetingService.readComment(detailId);
     }
 
     @GetMapping("/detail/{roomId}")

@@ -18,4 +18,6 @@ public interface MeetingService {
     ResponseEntity<CreateFolderResponse> createFolder(CreateFolderRequestDto dto);
 
     ResponseEntity<FolderResponse> readFolderList();
+
+    ResponseEntity<ReadCommentResponse> readComment(Long detailId);
 }
