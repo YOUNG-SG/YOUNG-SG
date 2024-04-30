@@ -31,9 +31,9 @@ const Chatting = () => {
 
   return (
     <>
-      <div className="h-full">
+      <div className="h-screen grid grid-rows-12">
         {isChatting && (
-          <div className="h-[90%] flex flex-col border rounded-xl gap-0.5">
+          <div className="row-span-10 flex flex-col border rounded-xl gap-0.5">
             <div className="flex w-full p-1 gap-0.5 ">
               <button
                 className="border bg-gray-300 hover:bg-gray-500 hover:text-white rounded-md w-full"
@@ -50,7 +50,7 @@ const Chatting = () => {
             </div>
             {isChatStatus && (
               <>
-                <div className="flex-1 m-1 overflow-y-auto rounded-xl">챝창 부분</div>
+                <div className="flex-1 m-1 overflow-y-auto rounded-xl">채팅창 부분</div>
                 <div className="flex flex-row gap-2 p-3 border-t border-gray-200 items-end">
                   <input
                     className="border rounded-xl h-7 pl-2"
@@ -66,29 +66,19 @@ const Chatting = () => {
             {!isChatStatus && (
               <>
                 <div className="flex-1 m-1 overflow-y-auto rounded-xl">요약 부분</div>
-                <div className="flex flex-row gap-1 p-3  border-t border-gray-200 items-end">
-                  <input
-                    className="pl-2 border rounded-xl h-7"
-                    type="text"
-                    placeholder="메시지를 입력하세요"
-                  />
-                  <button className="w-7 h-7 rounded-2xl bg-blue-400 hover:bg-blue-600 flex justify-center items-center">
-                    <img className="w-5 h-5" src={send} alt="" />
-                  </button>
-                </div>
               </>
             )}
           </div>
         )}
         {!isChatting && (
           <>
-            <div className="h-[90%] w-full flex flex-col border rounded-xl bg-white">
-              <div className="w-full">users</div>
+            <div className="row-span-10 w-full flex flex-col border rounded-xl ">
+              <div className="w-full">유저 목록</div>
             </div>
           </>
         )}
         {/* 버튼들 */}
-        <div className="h-[10%] flex gap-2 justify-end">
+        <div className="row-span-2 flex gap-2 justify-end items-center">
           <button
             onClick={handleIsSubscribers}
             className="w-10 h-10 rounded-full bg-gray-400 flex justify-center items-center"

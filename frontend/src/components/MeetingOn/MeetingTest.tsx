@@ -251,7 +251,7 @@ const MeetingTest = () => {
   return (
     <>
       <div>
-        <h1>진행화면</h1>
+        {/* <h1>진행화면</h1> */}
         <>
           {!session && (
             <Form
@@ -261,7 +261,7 @@ const MeetingTest = () => {
             />
           )}
           <div
-            className="h-screen flex flex-row "
+            className="h-screen grid grid-cols-12 pr-2"
             style={{
               backgroundImage: `url(${bg})`,
               backgroundSize: "cover",
@@ -270,13 +270,19 @@ const MeetingTest = () => {
             }}
           >
             {/* 세션 연결 후 화면 */}
-            <div className="flex flex-col items-center justify-center">
-              {session && (
-                <Session publisher={publisher as Publisher} subscriber={subscriber as Subscriber} />
-              )}
+            <div className="col-span-9 grid gird-rows-12">
+              <div className="row-span-10 items-center justify-center">
+                {session && (
+                  <Session
+                    publisher={publisher as Publisher}
+                    subscriber={subscriber as Subscriber}
+                  />
+                )}
+              </div>
+
               {/* 버튼들 */}
-              <div className="flex items-center justify-center w-full">
-                <div className="justify-items-start p-4">
+              <div className="row-span-2 flex items-center justify-center w-full">
+                <div className="justify-items-start pr-5">
                   <button className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center">
                     <img className="h-7 w-7" src={invite} alt="" />
                   </button>
@@ -318,7 +324,7 @@ const MeetingTest = () => {
                 )}
               </div>
             </div>
-            <div>
+            <div className="col-span-3">
               <Chatting />
             </div>
           </div>

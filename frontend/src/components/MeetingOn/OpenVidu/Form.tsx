@@ -18,6 +18,7 @@ function Form({ joinSession, sessionId, sessionIdChangeHandler }: FormProps) {
       <form onSubmit={onSubmitHandler}>
         <p>
           <input
+            className="text-black"
             type="text"
             value={sessionId}
             onChange={sessionIdChangeHandler}
