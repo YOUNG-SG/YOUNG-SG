@@ -1,6 +1,6 @@
 FROM node:alpine as builder
 WORKDIR /frontend
-COPY package*.json ./
+COPY package.json .
 RUN npm install
 COPY ./ ./
 RUN npm run build
@@ -9,4 +9,4 @@ RUN npm run build
 EXPOSE 5173
 
 # npm start 스크립트 실행
-CMD ["npm", "start"]:
+CMD ["npm", "run", "dev"]:
