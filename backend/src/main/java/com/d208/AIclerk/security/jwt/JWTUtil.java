@@ -25,10 +25,11 @@ public class JWTUtil {
 
     private final MemberRepository memberRepository;
 
-    private static final String SECRET_KEY = "${JWT_SECRET_KEY}";
+    private static final String SECRET_KEY = "abcd123aaaaaaaaaaaaaaaaaaaazvxvcvzxvxzczxvcxvzxcvcvzxvzxcvzxcv" ;
     private static final SecretKey key = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
 
     public static String createToken(String email, int minute){
+        System.out.println(email);
         return Jwts.builder()
                 .signWith(key)
                 .issuer(email)
@@ -36,7 +37,6 @@ public class JWTUtil {
                 .subject("USER")
                 .compact();
     }
-
 
     // 토큰에서 클레임 추출
     public Claims extractClaims(String token) {
@@ -64,15 +64,14 @@ public class JWTUtil {
                     .build()
                     .parseSignedClaims(token) // 파싱 및 검증, 실패 시 에러
                     .getPayload();
-        } catch (MalformedJwtException malformedJwtException) {
-            throw new CustomJWTException("MALFORMED_TOKEN");
-        } catch (ExpiredJwtException expiredJwtException) {
-            throw new CustomJWTException("TOKEN_EXPIRED");
-        } catch (InvalidClaimException invalidClaimException) {
-            throw new CustomJWTException("INVALID_TOKEN");
-        } catch (JwtException jwtException) {
-            throw new CustomJWTException("JWT_TOKEN_ERROR");
+            String email = (String) claim.get("iss");
+            System.out.println("Email from token: " + email);
+
+        } catch (Exception e) {
+            log.error("Error processing token: " + e.getMessage(), e);
+            // 선택적으로 여기서 예외를 다시 던지거나, 처리 로직을 계속할 수 있습니다.
         }
+
 
         return claim;
     }

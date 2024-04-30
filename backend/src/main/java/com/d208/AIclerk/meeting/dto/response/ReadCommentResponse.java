@@ -17,4 +17,6 @@ public class ReadCommentResponse {
     private String message;
 
     private List<CommentResponseDto> data;
+
+    private Long currentMemberId;
 }
