@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import send from "../../../assets/chattingIcons/send.png";
 import chat from "../../../assets/chattingIcons/messenger.png";
 import people from "../../../assets/chattingIcons/people.png";
@@ -7,6 +7,7 @@ const Chatting = () => {
   // isChat이면 채팅창, false이면 사용자 목록
   const [isChatting, setIsChatting] = useState<boolean>(false);
   const [isChatStatus, setIsChatStatus] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
 
   const handleIsChatting = () => {
     const status = isChatting;
@@ -27,6 +28,15 @@ const Chatting = () => {
   };
   const handleIsSummaryClick = () => {
     setIsChatStatus(false);
+  };
+
+  const handleMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(event.target.value);
+  };
+
+  const handleSendMessage = () => {
+    console.log("메시지를 보냅니더", message);
+    setMessage("");
   };
 
   return (
@@ -56,8 +66,12 @@ const Chatting = () => {
                     className="border rounded-xl h-7 pl-2"
                     type="text"
                     placeholder="메시지를 입력하세요"
+                    onChange={handleMessageChange}
                   />
-                  <button className="w-7 h-7 rounded-2xl bg-blue-400 hover:bg-blue-600 flex justify-center items-center">
+                  <button
+                    className="w-7 h-7 rounded-2xl bg-blue-400 hover:bg-blue-600 flex justify-center items-center"
+                    onClick={handleSendMessage}
+                  >
                     <img className="w-5 h-5" src={send} alt="" />
                   </button>
                 </div>

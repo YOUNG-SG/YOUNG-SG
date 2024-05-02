@@ -1,9 +1,9 @@
 import Navbar from "@/components/@common/Navbar";
 import { Navigate, Outlet } from "react-router";
+import { tokenStore } from "@/store/tokenStore";
 
 const HasNavbarLayout = () => {
-  // FIXME token 생성 후 수정
-  const token = "token";
+  const { token } = tokenStore();
 
   if (token) {
     return (

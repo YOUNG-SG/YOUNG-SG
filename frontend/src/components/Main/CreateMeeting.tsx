@@ -1,12 +1,25 @@
-// import { useNavigate } from "react-router-dom";
-
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createRoom } from "@/services/createRoom";
+import createRoomStore from "@/store/createRoom";
 
 const CreateMeeting = () => {
-  // const navigate = useNavigate();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [meetingName, setMeetingName] = useState("");
-  console.log(meetingName);
+  const navigate = useNavigate();
+
+  const { title, setTitle, setSessionId, setRoomId } = createRoomStore();
+  const createChattingRoom = async () => {
+    try {
+      const { invite_code, roomId } = await createRoom(title);
+      setSessionId(invite_code);
+      setRoomId(roomId);
+      console.log(invite_code, roomId);
+      // 이동
+      navigate(`/meeting/on/${invite_code}`);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  console.log(title);
 
   return (
     <div className="w-[1100px] h-[600px] bg-e-20 rounded-lg backdrop-blur-10 flex flex-col justify-center items-center gap-[30px]">
@@ -22,16 +35,14 @@ const CreateMeeting = () => {
             id="meetingName"
             className="w-[550px] h-[55px] rounded-lg text-[20px] px-[16px] bg-e-30 focus:outline-none"
             onChange={(event) => {
-              setMeetingName(event.target.value);
+              setTitle(event.target.value);
             }}
           />
         </div>
         <div
           className="flex justify-center items-center w-[280px] h-[50px] text-[24px] text-[#333333] font-bold bg-[#EEEEEE] bg-opacity-80 hover:bg-opacity-70 rounded-lg shadow-md cursor-pointer"
           // [API] 회의생성API & 회의코드 저장 & navigate 회의진행 페이지
-          onClick={() => {
-            // navigate("회의진행")
-          }}
+          onClick={createChattingRoom}
         >
           생성
         </div>

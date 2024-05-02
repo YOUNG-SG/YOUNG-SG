@@ -4,7 +4,7 @@ import { OpenVidu, Session as OVSession, Publisher, Subscriber } from "openvidu-
 interface MeetingState {
   session: OVSession | null;
   screenSession: OVSession | null;
-  sessionId: string;
+  // sessionId: string;
   subscriber: Subscriber | null;
   screenSubscriber: Subscriber | null;
   publisher: Publisher | null;
@@ -16,7 +16,7 @@ interface MeetingState {
 
   setSession: (session: OVSession | null) => void;
   setScreenSession: (session: OVSession | null) => void;
-  setSessionId: (sessionId: string) => void;
+  // setSessionId: (sessionId: string) => void;
   setSubscriber: (subscriber: Subscriber | null) => void;
   setScreenSubscriber: (screenSubscriber: Subscriber | null) => void;
   setPublisher: (publisher: Publisher | null) => void;
@@ -30,7 +30,7 @@ interface MeetingState {
 const useMeetingStore = create<MeetingState>((set) => ({
   session: null,
   screenSession: null,
-  sessionId: "",
+  // sessionId: "",
   subscriber: null,
   screenSubscriber: null,
   publisher: null,
@@ -42,7 +42,7 @@ const useMeetingStore = create<MeetingState>((set) => ({
 
   setSession: (session) => set({ session }),
   setScreenSession: (screenSession) => set({ screenSession }),
-  setSessionId: (sessionId) => set({ sessionId }),
+  // setSessionId: (sessionId) => set({ sessionId }),
   setSubscriber: (subscriber) => set({ subscriber }),
   setScreenSubscriber: (screenSubscriber) => set({ screenSubscriber }),
   setPublisher: (publisher) => set({ publisher }),

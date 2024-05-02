@@ -15,15 +15,17 @@ import screen from "../../assets/chattingIcons/screen.png";
 import bg from "../../assets/chattingIcons/bgImage.jpg";
 import { OpenVidu, Publisher, Subscriber } from "openvidu-browser";
 import axios, { AxiosError } from "axios";
+import createRoomStore from "@/store/createRoom";
 
 const MeetingTest = () => {
+  const { sessionId, setSessionId } = createRoomStore();
   const {
     session,
     setSession,
     screenSession,
     setScreenSession,
-    sessionId,
-    setSessionId,
+    // sessionId,
+    // setSessionId,
     subscriber,
     setSubscriber,
     // screenSubscriber,
@@ -136,6 +138,10 @@ const MeetingTest = () => {
       throw new Error("Failed to get token.");
     }
   };
+
+  useEffect(() => {
+    joinSession();
+  }, []);
 
   useEffect(() => {
     if (session === null) return;
