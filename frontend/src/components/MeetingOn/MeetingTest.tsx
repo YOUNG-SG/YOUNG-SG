@@ -270,7 +270,7 @@ const MeetingTest = () => {
             }}
           >
             {/* 세션 연결 후 화면 */}
-            <div className="col-span-9 grid gird-rows-12">
+            <div className="col-span-9 grid grid-rows-12">
               <div className="row-span-10 items-center justify-center">
                 {session && (
                   <Session
