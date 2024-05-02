@@ -20,4 +20,6 @@ public interface MeetingService {
     ResponseEntity<FolderResponse> readFolderList();
 
     ResponseEntity<ReadCommentResponse> readComment(Long detailId);
+
+    ResponseEntity<String> checkhello();
 }

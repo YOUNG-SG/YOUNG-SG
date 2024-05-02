@@ -225,4 +225,10 @@ public class MeetingServiceImpl implements MeetingService {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Override
+    public ResponseEntity<String> checkhello() {
+        String response = "hello";
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }
