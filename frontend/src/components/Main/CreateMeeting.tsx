@@ -5,11 +5,10 @@ import createRoomStore from "@/store/createRoom";
 const CreateMeeting = () => {
   const navigate = useNavigate();
 
-  const { title, setTitle, setSessionId, setRoomId } = createRoomStore();
+  const { title, setTitle, setRoomId } = createRoomStore();
   const createChattingRoom = async () => {
     try {
       const { invite_code, roomId } = await createRoom(title);
-      setSessionId(invite_code);
       setRoomId(roomId);
       console.log(invite_code, roomId);
       // 이동

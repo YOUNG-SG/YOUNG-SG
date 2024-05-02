@@ -140,10 +140,6 @@ const MeetingTest = () => {
   };
 
   useEffect(() => {
-    joinSession();
-  }, []);
-
-  useEffect(() => {
     if (session === null) return;
 
     session.on("streamDestroyed", (event) => {
