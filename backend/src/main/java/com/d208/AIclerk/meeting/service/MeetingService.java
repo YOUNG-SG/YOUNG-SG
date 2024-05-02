@@ -20,4 +20,8 @@ public interface MeetingService {
     ResponseEntity<FolderResponse> readFolderList();
 
     ResponseEntity<ReadCommentResponse> readComment(Long detailId);
+
+    ResponseEntity<MeetingDetailResponse> fileTest(Long fileId);
+
 }
+

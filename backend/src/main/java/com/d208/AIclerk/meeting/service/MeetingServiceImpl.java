@@ -50,8 +50,6 @@ public class MeetingServiceImpl implements MeetingService {
     private final CommentRepository commentRepository;
     private final FolderRepository folderRepository;
 
-    private final WordDocumentUpdater wordDocumentUpdater;
-
     // OpenAi 텍스트 요약
     @Override
     public ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception {
@@ -240,15 +238,17 @@ public class MeetingServiceImpl implements MeetingService {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    public ResponseEntity<MeetingDetailResponse> test1(Long a) {
+    public ResponseEntity<MeetingDetailResponse> fileTest(Long fileId) {
         String baseDirectory = "C:/Users/SSAFY/Desktop/word_test/docs/";
         String originalFileName = "test_test.docx";
         String newFileName = "회의록_" + WordDocumentUpdater.getCurrentTimeFormatted() + ".docx";
         String newFilePath = baseDirectory + newFileName;
         List<String> attendees = List.of("홍길동", "김개똥", "이민정", "신민아", "김광석");
 
-        WordDocumentUpdater.updateDocument(baseDirectory + originalFileName, newFilePath, "이건 제목입니당", "회의록 작성 잘 되는지 확인해볼까용", attendees);
+        String content = meetingDetailRepository.findSummaryById(fileId);
 
-        return ResponseEntity.ok().build();  // 적절한 응답 반환
+        WordDocumentUpdater.updateDocument(baseDirectory + originalFileName, newFilePath, "이건  제목입니당", content, attendees);
+
+        return ResponseEntity.ok().build();
     }
 }
