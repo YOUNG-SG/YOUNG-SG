@@ -228,8 +228,9 @@ public class MemberServiceImpl implements MemberService{
     }
 
     public ResponseEntity<EditMemberResponseDto> editProfile(EditMemberRequestDto dto){
-        dto.getProfileImg();
-        dto.getNickname();
+//        dto.getProfileImg();
+//        dto.getNickname();
+        System.out.println(JWTUtil.findEmailByToken());
         return null;
     }
 

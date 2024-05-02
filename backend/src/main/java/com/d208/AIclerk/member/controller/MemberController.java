@@ -2,6 +2,8 @@ package com.d208.AIclerk.member.controller;
 
 
 import com.d208.AIclerk.entity.Member;
+import com.d208.AIclerk.member.dto.requestDto.EditMemberRequestDto;
+import com.d208.AIclerk.member.dto.responseDto.EditMemberResponseDto;
 import com.d208.AIclerk.member.dto.responseDto.GetMemberResponse;
 import com.d208.AIclerk.member.dto.responseDto.SignInResponseDTO;
 import com.d208.AIclerk.member.repository.MemberRepository;
@@ -46,8 +48,8 @@ public class MemberController {
 
     @PutMapping("mypage/profile/edit")
     @Operation(summary = "개인 정보 수정", description = "개인 정보를 편집합니다.")
-    public ResponseEntity editProfile() {
-        return null;
+    public ResponseEntity<EditMemberResponseDto> editProfile(@RequestBody EditMemberRequestDto dto) {
+        return memberService.editProfile(dto);
     }
 
 
