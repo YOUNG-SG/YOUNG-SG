@@ -61,6 +61,10 @@ public class S3Uploader {
     private Optional<File> convert(MultipartFile file) throws IOException {
         File convertFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
 
+        // 이미 존재하는 파일인 경우 삭제 후 다시 생성
+        if (convertFile.exists() && !convertFile.delete()) {
+            throw new IOException("이미 존재하는 파일을 삭제하는데 실패했습니다.");
+        }
 
         if (convertFile.createNewFile()) {
             try (FileOutputStream fos = new FileOutputStream(convertFile)) { //convertFile를 OutputStream으로 만들어라

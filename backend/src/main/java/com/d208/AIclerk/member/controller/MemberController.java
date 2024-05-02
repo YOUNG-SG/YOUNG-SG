@@ -46,9 +46,9 @@ public class MemberController {
         return memberService.getProfile();
     }
 
-    @PutMapping("mypage/profile/edit")
+    @PutMapping("/mypage/profile/edit")
     @Operation(summary = "개인 정보 수정", description = "개인 정보를 편집합니다.")
-    public ResponseEntity<EditMemberResponseDto> editProfile(@RequestBody EditMemberRequestDto dto) {
+    public ResponseEntity<EditMemberResponseDto> editProfile(@ModelAttribute EditMemberRequestDto dto) {
         return memberService.editProfile(dto);
     }
 

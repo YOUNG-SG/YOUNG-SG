@@ -1,5 +1,6 @@
 package com.d208.AIclerk.member.service;
 
+import com.d208.AIclerk.common.S3Uploader;
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.member.dto.requestDto.EditMemberRequestDto;
 import com.d208.AIclerk.member.dto.responseDto.EditMemberResponseDto;
@@ -24,6 +25,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +37,7 @@ public class MemberServiceImpl implements MemberService{
     private final MemberRepository memberRepository; //(1)
     private final RefreshTokenRepository refreshTokenRepository;
     private final CommonUtil commonUtil;
+    private final S3Uploader s3Uploader;
 
 
     @Value("${KAKAO_CLIENT_ID}")
@@ -227,11 +230,25 @@ public class MemberServiceImpl implements MemberService{
         return ResponseEntity.ok().headers(headers).body(signInResponseDTO);
     }
 
-    public ResponseEntity<EditMemberResponseDto> editProfile(EditMemberRequestDto dto){
+    @Override
+    public ResponseEntity<EditMemberResponseDto> editProfile(EditMemberRequestDto dto) {
 //        dto.getProfileImg();
 //        dto.getNickname();
-        System.out.println(JWTUtil.findEmailByToken());
-        return null;
+//        System.out.println(JWTUtil.findEmailByToken());
+        System.out.println("hi");
+
+        // imgUrl을 만들어서 s#에 저장 시작
+        try {
+            String imgUrl = "";
+            System.out.println(dto.getProfileImg());
+            imgUrl = s3Uploader.upload(dto.getProfileImg());
+            System.out.println(imgUrl);
+            return null;
+        } catch (IOException e ) {
+            System.err.println("Error uploading image to S3: " + e.getMessage());
+            return null;
+        }
+
     }
 
 }
