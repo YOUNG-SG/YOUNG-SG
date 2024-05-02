@@ -17,7 +17,7 @@ public class MemberMeeting {
     private Long id;
 
     @Column(name = "folder_id")
-    private String folderId;
+    private Long folderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "detail_id", nullable = false)
