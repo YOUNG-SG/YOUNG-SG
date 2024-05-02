@@ -63,7 +63,7 @@ public class MeetingController {
         return meetingService.readFolderList();
     }
 
-    @GetMapping("hello")
+    @GetMapping("/hello")
     public ResponseEntity<String> checkhello(){
         return meetingService.checkhello();
     }
