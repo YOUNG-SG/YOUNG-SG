@@ -1,12 +1,12 @@
 import { axiosRequest, axiosAuthRequest } from "./axios";
 
-// 회의 상세 (id: 회의방 id)
+// TODO 회의 상세 (id: 회의방 id)
 export const fetchMeetingDetail = async (roomId: number) => {
   const res = await axiosRequest.get(`/api/meeting/detail/${roomId}`);
   return res;
 };
 
-// 파일 다운로드
+// TODO 파일 다운로드
 export const downloadFile = async (fileName: string) => {
   const res = await axiosRequest.get(`/api/meeting/file/download/${fileName}`);
   return res;
