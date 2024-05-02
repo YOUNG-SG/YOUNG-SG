@@ -1,7 +1,8 @@
 package com.d208.AIclerk.member.service;
 
 import com.d208.AIclerk.entity.Member;
-import com.d208.AIclerk.member.dto.responseDto.EditMemberResponse;
+import com.d208.AIclerk.member.dto.requestDto.EditMemberRequestDto;
+import com.d208.AIclerk.member.dto.responseDto.EditMemberResponseDto;
 import com.d208.AIclerk.member.dto.responseDto.GetMemberResponse;
 import com.d208.AIclerk.member.dto.responseDto.GetMemberResponseDTO;
 import com.d208.AIclerk.member.dto.responseDto.SignInResponseDTO;
@@ -221,7 +222,9 @@ public class MemberServiceImpl implements MemberService{
         return ResponseEntity.ok().headers(headers).body(signInResponseDTO);
     }
 
-    public ResponseEntity<EditMemberResponse> editProfile(){
+    public ResponseEntity<EditMemberResponseDto> editProfile(EditMemberRequestDto dto){
+        dto.getProfileImg();
+        dto.getNickname();
         return null;
     }
 
