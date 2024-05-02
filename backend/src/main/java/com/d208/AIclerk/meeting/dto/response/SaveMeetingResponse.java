@@ -6,12 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class CreateFolderResponse {
+public class SaveMeetingResponse {
 
     private String message;
 
-    private boolean data;
 }

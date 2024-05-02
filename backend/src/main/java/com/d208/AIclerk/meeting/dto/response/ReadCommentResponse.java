@@ -1,17 +1,22 @@
 package com.d208.AIclerk.meeting.dto.response;
 
+import com.d208.AIclerk.meeting.dto.responseDto.CommentResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
+import java.util.List;
+
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class CreateFolderResponse {
+@Data
+public class ReadCommentResponse {
 
     private String message;
 
-    private boolean data;
+    private List<CommentResponseDto> data;
+
+    private Long currentMemberId;
 }

@@ -6,9 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class CreateFolderResponseDto {
+public class FolderResponseDto {
+
+    private Long folderId;
+
     private String title;
+
+    private Long totalTime;
+
 }

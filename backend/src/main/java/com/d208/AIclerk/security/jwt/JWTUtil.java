@@ -5,6 +5,7 @@ import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.security.exception.CustomJWTException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,7 +28,6 @@ public class JWTUtil {
     private static final String SECRET_KEY = "abcd123aaaaaaaaaaaaaaaaaaaazvxvcvzxvxzczxvcxvzxcvcvzxvzxcvzxcv" ;
     private static final SecretKey key = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
 
-
     public static String createToken(String email, int minute){
         System.out.println(email);
         return Jwts.builder()
@@ -37,7 +37,6 @@ public class JWTUtil {
                 .subject("USER")
                 .compact();
     }
-
 
     // 토큰에서 클레임 추출
     public Claims extractClaims(String token) {

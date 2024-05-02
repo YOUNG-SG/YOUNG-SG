@@ -3,10 +3,8 @@ package com.d208.AIclerk.meeting.controller;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateCommentRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateFolderRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
-import com.d208.AIclerk.meeting.dto.response.CommentDeleteResponse;
-import com.d208.AIclerk.meeting.dto.response.CreateCommentResponse;
-import com.d208.AIclerk.meeting.dto.response.CreateFolderResponse;
-import com.d208.AIclerk.meeting.dto.response.MeetingDetailResponse;
+import com.d208.AIclerk.meeting.dto.requestDto.SaveMeetingRequestDto;
+import com.d208.AIclerk.meeting.dto.response.*;
 import com.d208.AIclerk.meeting.service.MeetingService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -36,23 +34,46 @@ public class MeetingController {
         return meetingService.createComment(dto);
     }
 
-    // 코멘트 삭제
     @DeleteMapping("/comment/{commentId}")
-    @Operation(summary = "책 코멘트 삭제", description = "책 코멘트 삭제")
+    @Operation(summary = "코멘트 삭제", description = "책 코멘트 삭제")
     public ResponseEntity<CommentDeleteResponse> deleteComment(@PathVariable("commentId") Long commentId) {
         return meetingService.deleteComment(commentId);
     }
 
-    @GetMapping("/detail/{detailId}")
+    @GetMapping("/comment/{detailId}")
+    @Operation(summary = "댓글 리스트 조회", description = "댓글 리스트 조회 api")
+    public ResponseEntity<ReadCommentResponse> readComment(@PathVariable("detailId") Long detailId) {
+        return meetingService.readComment(detailId);
+    }
+
+    @GetMapping("/detail/{roomId}")
     @Operation(summary = "회의 상세 페이지", description = "회의 종료 후 생성되는 상세페이지")
     public ResponseEntity<MeetingDetailResponse> readMeetingDetail(@PathVariable("roomId") Long roomId){
         return meetingService.readMeetingDetail(roomId);
     }
 
+    @GetMapping("detail/{folderId}")
+    @Operation(summary = "회의 상세 페이지 목록 조회", description = "회의 상세페이지 목록 조회 (폴더 클릭시 보이는 리스트")
+    public ResponseEntity<DetailListResponse> readDetailList(@PathVariable("folderId") Long folderId) {
+        return meetingService.readDetailList(folderId);
+    }
+
     @PostMapping("/folder/create")
     @Operation(summary = "폴더 생성", description = "회의정보를 저장할 폴더 생성")
-    public ResponseEntity<CreateFolderResponse> createFoler(@RequestBody CreateFolderRequestDto dto) {
+    public ResponseEntity<CreateFolderResponse> createFolder(@RequestBody CreateFolderRequestDto dto) {
         return meetingService.createFolder(dto);
+    }
+
+    @GetMapping("/folder-list")
+    @Operation(summary = "폴더 목록 조회", description = "회의정보를 저장할 폴더 목록 조회 (개인별로 다름)")
+    public ResponseEntity<FolderResponse> readFolderList(){
+        return meetingService.readFolderList();
+    }
+
+    @PostMapping("/save-meeting")
+    @Operation(summary = "회의 저장 하기", description = "폴더 선택 후 회의 저장 기능")
+    public ResponseEntity<SaveMeetingResponse> saveMeeting(@RequestBody SaveMeetingRequestDto dto) {
+        return meetingService.saveMeeting(dto);
     }
 
 }

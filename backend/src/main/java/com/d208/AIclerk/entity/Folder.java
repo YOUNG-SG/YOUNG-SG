@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -21,7 +22,14 @@ public class Folder {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "createAt")
+    @Column(name = "create_at")
     private LocalDateTime createAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
+
+    @OneToMany(mappedBy = "folder", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<MemberMeeting> memberMeetings;
 
 }
