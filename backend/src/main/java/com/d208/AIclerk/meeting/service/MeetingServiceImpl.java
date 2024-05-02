@@ -1,23 +1,23 @@
 package com.d208.AIclerk.meeting.service;
 
 
-import com.d208.AIclerk.entity.Comment;
-import com.d208.AIclerk.entity.Folder;
-import com.d208.AIclerk.entity.MeetingDetail;
-import com.d208.AIclerk.entity.Member;
+import com.d208.AIclerk.entity.*;
 import com.d208.AIclerk.exception.meeting.CommentException;
 import com.d208.AIclerk.exception.meeting.FolderException;
 import com.d208.AIclerk.exception.meeting.MeetingDetailException;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateCommentRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateFolderRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
+import com.d208.AIclerk.meeting.dto.requestDto.SaveMeetingRequestDto;
 import com.d208.AIclerk.meeting.dto.response.*;
 import com.d208.AIclerk.meeting.dto.responseDto.CommentResponseDto;
+import com.d208.AIclerk.meeting.dto.responseDto.DetailListResponseDto;
 import com.d208.AIclerk.meeting.dto.responseDto.FolderResponseDto;
 import com.d208.AIclerk.meeting.dto.responseDto.MeetingDetailResponseDto;
 import com.d208.AIclerk.meeting.repository.CommentRepository;
 import com.d208.AIclerk.meeting.repository.FolderRepository;
 import com.d208.AIclerk.meeting.repository.MeetingDetailRepository;
+import com.d208.AIclerk.meeting.repository.MemberMeetingRepository;
 import com.d208.AIclerk.utill.CommonUtil;
 import com.d208.AIclerk.utill.OpenAiUtil;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +43,7 @@ public class MeetingServiceImpl implements MeetingService {
     private final MeetingDetailRepository meetingDetailRepository;
     private final CommentRepository commentRepository;
     private final FolderRepository folderRepository;
+    private final MemberMeetingRepository memberMeetingRepository;
 
     // OpenAi 텍스트 요약
     @Override
@@ -158,6 +160,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         // 다음 회의
 
+
         // 참여자 목록
 
         // 파일 다운로드 링크
@@ -200,6 +203,10 @@ public class MeetingServiceImpl implements MeetingService {
         // memberId 로 멤버의 폴더들 모두 조회
         List<Folder> folderList = folderRepository.findAllByMemberId(currentMember.getId());
 
+        if (folderList.isEmpty()){
+            throw FolderException.folderNotFoundException();
+        }
+
         List<FolderResponseDto> folderResponseDtoList = folderList.stream()
                 .map(folder -> new FolderResponseDto(
                         folder.getId(),
@@ -207,6 +214,7 @@ public class MeetingServiceImpl implements MeetingService {
                         totalTime
                 ))
                 .toList();
+
 
         // 리스트들을 반환 해준다.
         FolderResponse response = new FolderResponse("폴더 목록 조회 성공", folderResponseDtoList);
@@ -217,8 +225,11 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     public ResponseEntity<ReadCommentResponse> readComment(Long detailId) {
 
-        // 댓글 리스트 (일부 수정이 필요함)
         List<Comment> comments = commentRepository.findAllByMeetingDetail_Id(detailId);
+
+        if (comments.isEmpty()){
+            throw CommentException.commentNotFoundException();
+        }
 
         log.info("(댓글들) {}", comments);
         // CommentResponseDto 리스트로 변환
@@ -240,5 +251,35 @@ public class MeetingServiceImpl implements MeetingService {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @Override
+    public ResponseEntity<DetailListResponse> readDetailList(Long folderId) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<SaveMeetingResponse> saveMeeting(SaveMeetingRequestDto dto) {
+
+        Member currentMember = commonUtil.getMember();
+
+        Folder folder = folderRepository.findById(dto.getFolderId())
+                .orElseThrow(FolderException::folderNotFoundException);
+
+        MeetingDetail meetingDetail = meetingDetailRepository.findById(dto.getDetailId())
+                .orElseThrow(MeetingDetailException::meetingDetailNotFoundException);
+
+        MemberMeeting memberMeeting = MemberMeeting.builder()
+                .member(currentMember)
+                .folder(folder)
+                .meetingDetail(meetingDetail)
+                .build();
+
+        memberMeetingRepository.save(memberMeeting);
+
+        SaveMeetingResponse response = new SaveMeetingResponse("회의정보가 개인폴더에 저장되었습니다.");
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
 }
