@@ -46,7 +46,7 @@ function Session({ subscriber, publisher }: SessionProps) {
     const nextSubscribers = nowSubscribers + maxSubscribers < subscribers.length;
 
     return (
-      <div className={`flex flex-row justify-center gap-5 mb-5 cursor-pointer`}>
+      <div className={`flex flex-row justify-center gap-5 py-5 cursor-pointer`}>
         {
           <button onClick={handlePreSubscribers}>
             {"<"} {preSubscribers}

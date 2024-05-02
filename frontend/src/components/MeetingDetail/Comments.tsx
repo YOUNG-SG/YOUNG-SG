@@ -1,16 +1,30 @@
-import testProfile from "@/assets/@test/profile.jpg";
-
 import Comment from "@/components/MeetingDetail/Comment";
+import { fetchComments, createComment } from "@/services/MeetingDetail";
+import { CommentType } from "@/components/MeetingDetail/Comment";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
 import { useState } from "react";
 
 const Comments = () => {
+  const queryClient = useQueryClient();
   const [content, setContent] = useState("");
-  const cmt = {
-    profile: testProfile,
-    nickname: "유미의세포",
-    content: "댓글내용".repeat(20),
-    isWriter: true,
-  };
+  const { id: meetingDetailId } = useParams();
+
+  const { data: res, isLoading } = useQuery({
+    queryKey: ["comments", meetingDetailId],
+    queryFn: () => fetchComments(meetingDetailId),
+  });
+
+  const { mutate: postComment } = useMutation({
+    mutationFn: createComment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comments", meetingDetailId] });
+    },
+  });
+
+  if (isLoading) {
+    return <div>로딩 중</div>;
+  }
 
   return (
     <div
@@ -19,22 +33,35 @@ const Comments = () => {
     >
       {/* 댓글조회 */}
       <div className="w-full flex flex-col gap-[16px] overflow-scroll">
-        <Comment comment={cmt} />
-        <Comment comment={cmt} />
+        {res?.data.map((comment: CommentType) => (
+          <Comment
+            key={comment.commentId}
+            comment={comment}
+            myMemberId={res.currentMemberId}
+            meetingDetailId={meetingDetailId}
+          />
+        ))}
       </div>
 
       {/* 댓글작성 */}
       <div className="flex min-h-[98px] gap-[8px]">
         <textarea
           className="flex-[10] bg-[#000000] bg-opacity-30 resize-none focus:outline-none rounded-lg p-[10px]"
+          value={content}
           onChange={(e) => {
             setContent(e.target.value);
           }}
         ></textarea>
         <div
           className="flex-[1] flex bg-[#000000] bg-opacity-50 hover:bg-opacity-30 justify-center items-center rounded-lg cursor-pointer"
+          // FIXME 엔터키로도 작성 가능하게 수정
           onClick={() => {
-            console.log(content);
+            try {
+              postComment({ meetingId: 1, content: content });
+              setContent("");
+            } catch (err) {
+              console.log(err);
+            }
           }}
         >
           작성
