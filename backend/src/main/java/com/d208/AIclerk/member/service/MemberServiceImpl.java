@@ -44,7 +44,7 @@ public class MemberServiceImpl implements MemberService{
     @Value("${REDIRECT_URI}")
     String RedirectUri;
 
-    private int accessTokenMinute = 60;
+    private int accessTokenMinute = 720;
     private int refreshTokenMinute = 3000;
 
     @Override
