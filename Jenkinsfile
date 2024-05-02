@@ -123,6 +123,7 @@ pipeline {
             steps {
                 echo '프론트 빌드 및 테스트 시작!'
                 dir("./frontend") {
+                    sh 'rm -rf node_modules package-lock.json'
                     sh "npm install"
                     sh "npm run build"
                 }
