@@ -17,16 +17,24 @@ import com.d208.AIclerk.meeting.dto.responseDto.MeetingDetailResponseDto;
 import com.d208.AIclerk.meeting.repository.CommentRepository;
 import com.d208.AIclerk.meeting.repository.FolderRepository;
 import com.d208.AIclerk.meeting.repository.MeetingDetailRepository;
+import com.d208.AIclerk.security.WordDocumentUpdater;
 import com.d208.AIclerk.utill.CommonUtil;
 import com.d208.AIclerk.utill.OpenAiUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -41,6 +49,8 @@ public class MeetingServiceImpl implements MeetingService {
     private final MeetingDetailRepository meetingDetailRepository;
     private final CommentRepository commentRepository;
     private final FolderRepository folderRepository;
+
+    private final WordDocumentUpdater wordDocumentUpdater;
 
     // OpenAi 텍스트 요약
     @Override
@@ -230,4 +240,15 @@ public class MeetingServiceImpl implements MeetingService {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    public ResponseEntity<MeetingDetailResponse> test1(Long a) {
+        String baseDirectory = "C:/Users/SSAFY/Desktop/word_test/docs/";
+        String originalFileName = "test_test.docx";
+        String newFileName = "회의록_" + WordDocumentUpdater.getCurrentTimeFormatted() + ".docx";
+        String newFilePath = baseDirectory + newFileName;
+        List<String> attendees = List.of("홍길동", "김개똥", "이민정", "신민아", "김광석");
+
+        WordDocumentUpdater.updateDocument(baseDirectory + originalFileName, newFilePath, "이건 제목입니당", "회의록 작성 잘 되는지 확인해볼까용", attendees);
+
+        return ResponseEntity.ok().build();  // 적절한 응답 반환
+    }
 }
