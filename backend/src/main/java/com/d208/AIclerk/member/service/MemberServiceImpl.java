@@ -43,7 +43,10 @@ public class MemberServiceImpl implements MemberService{
     @Value("${KAKAO_CLIENT_SECRET}")
     String SecretKey;
 
-    private int accessTokenMinute = 60;
+    @Value("${REDIRECT_URI}")
+    String RedirectUri;
+
+    private int accessTokenMinute = 720;
     private int refreshTokenMinute = 3000;
 
     @Override
@@ -60,9 +63,11 @@ public class MemberServiceImpl implements MemberService{
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", ClientKey);
-        params.add("redirect_uri", "http://localhost:5173/oauth/callback/kakao");
+        params.add("redirect_uri", RedirectUri);
         params.add("code", code);
         params.add("client_secret", SecretKey);
+
+        //url 테스트
 
         //(5)
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
