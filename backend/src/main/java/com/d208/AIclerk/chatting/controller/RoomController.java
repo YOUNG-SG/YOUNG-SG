@@ -88,6 +88,8 @@ public class RoomController {
     @PostMapping("/join/{roomId}")
     public ResponseEntity<String> joinRoom(@PathVariable Long roomId) {
         long userId=commonUtil.getMember().getId();
+        System.out.println("방아이디이이이이이이"+userId);
+
         roomService.joinRoom(roomId, userId);
         return ResponseEntity.ok("방참여완료...");
     }

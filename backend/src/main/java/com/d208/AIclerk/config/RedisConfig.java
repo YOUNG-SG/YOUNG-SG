@@ -62,7 +62,11 @@ public class RedisConfig {
         List<String> memberIds = listOperations.range(roomKey + ":members", 0, -1);
         String ownerId = (String) hashOperations.get(roomKey, "owner");
         List<String> memberNicknames = new ArrayList<>();
+
+
+        System.out.print(memberIds+"zzdasdasd");
         //멤버목록이니라
+        assert memberIds != null;
         for (String memberId : memberIds) {
             Member member = memberRepository.findById(Long.parseLong(memberId))
                     .orElseThrow(() -> new MemberNotFoundException("Member not found ID: " + memberId));
@@ -94,19 +98,24 @@ public class RedisConfig {
 
     public void addRoomMember(long roomId, long memberId) {
         String memberKey = "room:" + roomId + ":members";
+        List<String> existingMembers = redisTemplate.opsForList().range(memberKey, 0, -1);
+
+        //이미 회원방에 존재하면..
+        if (existingMembers.contains(String.valueOf(memberId))) {
+            throw new IllegalStateException("회원이 이미 방에 참여했습니다. ID: " + memberId);
+        }
+
+        //멤버예외처리
         Member currentMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("404없다 ID: " + memberId));
         String nickname = currentMember.getNickname();
-        redisTemplate.opsForList().rightPush(memberKey, String.valueOf(memberId));
-        // Redis Pub/Sub 메시지 발행
 
+        redisTemplate.opsForList().rightPush(memberKey, String.valueOf(memberId));
         String message = roomId + ":" + nickname + "님이 입장하셨습니다.";
-        //레디스에서 사용하는 퍼블리싱
         redisTemplate.convertAndSend("chatRoom:" + roomId, message);
-        System.out.println("1");
         updateRoomInfo(roomId);
-        System.out.println("2");
     }
+
 
 
 
@@ -115,31 +124,35 @@ public class RedisConfig {
         Member currentMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("404없다 ID: " + memberId));
         String nickname = currentMember.getNickname();
-
         String currentOwner = (String) hashOperations.get(roomKey, "owner");
+
+        System.out.println(currentOwner + "현재방장아이디");
+
         if (currentOwner.equals(memberId.toString())) {
             List<String> members = listOperations.range(roomKey + ":members", 0, -1);
-            if (members != null) {
-                members.remove(memberId.toString());
-                if (!members.isEmpty()) {
-                    Collections.shuffle(members);
-                    String newOwner = members.get(0);
-                    hashOperations.put(roomKey, "owner", newOwner);
-                    listOperations.remove(roomKey + ":members", 0, memberId.toString());
-                    String message = roomId + ":" + nickname + " 방장님이 퇴장하셨습니다.";
-                    redisTemplate.convertAndSend("chatRoom:" + roomId, message);
-                    updateRoomInfo(roomId);
-                } else {
-                    deleteRoom(roomId);
-                }
+            members.remove(memberId.toString());
+            if (members.isEmpty()) {
+                deleteRoom(roomId);
+                String message = roomId + ": 방장님이 퇴장하시면서 방이 삭제되었습니다.";
+                redisTemplate.convertAndSend("chatRoom:" + roomId, message);
+            } else {
+                Collections.shuffle(members);
+                String newOwner = members.get(0);
+                hashOperations.put(roomKey, "owner", newOwner);
+                listOperations.remove(roomKey + ":members", 0, memberId.toString());
+                String message = roomId + ":" + nickname + " 방장님이 퇴장하셨습니다.";
+                redisTemplate.convertAndSend("chatRoom:" + roomId, message);
+                updateRoomInfo(roomId);
             }
         } else {
+            // Not the owner, just remove from the list
             listOperations.remove(roomKey + ":members", 0, memberId.toString());
             String message = roomId + ":" + nickname + "님이 퇴장하셨습니다.";
             redisTemplate.convertAndSend("chatRoom:" + roomId, message);
             updateRoomInfo(roomId);
         }
     }
+
 
 
     public void deleteRoom(Long roomId) {
