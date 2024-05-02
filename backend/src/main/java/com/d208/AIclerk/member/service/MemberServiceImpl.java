@@ -58,7 +58,7 @@ public class MemberServiceImpl implements MemberService{
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", ClientKey);
-        params.add("redirect_uri", "http://localhost:5173/oauth/callback/kakao");
+        params.add("redirect_uri", "https://k10d208.p.ssafy.io/login/oauth/callback/kakao");
         params.add("code", code);
         params.add("client_secret", SecretKey);
 
