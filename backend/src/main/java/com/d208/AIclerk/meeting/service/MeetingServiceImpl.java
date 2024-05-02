@@ -13,6 +13,7 @@ import com.d208.AIclerk.meeting.dto.requestDto.CreateFolderRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
 import com.d208.AIclerk.meeting.dto.response.*;
 import com.d208.AIclerk.meeting.dto.responseDto.CommentResponseDto;
+import com.d208.AIclerk.meeting.dto.responseDto.FolderResponseDto;
 import com.d208.AIclerk.meeting.dto.responseDto.MeetingDetailResponseDto;
 import com.d208.AIclerk.meeting.repository.CommentRepository;
 import com.d208.AIclerk.meeting.repository.FolderRepository;
@@ -194,11 +195,21 @@ public class MeetingServiceImpl implements MeetingService {
 
         Member currentMember = commonUtil.getMember();
 
+        Long totalTime = 12323L;
+
         // memberId 로 멤버의 폴더들 모두 조회
         List<Folder> folderList = folderRepository.findAllByMemberId(currentMember.getId());
 
+        List<FolderResponseDto> folderResponseDtoList = folderList.stream()
+                .map(folder -> new FolderResponseDto(
+                        folder.getId(),
+                        folder.getTitle(),
+                        totalTime
+                ))
+                .toList();
+
         // 리스트들을 반환 해준다.
-        FolderResponse response = new FolderResponse("폴더 목록 조회 성공", folderList);
+        FolderResponse response = new FolderResponse("폴더 목록 조회 성공", folderResponseDtoList);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
