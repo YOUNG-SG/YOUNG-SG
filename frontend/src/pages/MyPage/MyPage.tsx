@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { selectFolderStore } from "@/store/myPageStore";
+import { editModeStore, selectFolderStore } from "@/store/myPageStore";
 import Profile from "@/components/MyPage/Profile";
+import ProfileEdit from "@/components/MyPage/ProfileEdit";
 import FolderList from "@/components/MyPage/FolderList";
 import FolderDetail from "@/components/MyPage/FolderDetail";
 import Timeline from "@/components/MyPage/Timeline";
@@ -8,6 +9,7 @@ import Timeline from "@/components/MyPage/Timeline";
 const MyPage = () => {
   const [select, setSelect] = useState("folder");
   const { selectFolder, setSelectFolder } = selectFolderStore();
+  const { editMode } = editModeStore();
 
   useEffect(() => {
     if (selectFolder > -1) {
@@ -17,7 +19,7 @@ const MyPage = () => {
 
   return (
     <div className="flex h-screen">
-      <Profile />
+      {editMode ? <ProfileEdit /> : <Profile />}
       <div
         className="w-full h-full flex flex-col px-[50px] py-[40px]"
         // style={{ width: "calc(100% - 240px)" }}

@@ -19,7 +19,7 @@ const Navbar = () => {
           navigate("/");
         }}
       />
-      {isLoading ? (
+      {isLoading ? ( // 로딩 컴포넌트 x
         <div className="bg-white w-[50px] h-[50px] rounded-full"></div>
       ) : (
         <img
