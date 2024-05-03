@@ -18,8 +18,6 @@ const CreateMeeting = () => {
     }
   };
 
-  console.log(title);
-
   return (
     <div className="w-[1100px] h-[600px] bg-e-20 rounded-lg backdrop-blur-10 flex flex-col justify-center items-center gap-[30px]">
       <div className="text-[36px] font-bold">회의 생성</div>

@@ -1,9 +1,9 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import useMeetingStore from "../../store/meetingStore";
 import Form from "./OpenVidu/Form";
 import Session from "./OpenVidu/Session";
 import Dictaphone from "./OpenVidu/Dictaphone";
-import Chatting from "./OpenVidu/Chatting";
+import Chatting from "./OpenViduTest/Chatting";
 
 import mute from "../../assets/chattingIcons/mute.png";
 import mic from "../../assets/chattingIcons/mic.png";
@@ -46,6 +46,7 @@ const MeetingTest = () => {
 
   const OPENVIDU_SERVER_URL = "https://youngseogi.duckdns.org";
   const OPENVIDU_SERVER_SECRET = "MYSECRET";
+  const [isClickInvite, setIsClickInvite] = useState(false);
 
   const leaveSession = useCallback(() => {
     if (session) session.disconnect();
@@ -250,6 +251,10 @@ const MeetingTest = () => {
     }
   };
 
+  const toggleInvite = () => {
+    setIsClickInvite(!isClickInvite);
+  };
+
   return (
     <>
       <div>
@@ -285,7 +290,10 @@ const MeetingTest = () => {
               {/* 버튼들 */}
               <div className="row-span-2 flex items-center justify-center w-full">
                 <div className="justify-items-start pr-5">
-                  <button className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center">
+                  <button
+                    onClick={toggleInvite}
+                    className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center"
+                  >
                     <img className="h-7 w-7" src={invite} alt="" />
                   </button>
                 </div>

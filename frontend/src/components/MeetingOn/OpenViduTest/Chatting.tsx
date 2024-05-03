@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import SockJS from "sockjs-client";
+import { Stomp } from "@stomp/stompjs";
+
 import send from "../../../assets/chattingIcons/send.png";
 import chat from "../../../assets/chattingIcons/messenger.png";
 import people from "../../../assets/chattingIcons/people.png";
+import createRoomStore from "@/store/createRoom";
 
 const Chatting = () => {
+  const { roomId } = createRoomStore();
+
   // isChat이면 채팅창, false이면 사용자 목록
   const [isChatting, setIsChatting] = useState<boolean>(false);
   const [isChatStatus, setIsChatStatus] = useState<boolean>(false);
@@ -38,6 +44,8 @@ const Chatting = () => {
     console.log("메시지를 보냅니더", message);
     setMessage("");
   };
+
+  // socket
 
   return (
     <>
@@ -79,7 +87,7 @@ const Chatting = () => {
             )}
             {!isChatStatus && (
               <>
-                <div className="flex-1 m-1 overflow-y-auto rounded-xl">요약 부분</div>
+                <div className="flex-1 m-1 overflow-y-auto rounded-xl">ㅇㅁㅇ</div>
               </>
             )}
           </div>
