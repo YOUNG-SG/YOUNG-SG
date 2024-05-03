@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalTime;
+
 @Getter
 @Setter
 @ToString
@@ -16,4 +18,7 @@ public class MessageDto {
 
     private String sender;
     private String content;
+    private String profile;
+    private LocalTime sent_time;
+
 }

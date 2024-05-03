@@ -16,7 +16,7 @@ public class MemberMeeting {
     @Column(name = "member_meeting_id")
     private Long id;
 
-    @Column(name = "roomd_id")
+    @Column(name = "room_id")
     private Long roomId;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,5 +1,6 @@
 package com.d208.AIclerk.chatting.dto.requestDto;
 
+
 import lombok.*;
 
 @Getter
@@ -7,9 +8,8 @@ import lombok.*;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class LeaveMeetingRequestDto {
+public class RequestRoomIdDTO {
 
-    private long roomId;
-
+    private String code;
 
 }
