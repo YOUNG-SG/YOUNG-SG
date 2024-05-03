@@ -1,5 +1,16 @@
 import { create } from "zustand";
 
+// 프로필 수정
+type editModeState = {
+  editMode: boolean;
+  setEditMode: (editMode: boolean) => void;
+};
+
+export const editModeStore = create<editModeState>((set) => ({
+  editMode: false,
+  setEditMode: (editMode: boolean) => set({ editMode }),
+}));
+
 // 마이페이지 선택된폴더 id 관리
 type FolderState = {
   selectFolder: number;
