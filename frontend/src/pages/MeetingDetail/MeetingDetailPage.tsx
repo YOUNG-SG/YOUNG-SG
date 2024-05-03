@@ -1,4 +1,3 @@
-import testProfile from "@/assets/@test/profile.jpg";
 import Expansion from "@/assets/MeetingDetail/ArrowsOutSimple.svg?react";
 import Download from "@/assets/MeetingDetail/DownloadSimple.svg?react";
 import UserInfo from "@/components/MeetingDetail/UserInfo";
@@ -6,14 +5,30 @@ import Comments from "@/components/MeetingDetail/Comments";
 import DetailBox from "@/components/MeetingDetail/DetailBox";
 import SummaryModal from "@/components/MeetingDetail/SummaryModal";
 import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { fetchMeetingDetail } from "@/services/MeetingDetail";
 
 const MeetingDetailPage = () => {
-  const summary = "회의 요약입니다 ".repeat(500);
   const [showModal, setShowModal] = useState(false);
+  const { id: meetingDetailId } = useParams<string>();
+
+  const { data: meetingDetail, isLoading } = useQuery({
+    queryKey: ["meetingDetail", meetingDetailId],
+    queryFn: () => fetchMeetingDetail(meetingDetailId),
+  });
+
+  console.log(meetingDetail);
+
+  if (isLoading) {
+    return <div>로딩 중</div>;
+  }
 
   return (
     <div className="w-full h-full p-[50px]">
-      {showModal && <SummaryModal handleModal={() => setShowModal(false)} summary={summary} />}
+      {showModal && (
+        <SummaryModal handleModal={() => setShowModal(false)} summary={meetingDetail.summary} />
+      )}
       <div className="w-full h-full flex gap-[30px]">
         <div className="w-2/5 h-full flex flex-col gap-[30px]">
           <div className="w-full" style={{ height: "calc((100% - 30px) * 0.78)" }}>
@@ -32,7 +47,7 @@ const MeetingDetailPage = () => {
                 className="text-[20px] font-l overflow-scroll"
                 style={{ height: "calc(100% - 60px)" }}
               >
-                {summary}
+                {meetingDetail.summary}
               </div>
             </DetailBox>
           </div>
@@ -42,6 +57,7 @@ const MeetingDetailPage = () => {
               title="파일"
               icon={<Download className="cursor-pointer" onClick={() => {}} />}
             >
+              {/* FIXME 파일명, 파일 URL ?? */}
               <div className="text-[20px] font-l">회의제목_240412_1.docx</div>
             </DetailBox>
           </div>
@@ -53,7 +69,7 @@ const MeetingDetailPage = () => {
           >
             <div className="h-full" style={{ width: "calc((100% - 30px) * 5 / 12)" }}>
               <DetailBox title="다음 회의">
-                <div className="text-[20px] font-l">다음 회의가 없습니다</div>
+                <div className="text-[20px] font-l">{meetingDetail.nextMeeting}</div>
               </DetailBox>
             </div>
             <div className="h-full" style={{ width: "calc((100% - 30px) * 7 / 12)" }}>
@@ -62,17 +78,11 @@ const MeetingDetailPage = () => {
                   className="grid grid-cols-2 content-start gap-[10px] overflow-scroll"
                   style={{ height: "calc(100% - 60px)" }}
                 >
-                  <>
-                    <UserInfo img={testProfile} nickname="유미의세포1" />
-                    <UserInfo img={testProfile} nickname="유미의세포2" />
-                    <UserInfo img={testProfile} nickname="유미의세포3" />
-                    <UserInfo img={testProfile} nickname="유미의세포4" />
-                    <UserInfo img={testProfile} nickname="유미의세포5" />
-                    <UserInfo img={testProfile} nickname="유미의세포6" />
-                    <UserInfo img={testProfile} nickname="유미의세포7" />
-                    <UserInfo img={testProfile} nickname="유미의세포8" />
-                    <UserInfo img={testProfile} nickname="유미의세포9" />
-                  </>
+                  {meetingDetail.participantInfoDtoList.map(
+                    (p: { profile: string; nickName: string }) => (
+                      <UserInfo img={p.profile} nickname={p.nickName} />
+                    ),
+                  )}
                 </div>
               </DetailBox>
             </div>
