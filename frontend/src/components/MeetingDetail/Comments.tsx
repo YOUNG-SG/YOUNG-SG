@@ -4,6 +4,7 @@ import { CommentType } from "@/components/MeetingDetail/Comment";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
+import Loading from "../@common/Loading";
 
 const Comments = () => {
   const queryClient = useQueryClient();
@@ -23,7 +24,7 @@ const Comments = () => {
   });
 
   if (isLoading) {
-    return <div>로딩 중</div>;
+    return <Loading />;
   }
 
   return (
