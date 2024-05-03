@@ -70,8 +70,6 @@ public class MemberServiceImpl implements MemberService{
         params.add("code", code);
         params.add("client_secret", SecretKey);
 
-        //url 테스트
-
         //(5)
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
                 new HttpEntity<>(params, headers);

@@ -76,4 +76,9 @@ public class MeetingController {
         return meetingService.saveMeeting(dto);
     }
 
+    @GetMapping("/filetest/{fileId}")
+    @Operation(summary = "파일 생성 테스트", description = "파일 생성 테스트 api")
+    ResponseEntity<MeetingDetailResponse> fileTest(@PathVariable Long fileId) {
+        return meetingService.fileTest(fileId);
+    }
 }
