@@ -1,15 +1,22 @@
 package com.d208.AIclerk.member.dto.responseDto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
+@Getter
 public class EditMemberResponseDto {
     private String profileImg;
     private String nickname;
+
+    @Builder
+    private EditMemberResponseDto(String profileImg, String nickname) {
+        this.profileImg = profileImg;
+        this.nickname = nickname;
+    }
+
+    public static EditMemberResponseDto of(String profileImg, String nickname){
+        return builder()
+                .profileImg(profileImg)
+                .nickname(nickname)
+                .build();
+    }
 }

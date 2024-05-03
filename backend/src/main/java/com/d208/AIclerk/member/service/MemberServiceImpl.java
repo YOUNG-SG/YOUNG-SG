@@ -231,23 +231,24 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public ResponseEntity<EditMemberResponseDto> editProfile(EditMemberRequestDto dto) {
-//        dto.getProfileImg();
-//        dto.getNickname();
-//        System.out.println(JWTUtil.findEmailByToken());
-        System.out.println("hi");
+    public ResponseEntity<EditMemberResponseDto> editProfile(EditMemberRequestDto dto) throws IOException {
+        Member member = commonUtil.getMember();
 
-        // imgUrl을 만들어서 s#에 저장 시작
-        try {
-            String imgUrl = "";
-            System.out.println(dto.getProfileImg());
+        // imgUrl을 만들어서 s3에 저장 시작
+        String imgUrl = "";
+        if (dto.getProfileImg() == null) {
+            imgUrl = member.getImage();
+        } else {
             imgUrl = s3Uploader.upload(dto.getProfileImg());
-            System.out.println(imgUrl);
-            return null;
-        } catch (IOException e ) {
-            System.err.println("Error uploading image to S3: " + e.getMessage());
-            return null;
         }
+
+        member.setNickname(dto.getNickname());
+        member.setImage(imgUrl);
+        memberRepository.save(member);
+
+        EditMemberResponseDto responseDto = EditMemberResponseDto.of(imgUrl, dto.getNickname());
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
 
     }
 

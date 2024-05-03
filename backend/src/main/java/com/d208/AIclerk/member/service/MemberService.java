@@ -25,6 +25,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.*;
 
 public interface MemberService {
@@ -36,5 +37,5 @@ public interface MemberService {
     String createRefreshToken(Member member);
     ResponseEntity signIn(String code);
 
-    ResponseEntity<EditMemberResponseDto> editProfile(EditMemberRequestDto dto);
+    ResponseEntity<EditMemberResponseDto> editProfile(EditMemberRequestDto dto) throws IOException;
 }

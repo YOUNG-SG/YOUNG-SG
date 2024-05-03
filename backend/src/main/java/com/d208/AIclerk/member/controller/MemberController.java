@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 @Log4j2
@@ -48,7 +49,7 @@ public class MemberController {
 
     @PutMapping("/mypage/profile/edit")
     @Operation(summary = "개인 정보 수정", description = "개인 정보를 편집합니다.")
-    public ResponseEntity<EditMemberResponseDto> editProfile(@ModelAttribute EditMemberRequestDto dto) {
+    public ResponseEntity<EditMemberResponseDto> editProfile(@ModelAttribute EditMemberRequestDto dto) throws IOException {
         return memberService.editProfile(dto);
     }
 
