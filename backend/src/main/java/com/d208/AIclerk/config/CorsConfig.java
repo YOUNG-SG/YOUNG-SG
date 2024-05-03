@@ -19,6 +19,7 @@ public class CorsConfig {
         config.addExposedHeader("*"); //(2)
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/ws/**", config);  // WebSocket 경로에도 CORS 설정 적용
         return new CorsFilter(source);
     }
 }
