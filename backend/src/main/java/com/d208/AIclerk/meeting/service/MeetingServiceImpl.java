@@ -1,6 +1,7 @@
 package com.d208.AIclerk.meeting.service;
 
 
+import com.d208.AIclerk.chatting.repository.RoomRepository;
 import com.d208.AIclerk.entity.*;
 import com.d208.AIclerk.exception.meeting.CommentException;
 import com.d208.AIclerk.exception.meeting.FolderException;
@@ -10,14 +11,8 @@ import com.d208.AIclerk.meeting.dto.requestDto.CreateFolderRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.SaveMeetingRequestDto;
 import com.d208.AIclerk.meeting.dto.response.*;
-import com.d208.AIclerk.meeting.dto.responseDto.CommentResponseDto;
-import com.d208.AIclerk.meeting.dto.responseDto.DetailListResponseDto;
-import com.d208.AIclerk.meeting.dto.responseDto.FolderResponseDto;
-import com.d208.AIclerk.meeting.dto.responseDto.MeetingDetailResponseDto;
-import com.d208.AIclerk.meeting.repository.CommentRepository;
-import com.d208.AIclerk.meeting.repository.FolderRepository;
-import com.d208.AIclerk.meeting.repository.MeetingDetailRepository;
-import com.d208.AIclerk.meeting.repository.MemberMeetingRepository;
+import com.d208.AIclerk.meeting.dto.responseDto.*;
+import com.d208.AIclerk.meeting.repository.*;
 import com.d208.AIclerk.utill.CommonUtil;
 import com.d208.AIclerk.utill.OpenAiUtil;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,8 +41,10 @@ public class MeetingServiceImpl implements MeetingService {
     private final CommentRepository commentRepository;
     private final FolderRepository folderRepository;
     private final MemberMeetingRepository memberMeetingRepository;
+    private final RoomRepository roomRepository;
+    private final ParticipantRepository participantRepository;
 
-    // OpenAi 텍스트 요약
+    // OpenAi 텍스트 요약 및 meetingDetail 저장
     @Override
     public ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception {
 
@@ -71,23 +70,19 @@ public class MeetingServiceImpl implements MeetingService {
             fullSummary.append(" "); // 부분 요약들을 구분하기 위해 공백 추가
         }
 
-        /*
-        해야 할 일
-        1. 회의 방 이름 넣기 (meetingDetail.title)
+        MeetingRoom meetingRoom = roomRepository.findById(dto.getRoomId())
+                .orElseThrow();
 
-        2. 참여자 명단 받아오기 (participant)
+        // 회의 상세 저장
+        MeetingDetail meetingDetail = MeetingDetail.builder()
+                .summary(fullSummary.toString())
+                .title(meetingRoom.getTitle())
+                .meetingRoom(meetingRoom)
+                .build();
 
-        3. createFile 호출하기
-         */
-
-        log.info("(MeetingServiceImpl) Original: {}", dto.getText());
-        log.info("(MeetingServiceImpl) Summary: {}", fullSummary);
-
-        MeetingDetail meetingDetail = new MeetingDetail();
-        meetingDetail.setSummary(fullSummary.toString());
         meetingDetailRepository.save(meetingDetail);
 
-        return ResponseEntity.ok("저장 성공");
+        return ResponseEntity.ok("회의 상세(meeting_detail) 저장 성공");
     }
 
 
@@ -150,24 +145,42 @@ public class MeetingServiceImpl implements MeetingService {
         MeetingDetailResponseDto dto = new MeetingDetailResponseDto();
 
         // 회의방에 연결되어 있는 상세페이지 찾아오기 (1개밖에 없음)
-        MeetingDetail meetingDetail = meetingDetailRepository.findById(roomId)
-                .orElseThrow(MeetingDetailException::meetingDetailNotFoundException);
+        MeetingDetail meetingDetail = meetingDetailRepository.findByMeetingRoom_Id(roomId);
+
 
         // 하나씩 찾아서 넣어주기
 
+        // detailId
+        dto.setDetailId(meetingDetail.getId());
         // 요약 내용
         dto.setSummary(meetingDetail.getSummary());
-
         // 다음 회의
 
+        // 참여자 목록 조회
+        List<Participant> participantList = participantRepository.findAllByMeetingRoom_Id(roomId);
+        List<ParticipantInfoDto> participantInfoDtos = participantList.stream()
+                .map(participant -> {
+                    ParticipantInfoDto infoDto = new ParticipantInfoDto();
+                    infoDto.setNickName(participant.getMember().getNickname());
+                    infoDto.setProfile(participant.getMember().getImage());
+                    return infoDto;
+                }).collect(Collectors.toList());
 
-        // 참여자 목록
-
+        dto.setParticipantInfoDtoList(participantInfoDtos);
         // 파일 다운로드 링크
 
 
         MeetingDetailResponse response = new MeetingDetailResponse("상세 페이지 조회 성공", dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Override
+    public ResponseEntity<DetailListResponse> readDetailList(Long folderId) {
+        // Member_meeting 에 접근 : folder_id 같은 것 뽑아오기
+        // 뽑아온 member_meeting_list를 하나씩 돌면서 detail_id에 접근하여 DetailListResponseDto 정보 뺴오기
+        // DetailListResponseList 뽑아서 DetailListResponse에 넣어주기
+
+        return null;
     }
 
     @Override
@@ -252,10 +265,6 @@ public class MeetingServiceImpl implements MeetingService {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Override
-    public ResponseEntity<DetailListResponse> readDetailList(Long folderId) {
-        return null;
-    }
 
     @Override
     public ResponseEntity<SaveMeetingResponse> saveMeeting(SaveMeetingRequestDto dto) {
@@ -265,13 +274,10 @@ public class MeetingServiceImpl implements MeetingService {
         Folder folder = folderRepository.findById(dto.getFolderId())
                 .orElseThrow(FolderException::folderNotFoundException);
 
-        MeetingDetail meetingDetail = meetingDetailRepository.findById(dto.getDetailId())
-                .orElseThrow(MeetingDetailException::meetingDetailNotFoundException);
-
         MemberMeeting memberMeeting = MemberMeeting.builder()
                 .member(currentMember)
                 .folder(folder)
-                .meetingDetail(meetingDetail)
+                .roomId(dto.getRoomId())
                 .build();
 
         memberMeetingRepository.save(memberMeeting);

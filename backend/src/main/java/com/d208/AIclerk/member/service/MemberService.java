@@ -1,6 +1,8 @@
 package com.d208.AIclerk.member.service;
 
 import com.d208.AIclerk.entity.Member;
+import com.d208.AIclerk.member.dto.requestDto.EditMemberRequestDto;
+import com.d208.AIclerk.member.dto.responseDto.EditMemberResponseDto;
 import com.d208.AIclerk.member.dto.responseDto.GetMemberResponse;
 import com.d208.AIclerk.member.dto.responseDto.GetMemberResponseDTO;
 import com.d208.AIclerk.member.dto.responseDto.SignInResponseDTO;
@@ -23,6 +25,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.*;
 
 public interface MemberService {
@@ -33,4 +36,6 @@ public interface MemberService {
     String createAccessToken(Member member);
     String createRefreshToken(Member member);
     ResponseEntity signIn(String code);
+
+    ResponseEntity<EditMemberResponseDto> editProfile(EditMemberRequestDto dto) throws IOException;
 }
