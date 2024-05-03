@@ -1,8 +1,10 @@
 package com.d208.AIclerk.member.service;
 
 import com.d208.AIclerk.common.S3Uploader;
+import com.d208.AIclerk.entity.MeetingRoom;
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.entity.MemberMeeting;
+import com.d208.AIclerk.meeting.repository.MeetingRoomRepository;
 import com.d208.AIclerk.meeting.repository.MemberMeetingRepository;
 import com.d208.AIclerk.member.dto.requestDto.EditMemberRequestDto;
 import com.d208.AIclerk.member.dto.responseDto.EditMemberResponseDto;
@@ -43,6 +45,7 @@ public class MemberServiceImpl implements MemberService{
     private final CommonUtil commonUtil;
     private final S3Uploader s3Uploader;
     private final MemberMeetingRepository memberMeetingRepository;
+    private final MeetingRoomRepository meetingRoomRepository;
 
 
     @Value("${KAKAO_CLIENT_ID}")
@@ -260,11 +263,15 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public ResponseEntity<EditMemberResponseDto> timeline() {
         Member member = commonUtil.getMember();
-        // 레파지토리에서 날짜 최신순으로 설정
+        // 레파지토리에서 날짜 최신순으로 설정 => meetingroom이랑 joing해서 사용
         List<MemberMeeting> meetingList = memberMeetingRepository.findAllByMember(member);
         // List 비었는지 체크해야함
-        for (MemberMeeting meeting :meetingList) {
+        for (MemberMeeting meeting:meetingList) {
+            // 이전 연도와 다르면 추가 : 초기값은 현재 일자로 체크
             System.out.println(meeting.getFolder().getTitle());
+            MeetingRoom meetingRoom = meetingRoomRepository.findById(meeting.getRoomId()).orElse(null);
+            System.out.println(meetingRoom.getTitle()); // 회의 제목, 연도와 월 날짜도 가져와야함
+            System.out.println(meetingRoom.getStartTime()); // 회의 제목, 연도와 월 날짜도 가져와야함
         }
         // folder list에서 폴더 제목
         // room id로 회의방 제목
