@@ -1,4 +1,5 @@
-package com.d208.AIclerk.meeting.dto.requestDto;
+package com.d208.AIclerk.meeting.dto.responseDto;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +10,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaveMeetingRequestDto {
+public class ParticipantInfoDto {
 
-    private Long folderId;
+    private String nickName;
 
-    private Long roomId;
+    private String profile;
+
+
 
 }
