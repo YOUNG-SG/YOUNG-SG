@@ -2,6 +2,8 @@ package com.d208.AIclerk.chatting.controller;
 
 import com.d208.AIclerk.chatting.dto.requestDto.*;
 import com.d208.AIclerk.chatting.dto.responseDto.CreateRoomResponseDto;
+import com.d208.AIclerk.chatting.dto.responseDto.ResnposeRoomIdDTO;
+import com.d208.AIclerk.chatting.repository.RoomRepository;
 import com.d208.AIclerk.entity.MeetingRoom;
 import com.d208.AIclerk.chatting.service.RoomService;
 import com.d208.AIclerk.chatting.service.RabbitMqService;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/meeting")
@@ -28,12 +32,14 @@ public class RoomController {
     private final RabbitMqService rabbitMqService;
     private final SimpMessagingTemplate messagingTemplate;
     private final CommonUtil commonUtil;
+    private final RoomRepository roomRepository;
 
-    public RoomController(RoomService roomService, RabbitMqService rabbitMqService, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil) {
+    public RoomController(RoomService roomService, RabbitMqService rabbitMqService, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, RoomRepository roomRepository) {
         this.roomService = roomService;
         this.rabbitMqService = rabbitMqService;
         this.messagingTemplate = messagingTemplate;
         this.commonUtil = commonUtil;
+        this.roomRepository = roomRepository;
     }
 
     /**
@@ -88,12 +94,22 @@ public class RoomController {
      *
      * **/
 
+    @PostMapping("/get-room-id")
+    public ResponseEntity<ResnposeRoomIdDTO> getRoomIdByInviteCode(@RequestBody RequestRoomIdDTO requestDto) {
+        Optional<MeetingRoom> roomOptional = roomRepository.findByInviteCode(requestDto.getCode());
+        if (roomOptional.isPresent()) {
+            return ResponseEntity.ok(new ResnposeRoomIdDTO(roomOptional.get().getId()));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
 
     @MessageMapping("/{roomId}/recordMessage")
     public void recordMessage(@DestinationVariable Long roomId, MessageDto message) {
         String text = message.getContent(); // 메시지 텍스트 추출
 //        redisConfig.appendChatLog(roomId, text); // Redis에 채팅 로그 저장
-
         log.info("Recorded message for room {}: {}", roomId, text);
     }
 
