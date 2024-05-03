@@ -9,7 +9,7 @@ import lombok.Data;
 public class GetMemberResponseDTO {
 
     private String email;
-    private String nickname;
-    private String image;
+    private String nickName;
+    private String profileImg;
 
 }

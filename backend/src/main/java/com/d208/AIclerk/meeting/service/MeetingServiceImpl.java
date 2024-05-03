@@ -3,6 +3,7 @@ package com.d208.AIclerk.meeting.service;
 
 import com.d208.AIclerk.chatting.repository.RoomRepository;
 import com.d208.AIclerk.entity.*;
+import com.d208.AIclerk.entity.File;
 import com.d208.AIclerk.exception.meeting.CommentException;
 import com.d208.AIclerk.exception.meeting.FolderException;
 import com.d208.AIclerk.exception.meeting.MeetingDetailException;
@@ -48,6 +49,7 @@ public class MeetingServiceImpl implements MeetingService {
     private final MemberMeetingRepository memberMeetingRepository;
     private final RoomRepository roomRepository;
     private final ParticipantRepository participantRepository;
+    private final FileRepository fileRepository;
 
     // OpenAi 텍스트 요약 및 meetingDetail 저장
     @Override
@@ -344,6 +346,13 @@ public class MeetingServiceImpl implements MeetingService {
         String title = meetingDetail.getTitle();
 
         WordDocumentUpdater.updateDocument(inputStream, bucketName, newKey, title, content, attendees);
+
+        File newFile = File.builder()
+                .url(newKey)
+                .name(title)
+                .meetingDetail(null)
+                .build();
+        fileRepository.save(newFile);
 
         return ResponseEntity.ok().build();
     }

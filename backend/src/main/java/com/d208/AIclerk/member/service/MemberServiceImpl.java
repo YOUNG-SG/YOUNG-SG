@@ -141,12 +141,12 @@ public class MemberServiceImpl implements MemberService{
 
         GetMemberResponseDTO getMemberResponseDTO = GetMemberResponseDTO.builder()
                 .email(member.getEmail())
-                .nickname(member.getNickname())
-                .image(member.getImage())
+                .nickName(member.getNickname())
+                .profileImg(member.getImage())
                 .build();
 
         GetMemberResponse response = GetMemberResponse.creategetMemberResponse(
-                "Success",
+                "내 정보 조회 성공",
                 getMemberResponseDTO
         );
 
