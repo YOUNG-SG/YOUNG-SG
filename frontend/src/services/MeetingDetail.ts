@@ -1,9 +1,9 @@
 import { axiosRequest, axiosAuthRequest } from "./axios";
 
-// TODO 회의 상세 (id: 회의방 id)
-export const fetchMeetingDetail = async (roomId: number) => {
+// TODO - 연결 중 // 회의 상세 (id: 회의방 id)
+export const fetchMeetingDetail = async (roomId: string | undefined) => {
   const res = await axiosRequest.get(`/api/meeting/detail/${roomId}`);
-  return res;
+  return res.data.data;
 };
 
 // TODO 파일 다운로드
