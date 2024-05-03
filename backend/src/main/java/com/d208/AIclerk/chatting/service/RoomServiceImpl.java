@@ -6,7 +6,9 @@ import com.d208.AIclerk.chatting.util.InviteCodeGenerator;
 import com.d208.AIclerk.config.RedisConfig;
 import com.d208.AIclerk.entity.MeetingRoom;
 import com.d208.AIclerk.chatting.repository.RoomRepository;
+import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.entity.Participant;
+import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.member.repository.ParticipantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,13 +25,16 @@ public class RoomServiceImpl implements RoomService {
     private final InviteCodeGenerator inviteCodeGenerator;
     private final RedisConfig redisConfig;
     private final ParticipantRepository participantRepository;
+    private final MemberRepository memberRepository;
+
 
     @Autowired
-    public RoomServiceImpl(RoomRepository roomRepository, InviteCodeGenerator inviteCodeGenerator, RedisConfig redisConfig, ParticipantRepository participantRepository) {
+    public RoomServiceImpl(RoomRepository roomRepository, InviteCodeGenerator inviteCodeGenerator, RedisConfig redisConfig, ParticipantRepository participantRepository, MemberRepository memberRepository) {
         this.roomRepository = roomRepository;
         this.inviteCodeGenerator = inviteCodeGenerator;
         this.redisConfig = redisConfig;
         this.participantRepository = participantRepository;
+        this.memberRepository = memberRepository;
     }
 
     @Override
@@ -48,10 +53,25 @@ public class RoomServiceImpl implements RoomService {
     }
 
     public void startMeeting(long roomId) {
-        MeetingRoom room = roomRepository.findById(roomId)
+        MeetingRoom meetingRoom = roomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid room ID: " + roomId));
-        room.setStartTime(LocalTime.now());
-        roomRepository.save(room);
+        meetingRoom.setStartTime(LocalTime.now());
+        roomRepository.save(meetingRoom);
+
+        List<String> memberIds = redisConfig.getRoomMembers(roomId);
+        for (String memberIdStr : memberIds) {
+            Long memberId = Long.parseLong(memberIdStr);
+            Member member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new RuntimeException("Member not found with ID: " + memberId));
+
+            Participant participant = Participant.builder()
+                    .member(member)
+                    .meetingRoom(meetingRoom)
+                    .build();
+
+            participantRepository.save(participant);
+        }
+
         redisConfig.startMeeting(roomId);
     }
 

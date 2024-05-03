@@ -167,10 +167,27 @@ public class RedisConfig {
     }
 
 
+
+    public List<String> getRoomMembers(Long roomId) {
+        String key = "room:" + roomId + ":members";
+        return redisTemplate.opsForList().range(key, 0, -1);
+    }
+
+
+
     public void endMeeting(Long roomId) {
         hashOperations.put("room:" + roomId, "status", "2");
         updateRoomInfo(roomId);
     }
+
+
+    // RedisConfig.java 내부에 채팅 로그 관리를 위한 메서드 추가
+    public void appendChatLog(Long roomId, String message) {
+        String key = "chatlog:" + roomId;
+        redisTemplate.opsForList().rightPush(key, message);
+    }
+
+
 
 
     // 방 상태 및 멤버 수 업데이트 메서드

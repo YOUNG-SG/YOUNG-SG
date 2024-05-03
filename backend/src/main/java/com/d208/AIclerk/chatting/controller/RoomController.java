@@ -74,7 +74,6 @@ public class RoomController {
         Member currentMember = commonUtil.getMember();
         String profile = currentMember.getImage();
         String nickname = currentMember.getNickname();
-
         message.setSender(nickname);
         message.setProfile(profile);
         message.setSent_time(LocalTime.now());
@@ -82,6 +81,22 @@ public class RoomController {
         messagingTemplate.convertAndSend("/sub/chat/" + roomId, message);
         // rabbitMqService.sendMessage(roomId, message);
     }
+
+    /**
+     *
+     * STT매새지기록
+     *
+     * **/
+
+
+    @MessageMapping("/{roomId}/recordMessage")
+    public void recordMessage(@DestinationVariable Long roomId, MessageDto message) {
+        String text = message.getContent(); // 메시지 텍스트 추출
+//        redisConfig.appendChatLog(roomId, text); // Redis에 채팅 로그 저장
+
+        log.info("Recorded message for room {}: {}", roomId, text);
+    }
+
 
 
 
