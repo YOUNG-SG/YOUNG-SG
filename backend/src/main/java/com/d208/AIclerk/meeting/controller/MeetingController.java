@@ -22,7 +22,7 @@ public class MeetingController {
     private final MeetingService meetingService;
 
     @PostMapping("/send-text")
-    @Operation(summary = "텍스트 요약", description = "텍스트 요약 후 db에 저장")
+    @Operation(summary = "텍스트 요약", description = "텍스트 요약 후 roomId에 맞게 meeting detail 까지 생성(title, roomId, summary")
     public ResponseEntity<String> summaryText(@RequestBody OpenAiRequestDto dto) throws Exception {
         log.info("(MeetingController) 시작");
         return meetingService.summaryText(dto);
@@ -52,7 +52,7 @@ public class MeetingController {
         return meetingService.readMeetingDetail(roomId);
     }
 
-    @GetMapping("detail/{folderId}")
+    @GetMapping("detail-list/{folderId}")
     @Operation(summary = "회의 상세 페이지 목록 조회", description = "회의 상세페이지 목록 조회 (폴더 클릭시 보이는 리스트")
     public ResponseEntity<DetailListResponse> readDetailList(@PathVariable("folderId") Long folderId) {
         return meetingService.readDetailList(folderId);

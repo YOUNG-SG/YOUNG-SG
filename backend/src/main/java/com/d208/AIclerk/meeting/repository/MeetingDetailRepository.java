@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface MeetingDetailRepository extends JpaRepository<MeetingDetail, Long> {
 
+    MeetingDetail findByMeetingRoom_Id(Long roomId);
+
 }

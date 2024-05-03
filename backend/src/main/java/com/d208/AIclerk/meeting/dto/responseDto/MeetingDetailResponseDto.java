@@ -13,9 +13,11 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor
 public class MeetingDetailResponseDto {
 
+    private Long detailId;
+
     private String summary;
 
-    private List<String> participants;
+    private List<ParticipantInfoDto> participantInfoDtoList;
 
     private String fileUrl;
 
