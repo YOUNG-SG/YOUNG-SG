@@ -3,6 +3,7 @@ package com.d208.AIclerk.meeting.service;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateCommentRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateFolderRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
+import com.d208.AIclerk.meeting.dto.requestDto.SaveMeetingRequestDto;
 import com.d208.AIclerk.meeting.dto.response.*;
 import org.springframework.http.ResponseEntity;
 
@@ -20,4 +21,8 @@ public interface MeetingService {
     ResponseEntity<FolderResponse> readFolderList();
 
     ResponseEntity<ReadCommentResponse> readComment(Long detailId);
+
+    ResponseEntity<DetailListResponse> readDetailList(Long folderId);
+
+    ResponseEntity<SaveMeetingResponse> saveMeeting(SaveMeetingRequestDto dto);
 }

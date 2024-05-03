@@ -16,4 +16,8 @@ public class FolderException extends RuntimeException {
         return new FolderException("폴더 제목의 길이가 맞지 않습니다.", HttpStatus.BAD_REQUEST);
     }
 
+    public static FolderException folderNotFoundException() {
+        return new FolderException("폴더가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+    }
+
 }
