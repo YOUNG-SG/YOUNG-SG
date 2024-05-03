@@ -38,7 +38,7 @@ const Folders = () => {
               </div>
               {/* 폴더 리스트 */}
               <div className="grid grid-cols-2 gap-4 w-full">
-                {["폴더1", "폴더2", "폴더3", "폴더4", "폴더5"].map((folderName) => (
+                {["폴더1", "폴더2", "폴더3", "폴더4", "폴더5", "1", "12"].map((folderName) => (
                   <div
                     key={folderName}
                     onClick={() => handleFolderClick(folderName)}
@@ -52,7 +52,7 @@ const Folders = () => {
               </div>
             </div>
             <div className="flex justify-center items-center rounded-lg text-white bg-opacity-80 bg-gray-500 h-12 cursor-pointer hover:bg-gray-600">
-              선택
+              저장
             </div>
           </div>
         </div>
