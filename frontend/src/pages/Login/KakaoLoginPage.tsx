@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { kakaoLoginFetch } from "@/services/Login";
 import { tokenStore } from "@/store/tokenStore";
+import Loading from "@/components/@common/Loading";
 
 const KakaoLoginPage = () => {
   const navigate = useNavigate();
@@ -26,13 +27,7 @@ const KakaoLoginPage = () => {
     }
   }, [code]);
 
-  return (
-    <>
-      <div className="min-h-screen flex items-center justify-center opacity-50">
-        <div id="login-loading"></div>
-      </div>
-    </>
-  );
+  return <Loading />;
 };
 
 export default KakaoLoginPage;

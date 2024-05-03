@@ -33,6 +33,7 @@ const ProfileEdit = () => {
   const [file, setFile] = useState<File | null>(null);
 
   if (isLoading) {
+    // 로딩 컴포넌트 x
     return (
       <div className="min-w-[240px] h-full py-[40px] flex flex-col items-center bg-[#777777] bg-opacity-30"></div>
     );

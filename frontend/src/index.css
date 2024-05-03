@@ -77,8 +77,8 @@ body::-webkit-scrollbar {
   backdrop-filter: blur(2.5px);
 }
 
-/* 로그인 */
-#login-loading {
+/* 로딩 */
+#loading {
   width: 70px;
   height: 70px;
   position: relative;
