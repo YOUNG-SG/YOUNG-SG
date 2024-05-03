@@ -7,7 +7,7 @@ import ChatTest from "../../components/MeetingOn/ChatTest";
 import { tokenStore } from "@/store/tokenStore";
 import createRoomStore from "@/store/createRoom";
 import { useEffect } from "react";
-import { getRoomIdCode } from "@/services/createRoom";
+import { getRoomId } from "@/services/createRoom";
 
 const MeetingOn = () => {
   const { token } = tokenStore();
@@ -23,14 +23,21 @@ const MeetingOn = () => {
       setSessionId(code);
     }
   }, [code]);
-  console.log(roomId);
+
   useEffect(() => {
-    if (roomId === null) {
-      const { roomid } = getRoomIdCode(sessionId);
-      setRoomId(roomid);
-      console.log("roomid", roomid);
-    }
-  }, [roomId, code]);
+    const fetchRoomId = async () => {
+      if (roomId == null) {
+        try {
+          const { roomid } = await getRoomId(sessionId);
+          setRoomId(roomid);
+          console.log("roomid", roomid);
+        } catch (err) {
+          console.log("roomId 에러", err);
+        }
+      }
+    };
+    fetchRoomId();
+  }, [roomId, sessionId, setRoomId]);
 
   if (!token) {
     return <Navigate to="/login" />;
@@ -42,7 +49,7 @@ const MeetingOn = () => {
       <MeetingTest />
       <MeetingOff />
 
-      {roomId && <ChatTest />}
+      {roomId && <ChatTest roomId={roomId} />}
     </>
   );
 };

@@ -5,7 +5,7 @@ export const createRoom = async (roomTitle: string) => {
   return res.data;
 };
 
-export const getRoomIdCode = async (inviteCode: string) => {
+export const getRoomId = async (inviteCode: string) => {
   const res = await axiosRequest.post("api/meeting/get-room-id", { code: inviteCode });
   return res.data;
 };

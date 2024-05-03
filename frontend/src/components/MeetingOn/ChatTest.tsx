@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import createRoomStore from "@/store/createRoom";
+// import createRoomStore from "@/store/createRoom";
 import { tokenStore } from "@/store/tokenStore";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import { joinRoom } from "@/services/createRoom";
 
-const ChatTest = () => {
-  const { roomId } = createRoomStore();
+interface ChatTestProps {
+  roomId: string;
+}
+
+const ChatTest = ({ roomId }: ChatTestProps) => {
+  // const { roomId } = createRoomStore();
   const { token } = tokenStore();
   const stompClientRef = useRef(null); // useRef를 사용하여 stompClient를 참조합니다.
   const [message, setMessage] = useState("");
@@ -19,28 +23,20 @@ const ChatTest = () => {
       console.error("No roomId available");
       return;
     }
+  }, []);
 
+  useEffect(() => {
     const joinMeetingRoom = async () => {
       try {
-        console.log("roomid 는", roomId);
         const { sender, content, profile, sent_time, senderId } = await joinRoom(roomId);
         setSenderInfo({ sender, profile, senderId }); // 발신자 정보를 상태에 저장
+        console.log("쪼인");
       } catch (err) {
         console.log(err);
-        console.log("chat room", roomId);
       }
     };
 
-    joinMeetingRoom();
-  }, [roomId]);
-
-  useEffect(() => {
-    const socket = new SockJS(
-      "http://localhost:8000/ws",
-      //  {
-      //   header: { Authorization: `Bearer ${token}` },
-      // }
-    );
+    const socket = new SockJS("http://localhost:8000/ws");
     const stompClient = Stomp.over(socket);
     stompClientRef.current = stompClient; // stompClient 인스턴스를 ref에 할당합니다.
 
@@ -61,6 +57,7 @@ const ChatTest = () => {
         setConnected(false); // 연결 오류 발생 시 연결 상태를 false로 설정
       },
     );
+    joinMeetingRoom();
 
     return () => {
       if (stompClientRef.current && connected) {
@@ -69,10 +66,11 @@ const ChatTest = () => {
         setConnected(false); // 연결 오류 발생 시 연결 상태를 false로 설정
       }
     };
-  }, [roomId, senderInfo, connected]); // roomId가 변경될 때마다 useEffect를 다시 실행합니다.
+  }, [roomId]); // roomId가 변경될 때마다 useEffect를 다시 실행합니다.
 
   const sendMessage = () => {
     console.log(senderInfo);
+    console.log(stompClientRef);
     if (message && stompClientRef.current) {
       const messageToSend = JSON.stringify({
         content: message,
