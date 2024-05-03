@@ -3,6 +3,7 @@ package com.d208.AIclerk.meeting.controller;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateCommentRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.CreateFolderRequestDto;
 import com.d208.AIclerk.meeting.dto.requestDto.OpenAiRequestDto;
+import com.d208.AIclerk.meeting.dto.requestDto.SaveMeetingRequestDto;
 import com.d208.AIclerk.meeting.dto.response.*;
 import com.d208.AIclerk.meeting.service.MeetingService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,9 +52,15 @@ public class MeetingController {
         return meetingService.readMeetingDetail(roomId);
     }
 
+    @GetMapping("detail/{folderId}")
+    @Operation(summary = "회의 상세 페이지 목록 조회", description = "회의 상세페이지 목록 조회 (폴더 클릭시 보이는 리스트")
+    public ResponseEntity<DetailListResponse> readDetailList(@PathVariable("folderId") Long folderId) {
+        return meetingService.readDetailList(folderId);
+    }
+
     @PostMapping("/folder/create")
     @Operation(summary = "폴더 생성", description = "회의정보를 저장할 폴더 생성")
-    public ResponseEntity<CreateFolderResponse> createFoler(@RequestBody CreateFolderRequestDto dto) {
+    public ResponseEntity<CreateFolderResponse> createFolder(@RequestBody CreateFolderRequestDto dto) {
         return meetingService.createFolder(dto);
     }
 
@@ -61,6 +68,12 @@ public class MeetingController {
     @Operation(summary = "폴더 목록 조회", description = "회의정보를 저장할 폴더 목록 조회 (개인별로 다름)")
     public ResponseEntity<FolderResponse> readFolderList(){
         return meetingService.readFolderList();
+    }
+
+    @PostMapping("/save-meeting")
+    @Operation(summary = "회의 저장 하기", description = "폴더 선택 후 회의 저장 기능")
+    public ResponseEntity<SaveMeetingResponse> saveMeeting(@RequestBody SaveMeetingRequestDto dto) {
+        return meetingService.saveMeeting(dto);
     }
 
 

@@ -66,6 +66,9 @@ dependencies {
 	implementation 'com.google.code.gson:gson:2.10.1'
 	implementation 'org.json:json:20210307'
 
+	// amazone s3
+	implementation "com.amazonaws:aws-java-sdk-s3:1.12.395"
+
 
 }
 

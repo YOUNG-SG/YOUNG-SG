@@ -1,6 +1,6 @@
 package com.d208.AIclerk.meeting.dto.response;
 
-import com.d208.AIclerk.entity.Folder;
+import com.d208.AIclerk.meeting.dto.responseDto.FolderResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,5 +15,5 @@ public class FolderResponse {
 
     private String message;
 
-    private List<Folder> data;
+    private List<FolderResponseDto> data;
 }
