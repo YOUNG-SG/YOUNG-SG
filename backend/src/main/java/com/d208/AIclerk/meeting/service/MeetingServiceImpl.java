@@ -18,6 +18,7 @@ import com.d208.AIclerk.meeting.repository.CommentRepository;
 import com.d208.AIclerk.meeting.repository.FolderRepository;
 import com.d208.AIclerk.meeting.repository.MeetingDetailRepository;
 import com.d208.AIclerk.meeting.repository.MemberMeetingRepository;
+import com.d208.AIclerk.security.WordDocumentUpdater;
 import com.d208.AIclerk.utill.CommonUtil;
 import com.d208.AIclerk.utill.OpenAiUtil;
 import lombok.RequiredArgsConstructor;
@@ -256,24 +257,6 @@ public class MeetingServiceImpl implements MeetingService {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-//
-//    public ResponseEntity<MeetingDetailResponse> fileTest(Long fileId) {
-//        String bucketName = "style-finder-bucket"; // S3 버킷 이름
-//        String key = "test_test.docx"; // S3에서 가져올 원본 파일 키
-//        InputStream inputStream = WordDocumentUpdater.getFileFromS3(bucketName, key);
-//
-//        String newFileName = "회의록_" + WordDocumentUpdater.getCurrentTimeFormatted() + ".docx";
-//        String newKey = "output/" + newFileName; // S3에 저장될 새 파일의 키
-//        List<String> attendees = List.of("홍길동", "김개똥", "이민정", "신민아", "김광석");
-//
-//        MeetingDetail meetingDetail = meetingDetailRepository.findById(fileId)
-//                .orElseThrow(() -> new NoSuchElementException("Meeting detail not found with id: " + fileId));
-//        String content = meetingDetail.getSummary();
-//
-//        WordDocumentUpdater.updateDocument(inputStream, bucketName, newKey, "이건 제목입니당", content, attendees);
-//
-//        return ResponseEntity.ok().build();
-//    }
 
     @Override
     public ResponseEntity<DetailListResponse> readDetailList(Long folderId) {
@@ -304,5 +287,22 @@ public class MeetingServiceImpl implements MeetingService {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    public ResponseEntity<MeetingDetailResponse> fileTest(Long fileId) {
+        String bucketName = "style-finder-bucket"; // S3 버킷 이름
+        String key = "test_test.docx"; // S3에서 가져올 원본 파일 키
+        InputStream inputStream = WordDocumentUpdater.getFileFromS3(bucketName, key);
+
+        String newFileName = "회의록_" + WordDocumentUpdater.getCurrentTimeFormatted() + ".docx";
+        String newKey = "output/" + newFileName; // S3에 저장될 새 파일의 키
+        List<String> attendees = List.of("홍길동", "김개똥", "이민정", "신민아", "김광석");
+
+        MeetingDetail meetingDetail = meetingDetailRepository.findById(fileId)
+                .orElseThrow(() -> new NoSuchElementException("Meeting detail not found with id: " + fileId));
+        String content = meetingDetail.getSummary();
+
+        WordDocumentUpdater.updateDocument(inputStream, bucketName, newKey, "이건 제목입니당", content, attendees);
+
+        return ResponseEntity.ok().build();
+    }
 
 }
