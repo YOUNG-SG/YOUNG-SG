@@ -2,6 +2,8 @@ package com.d208.AIclerk.member.service;
 
 import com.d208.AIclerk.common.S3Uploader;
 import com.d208.AIclerk.entity.Member;
+import com.d208.AIclerk.entity.MemberMeeting;
+import com.d208.AIclerk.meeting.repository.MemberMeetingRepository;
 import com.d208.AIclerk.member.dto.requestDto.EditMemberRequestDto;
 import com.d208.AIclerk.member.dto.responseDto.EditMemberResponseDto;
 import com.d208.AIclerk.member.dto.responseDto.GetMemberResponse;
@@ -27,7 +29,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +42,7 @@ public class MemberServiceImpl implements MemberService{
     private final RefreshTokenRepository refreshTokenRepository;
     private final CommonUtil commonUtil;
     private final S3Uploader s3Uploader;
+    private final MemberMeetingRepository memberMeetingRepository;
 
 
     @Value("${KAKAO_CLIENT_ID}")
@@ -250,6 +255,20 @@ public class MemberServiceImpl implements MemberService{
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
 
+    }
+
+    @Override
+    public ResponseEntity<EditMemberResponseDto> timeline() {
+        Member member = commonUtil.getMember();
+        // 레파지토리에서 날짜 최신순으로 설정
+        List<MemberMeeting> meetingList = memberMeetingRepository.findAllByMember(member);
+        // List 비었는지 체크해야함
+        for (MemberMeeting meeting :meetingList) {
+            System.out.println(meeting.getFolder().getTitle());
+        }
+        // folder list에서 폴더 제목
+        // room id로 회의방 제목
+        return null;
     }
 
 }

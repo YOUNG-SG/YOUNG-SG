@@ -38,4 +38,6 @@ public interface MemberService {
     ResponseEntity signIn(String code);
 
     ResponseEntity<EditMemberResponseDto> editProfile(EditMemberRequestDto dto) throws IOException;
+
+    ResponseEntity<EditMemberResponseDto> timeline();
 }

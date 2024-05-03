@@ -53,5 +53,11 @@ public class MemberController {
         return memberService.editProfile(dto);
     }
 
+    @GetMapping("/mypage/timeline")
+    @Operation(summary = "타임라인", description = "메인페이지의 타임라인을 조회합니다.")
+    public ResponseEntity<EditMemberResponseDto> timeline() {
+        return memberService.timeline();
+    }
+
 
 }
