@@ -6,9 +6,11 @@ const FolderDetail = () => {
       {/* <div className="p-[40px] h-full box-border bg-[black]"> */}
       <div className="p-[40px] h-full">
         <div className="h-[24px] text-[18px] text-[#CCCCCC]">시작일 24.04.08</div>
+        {/* FIXME total time 안 쓰면 아래 줄 지우기 */}
         <div className="h-[40px] flex justify-between items-end mt-[14px] mb-[40px]">
           <div className="text-[32px] font-extrabold">자율 PJT 기획 회의</div>
-          <div className="text-[16px] text-[#CCCCCC]">4시간 30분</div>
+          {/* total time */}
+          {/* <div className="text-[16px] text-[#CCCCCC]">4시간 30분</div> */}
         </div>
         <div
           className="flex flex-col gap-[10px] overflow-scroll"
