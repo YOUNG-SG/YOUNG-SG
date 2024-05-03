@@ -4,7 +4,7 @@ import com.d208.AIclerk.chatting.util.RedisSubscriber;
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.member.exception.MemberNotFoundException;
 import com.d208.AIclerk.member.repository.MemberRepository;
-import com.d208.AIclerk.member.repository.ParticipantRepository;
+import com.d208.AIclerk.meeting.repository.ParticipantRepository;
 import com.d208.AIclerk.utill.CommonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

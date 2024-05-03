@@ -9,10 +9,11 @@ import com.d208.AIclerk.chatting.repository.RoomRepository;
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.entity.Participant;
 import com.d208.AIclerk.member.repository.MemberRepository;
-import com.d208.AIclerk.member.repository.ParticipantRepository;
+import com.d208.AIclerk.meeting.repository.ParticipantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +56,7 @@ public class RoomServiceImpl implements RoomService {
     public void startMeeting(long roomId) {
         MeetingRoom meetingRoom = roomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid room ID: " + roomId));
-        meetingRoom.setStartTime(LocalTime.now());
+        meetingRoom.setStartTime(LocalDateTime.now());
         roomRepository.save(meetingRoom);
 
         List<String> memberIds = redisConfig.getRoomMembers(roomId);
@@ -83,7 +84,7 @@ public class RoomServiceImpl implements RoomService {
     public void endMeeting(long roomId) {
         MeetingRoom room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid room ID: " + roomId));
-        room.setEndTime(LocalTime.now());
+        room.setEndTime(LocalDateTime.now());
         roomRepository.save(room);
         redisConfig.endMeeting(roomId);
     }

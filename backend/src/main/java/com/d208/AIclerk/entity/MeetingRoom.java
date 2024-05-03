@@ -3,6 +3,7 @@ package com.d208.AIclerk.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
@@ -19,10 +20,10 @@ public class MeetingRoom {
     private Long id;
 
     @Column(name = "start_time")
-    private LocalTime startTime;
+    private LocalDateTime startTime;
 
     @Column(name = "end_time")
-    private LocalTime endTime;
+    private LocalDateTime endTime;
 
     @Column(name = "title")
     private String title;
