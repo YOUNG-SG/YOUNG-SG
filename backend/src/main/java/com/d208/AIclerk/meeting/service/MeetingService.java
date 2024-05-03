@@ -25,4 +25,7 @@ public interface MeetingService {
     ResponseEntity<DetailListResponse> readDetailList(Long folderId);
 
     ResponseEntity<SaveMeetingResponse> saveMeeting(SaveMeetingRequestDto dto);
+
+    ResponseEntity<MeetingDetailResponse> fileTest(Long fileId);
+
 }
