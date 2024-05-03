@@ -21,7 +21,7 @@ public interface MeetingService {
 
     ResponseEntity<ReadCommentResponse> readComment(Long detailId);
 
-    ResponseEntity<MeetingDetailResponse> fileTest(Long fileId);
+//    ResponseEntity<MeetingDetailResponse> fileTest(Long fileId);
 
 }
 

@@ -65,10 +65,9 @@ public class MeetingController {
 
 
 
-    @GetMapping("/filetest/{fileId}")
-    @Operation(summary = "파일 생성 테스트", description = "파일 생성 테스트 api")
-    ResponseEntity<MeetingDetailResponse> fileTest(@PathVariable Long fileId) {
-        return meetingService.fileTest(fileId);
-    }
-
+//    @GetMapping("/filetest/{fileId}")
+//    @Operation(summary = "파일 생성 테스트", description = "파일 생성 테스트 api")
+//    ResponseEntity<MeetingDetailResponse> fileTest(@PathVariable Long fileId) {
+//        return meetingService.fileTest(fileId);
+//    }
 }

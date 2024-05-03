@@ -17,7 +17,6 @@ import com.d208.AIclerk.meeting.dto.responseDto.MeetingDetailResponseDto;
 import com.d208.AIclerk.meeting.repository.CommentRepository;
 import com.d208.AIclerk.meeting.repository.FolderRepository;
 import com.d208.AIclerk.meeting.repository.MeetingDetailRepository;
-import com.d208.AIclerk.security.WordDocumentUpdater;
 import com.d208.AIclerk.utill.CommonUtil;
 import com.d208.AIclerk.utill.OpenAiUtil;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +27,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Service
@@ -237,18 +234,23 @@ public class MeetingServiceImpl implements MeetingService {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+//
+//    public ResponseEntity<MeetingDetailResponse> fileTest(Long fileId) {
+//        String bucketName = "style-finder-bucket"; // S3 버킷 이름
+//        String key = "test_test.docx"; // S3에서 가져올 원본 파일 키
+//        InputStream inputStream = WordDocumentUpdater.getFileFromS3(bucketName, key);
+//
+//        String newFileName = "회의록_" + WordDocumentUpdater.getCurrentTimeFormatted() + ".docx";
+//        String newKey = "output/" + newFileName; // S3에 저장될 새 파일의 키
+//        List<String> attendees = List.of("홍길동", "김개똥", "이민정", "신민아", "김광석");
+//
+//        MeetingDetail meetingDetail = meetingDetailRepository.findById(fileId)
+//                .orElseThrow(() -> new NoSuchElementException("Meeting detail not found with id: " + fileId));
+//        String content = meetingDetail.getSummary();
+//
+//        WordDocumentUpdater.updateDocument(inputStream, bucketName, newKey, "이건 제목입니당", content, attendees);
+//
+//        return ResponseEntity.ok().build();
+//    }
 
-    public ResponseEntity<MeetingDetailResponse> fileTest(Long fileId) {
-        String baseDirectory = "C:/Users/SSAFY/Desktop/word_test/docs/";
-        String originalFileName = "test_test.docx";
-        String newFileName = "회의록_" + WordDocumentUpdater.getCurrentTimeFormatted() + ".docx";
-        String newFilePath = baseDirectory + newFileName;
-        List<String> attendees = List.of("홍길동", "김개똥", "이민정", "신민아", "김광석");
-
-        String content = meetingDetailRepository.findSummaryById(fileId);
-
-        WordDocumentUpdater.updateDocument(baseDirectory + originalFileName, newFilePath, "이건  제목입니당", content, attendees);
-
-        return ResponseEntity.ok().build();
-    }
 }
