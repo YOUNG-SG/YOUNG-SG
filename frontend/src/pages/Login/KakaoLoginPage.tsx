@@ -28,7 +28,9 @@ const KakaoLoginPage = () => {
 
   return (
     <>
-      <div></div>
+      <div className="min-h-screen flex items-center justify-center opacity-50">
+        <div id="login-loading"></div>
+      </div>
     </>
   );
 };
