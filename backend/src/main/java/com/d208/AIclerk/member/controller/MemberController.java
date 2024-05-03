@@ -2,6 +2,8 @@ package com.d208.AIclerk.member.controller;
 
 
 import com.d208.AIclerk.entity.Member;
+import com.d208.AIclerk.member.dto.requestDto.EditMemberRequestDto;
+import com.d208.AIclerk.member.dto.responseDto.EditMemberResponseDto;
 import com.d208.AIclerk.member.dto.responseDto.GetMemberResponse;
 import com.d208.AIclerk.member.dto.responseDto.SignInResponseDTO;
 import com.d208.AIclerk.member.repository.MemberRepository;
@@ -19,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 @Log4j2
@@ -44,6 +47,11 @@ public class MemberController {
         return memberService.getProfile();
     }
 
+    @PutMapping("/mypage/profile/edit")
+    @Operation(summary = "개인 정보 수정", description = "개인 정보를 편집합니다.")
+    public ResponseEntity<EditMemberResponseDto> editProfile(@ModelAttribute EditMemberRequestDto dto) throws IOException {
+        return memberService.editProfile(dto);
+    }
 
-    
+
 }

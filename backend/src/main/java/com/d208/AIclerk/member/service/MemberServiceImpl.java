@@ -1,6 +1,9 @@
 package com.d208.AIclerk.member.service;
 
+import com.d208.AIclerk.common.S3Uploader;
 import com.d208.AIclerk.entity.Member;
+import com.d208.AIclerk.member.dto.requestDto.EditMemberRequestDto;
+import com.d208.AIclerk.member.dto.responseDto.EditMemberResponseDto;
 import com.d208.AIclerk.member.dto.responseDto.GetMemberResponse;
 import com.d208.AIclerk.member.dto.responseDto.GetMemberResponseDTO;
 import com.d208.AIclerk.member.dto.responseDto.SignInResponseDTO;
@@ -22,6 +25,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +37,7 @@ public class MemberServiceImpl implements MemberService{
     private final MemberRepository memberRepository; //(1)
     private final RefreshTokenRepository refreshTokenRepository;
     private final CommonUtil commonUtil;
+    private final S3Uploader s3Uploader;
 
 
     @Value("${KAKAO_CLIENT_ID}")
@@ -223,6 +228,28 @@ public class MemberServiceImpl implements MemberService{
 
         // 적절한 HTTP 헤더와 함께 토큰 응답을 반환
         return ResponseEntity.ok().headers(headers).body(signInResponseDTO);
+    }
+
+    @Override
+    public ResponseEntity<EditMemberResponseDto> editProfile(EditMemberRequestDto dto) throws IOException {
+        Member member = commonUtil.getMember();
+
+        // imgUrl을 만들어서 s3에 저장 시작
+        String imgUrl = "";
+        if (dto.getProfileImg() == null) {
+            imgUrl = member.getImage();
+        } else {
+            imgUrl = s3Uploader.upload(dto.getProfileImg());
+        }
+
+        member.setNickname(dto.getNickname());
+        member.setImage(imgUrl);
+        memberRepository.save(member);
+
+        EditMemberResponseDto responseDto = EditMemberResponseDto.of(imgUrl, dto.getNickname());
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+
     }
 
 }
