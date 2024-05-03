@@ -47,6 +47,7 @@ public class MeetingServiceImpl implements MeetingService {
 
     // OpenAi 텍스트 요약 및 meetingDetail 저장
     @Override
+    @Transactional
     public ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception {
 
         String inputText = dto.getText();
@@ -76,13 +77,10 @@ public class MeetingServiceImpl implements MeetingService {
 
         // Optional을 사용하여 null이면 현재 시간을 반환
         LocalDateTime startTime = Optional.ofNullable(meetingRoom.getStartTime())
-                .map(LocalDateTime::from)
                 .orElse(LocalDateTime.now()); // null 일 경우 현재 시간 반환
 
         LocalDateTime endTime = Optional.ofNullable(meetingRoom.getEndTime())
-                .map(LocalDateTime::from)
                 .orElse(LocalDateTime.now()); // null 일 경우 현재 시간 반환
-
 
 
         // 회의 상세 저장
