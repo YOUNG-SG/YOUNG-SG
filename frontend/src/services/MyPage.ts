@@ -7,8 +7,9 @@ export const fetchMyProfile = async () => {
 };
 
 // TODO 내 정보 수정
-export const updateMyProfile = async (profile: { profileImg: string; nickName: string }) => {
-  const res = await axiosAuthRequest.put("/api/mypage/profile/edit", profile);
+// export const updateMyProfile = async (profile: { profileImg: File; nickname: string }) => {
+export const updateMyProfile = async (profile: FormData) => {
+  const res = await axiosAuthRequest.put("/api/oauth/mypage/profile/edit", profile);
   return res;
 };
 
