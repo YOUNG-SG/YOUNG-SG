@@ -35,7 +35,7 @@ public class MeetingController {
     }
 
     @DeleteMapping("/comment/{commentId}")
-    @Operation(summary = "책 코멘트 삭제", description = "책 코멘트 삭제")
+    @Operation(summary = "코멘트 삭제", description = "코멘트 삭제")
     public ResponseEntity<CommentDeleteResponse> deleteComment(@PathVariable("commentId") Long commentId) {
         return meetingService.deleteComment(commentId);
     }

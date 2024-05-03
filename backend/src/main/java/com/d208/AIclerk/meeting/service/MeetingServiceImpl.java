@@ -24,8 +24,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +51,7 @@ public class MeetingServiceImpl implements MeetingService {
 
     // OpenAi 텍스트 요약 및 meetingDetail 저장
     @Override
+    @Transactional
     public ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception {
 
         String inputText = dto.getText();
@@ -78,11 +79,21 @@ public class MeetingServiceImpl implements MeetingService {
         MeetingRoom meetingRoom = roomRepository.findById(dto.getRoomId())
                 .orElseThrow();
 
+        // Optional을 사용하여 null이면 현재 시간을 반환
+        LocalDateTime startTime = Optional.ofNullable(meetingRoom.getStartTime())
+                .orElse(LocalDateTime.now()); // null 일 경우 현재 시간 반환
+
+        LocalDateTime endTime = Optional.ofNullable(meetingRoom.getEndTime())
+                .orElse(LocalDateTime.now()); // null 일 경우 현재 시간 반환
+
+
         // 회의 상세 저장
         MeetingDetail meetingDetail = MeetingDetail.builder()
                 .summary(fullSummary.toString())
                 .title(meetingRoom.getTitle())
                 .meetingRoom(meetingRoom)
+                .createAt(startTime)
+                .totalTime(Duration.between(startTime, endTime).toMinutes())
                 .build();
 
         meetingDetailRepository.save(meetingDetail);
@@ -181,11 +192,37 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public ResponseEntity<DetailListResponse> readDetailList(Long folderId) {
-        // Member_meeting 에 접근 : folder_id 같은 것 뽑아오기
-        // 뽑아온 member_meeting_list를 하나씩 돌면서 detail_id에 접근하여 DetailListResponseDto 정보 뺴오기
-        // DetailListResponseList 뽑아서 DetailListResponse에 넣어주기
 
-        return null;
+
+        // Member_meeting 에 접근 : folder_id 같은 것 뽑아오기
+        List<MemberMeeting> memberMeetingList = memberMeetingRepository.findAllByFolder_Id(folderId);
+        // 뽑아온 member_meeting_list를 하나씩 돌면서 detail_id에 접근하여 DetailListResponseDto 정보 뺴오기
+        List<DetailListResponseDto> detailListResponseDtos = memberMeetingList.stream()
+                .map(memberMeeting -> {
+                    DetailListResponseDto detailListResponseDto = new DetailListResponseDto();
+                    MeetingDetail detail = meetingDetailRepository.findByMeetingRoom_Id(memberMeeting.getRoomId());
+                    Long commentCnt = commentRepository.countAllByMeetingDetail_Id(detail.getId());
+
+
+                    Long meetingRoomId = Optional.ofNullable(detail.getMeetingRoom())
+                            .map(MeetingRoom::getId)
+                            .orElse(0L);
+
+                    Long participantCnt = participantRepository.countAllByMeetingRoom_Id(meetingRoomId);
+
+                    detailListResponseDto.setDetailId(detail.getId());
+                    detailListResponseDto.setTitle(detail.getTitle());
+                    detailListResponseDto.setCreateAt(detail.getCreateAt());
+                    detailListResponseDto.setTotalTime(detail.getTotalTime());
+                    detailListResponseDto.setCommentCnt(commentCnt);
+                    detailListResponseDto.setParticipantCnt(participantCnt);
+                    return detailListResponseDto;
+                }).toList();
+
+        // DetailListResponseList 뽑아서 DetailListResponse에 넣어주기
+        DetailListResponse response = new DetailListResponse("상세페이지 리스트 조회 성공", detailListResponseDtos);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Override
