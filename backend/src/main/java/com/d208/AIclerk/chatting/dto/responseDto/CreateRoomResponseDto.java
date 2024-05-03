@@ -12,5 +12,6 @@ public class CreateRoomResponseDto {
     private String invite_code;
     private long state;
     private String title;
-
+    private String message;
+    private long roomId;
 }
