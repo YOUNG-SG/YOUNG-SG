@@ -16,6 +16,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.w3c.dom.html.HTMLHeadElement;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -120,12 +121,22 @@ public class RoomController {
 
 
     @PostMapping("/join/{roomId}")
-    public ResponseEntity<String> joinRoom(@PathVariable Long roomId) {
-        long userId=commonUtil.getMember().getId();
-        System.out.println("방아이디이이이이이이"+userId);
+    public ResponseEntity<MessageDto> joinRoom(@PathVariable Long roomId) {
+        Member currentMember = commonUtil.getMember();
+        long userId= currentMember.getId();
+
+        String profile = currentMember.getImage();
+        String nickname = currentMember.getNickname();
+        long memberid = currentMember.getId();
+
+        MessageDto message = new MessageDto();
+        message.setSender(nickname);
+        message.setProfile(profile);
+        message.setSenderId(memberid);
 
         roomService.joinRoom(roomId, userId);
-        return ResponseEntity.ok("방참여완료...");
+
+        return ResponseEntity.ok(message);
     }
 
 
