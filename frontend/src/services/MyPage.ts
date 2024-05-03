@@ -20,7 +20,7 @@ export const fetchFolderList = async () => {
 
 // TODO 폴더 회의 목록 조회
 export const fetchFolderMeetingList = async (folderId: number) => {
-  const res = await axiosAuthRequest.get(`/api/meeting/detail/${folderId}`);
+  const res = await axiosAuthRequest.get(`/api/meeting/detail-list/${folderId}`);
   return res;
 };
 
