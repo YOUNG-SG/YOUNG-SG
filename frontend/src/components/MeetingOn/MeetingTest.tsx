@@ -16,6 +16,8 @@ import bg from "../../assets/chattingIcons/bgImage.jpg";
 import { OpenVidu, Publisher, Subscriber } from "openvidu-browser";
 import axios, { AxiosError } from "axios";
 import createRoomStore from "@/store/createRoom";
+import InviteButton from "./OpenVidu/InviteButton";
+import { baseURL } from "@/services/axios";
 
 const MeetingTest = () => {
   const { sessionId, setSessionId } = createRoomStore();
@@ -333,6 +335,27 @@ const MeetingTest = () => {
                   </>
                 )}
               </div>
+              {isClickInvite ? (
+                <>
+                  <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+                    <div className="bg-gray-800 p-5 rounded shadow-lg">
+                      <div>초대 URL: </div>
+                      <div className="bg-white text-black p-2 rounded-lg text-lg">
+                        {`${baseURL}/meeting/on/${sessionId}`}
+                      </div>
+                      <div className="justify-end flex">
+                        <InviteButton />
+                        <button
+                          className="mt-4 p-2 bg-red-500 text-white rounded"
+                          onClick={toggleInvite}
+                        >
+                          닫기
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : null}
             </div>
             <div className="col-span-3">
               <Chatting />
