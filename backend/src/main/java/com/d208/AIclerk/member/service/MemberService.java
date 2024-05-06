@@ -40,4 +40,6 @@ public interface MemberService {
     ResponseEntity<EditMemberResponseDto> editProfile(EditMemberRequestDto dto) throws IOException;
 
     ResponseEntity<EditMemberResponseDto> timeline();
+
+    ResponseEntity<String> deleteMeeting(Long usermeetingId);
 }

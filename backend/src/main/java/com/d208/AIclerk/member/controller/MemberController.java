@@ -59,5 +59,10 @@ public class MemberController {
         return memberService.timeline();
     }
 
+    @DeleteMapping("/mypage/delete/{usermeetingId}")
+    @Operation(summary = "회의 삭제", description = "회의를 삭제합니다.")
+    public ResponseEntity<String> deleteMeeting(@PathVariable("usermeetingId") Long usermeetingId) {
+        return memberService.deleteMeeting(usermeetingId);
+    }
 
 }

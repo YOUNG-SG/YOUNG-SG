@@ -4,6 +4,8 @@ import com.d208.AIclerk.common.S3Uploader;
 import com.d208.AIclerk.entity.MeetingRoom;
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.entity.MemberMeeting;
+import com.d208.AIclerk.exception.meeting.CommentException;
+import com.d208.AIclerk.exception.member.MemberException;
 import com.d208.AIclerk.meeting.repository.MeetingRoomRepository;
 import com.d208.AIclerk.meeting.repository.MemberMeetingRepository;
 import com.d208.AIclerk.member.dto.requestDto.EditMemberRequestDto;
@@ -263,7 +265,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public ResponseEntity<EditMemberResponseDto> timeline() {
         Member member = commonUtil.getMember();
-        // 레파지토리에서 날짜 최신순으로 설정 => meetingroom이랑 joing해서 사용
+        // 레파지토리에서 날짜 최신순으로 설정 => meetingroom이랑 join해서 사용
         List<MemberMeeting> meetingList = memberMeetingRepository.findAllByMember(member);
         // List 비었는지 체크해야함
         for (MemberMeeting meeting:meetingList) {
@@ -276,6 +278,23 @@ public class MemberServiceImpl implements MemberService{
         // folder list에서 폴더 제목
         // room id로 회의방 제목
         return null;
+    }
+
+    @Override
+    public ResponseEntity<String> deleteMeeting(Long usermeetingId) {
+        // memberid 체크 -> 아니면 권한 없음 띄우기 : usermeetingId로 가능
+        Member member = commonUtil.getMember();
+        // 회의 목록 조회
+        MemberMeeting memberMeeting = memberMeetingRepository.findById(usermeetingId)
+                .orElseThrow(MemberException::memberMeetingNotFound);
+        // 회의 목록 멤버 일치 확인
+        if (!member.getId().equals(memberMeeting.getMember().getId())) {
+            throw MemberException.memberMeetingNotEqualException();
+        }
+
+        memberMeetingRepository.deleteById(usermeetingId);
+
+        return ResponseEntity.status(HttpStatus.OK).body("회의가 삭제되었습니다.");
     }
 
 }
