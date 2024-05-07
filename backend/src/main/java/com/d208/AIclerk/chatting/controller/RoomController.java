@@ -59,9 +59,9 @@ public class RoomController {
 
         CreateRoomResponseDto response = new CreateRoomResponseDto(
                 createdRoom.getInviteCode(),
-                0,
-                createdRoom.getTitle(),
-                "Room created successfully",
+//                0,
+//                createdRoom.getTitle(),
+//                "Room created successfully",
                 createdRoom.getId(),
                 nickname,
                 profile,
