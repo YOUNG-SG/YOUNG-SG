@@ -12,16 +12,16 @@ export const updateMyProfile = async (profile: FormData) => {
   return res;
 };
 
-// TODO 폴더 목록 조회
+// 폴더 목록 조회
 export const fetchFolderList = async () => {
   const res = await axiosAuthRequest.get("/api/meeting/folder-list");
-  return res;
+  return res.data.data;
 };
 
-// TODO 폴더 회의 목록 조회
+// TODO 폴더 상세, 회의 목록 조회
 export const fetchFolderMeetingList = async (folderId: number) => {
   const res = await axiosAuthRequest.get(`/api/meeting/detail-list/${folderId}`);
-  return res;
+  return res.data.data;
 };
 
 // TODO 타임라인
