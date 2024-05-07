@@ -59,7 +59,7 @@ public class RoomController {
 
         CreateRoomResponseDto response = new CreateRoomResponseDto(
                 createdRoom.getInviteCode(),
-                0, 
+                0,
                 createdRoom.getTitle(),
                 "Room created successfully",
                 createdRoom.getId(),
@@ -82,16 +82,16 @@ public class RoomController {
      */
     @MessageMapping("/{roomId}/sendMessage")
     public void sendMessage(@DestinationVariable Long roomId, MessageDto message) {
-        Member currentMember = commonUtil.getMember();
-
-        String profile = currentMember.getImage();
-        String nickname = currentMember.getNickname();
-
-        message.setSender(nickname);
-        message.setProfile(profile);
+////        Member currentMember = commonUtil.getMember();
+//
+//        String profile = currentMember.getImage();
+//        String nickname = currentMember.getNickname();
+//        message.setSender(nickname);
+//        message.setProfile(profile);
+//        message.setSent_time(LocalDateTime.now());
         message.setSent_time(LocalDateTime.now());
 
-        log.info("chat {} send by {} to room number {}", message, nickname, roomId);
+        log.info("Received message from {} ({}): {}", message.getSender(), message.getSenderId(), message.getContent());
         messagingTemplate.convertAndSend("/sub/chat/" + roomId, message);
         // rabbitMqService.sendMessage(roomId, message);
     }
