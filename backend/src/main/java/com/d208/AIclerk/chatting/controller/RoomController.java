@@ -48,21 +48,25 @@ public class RoomController {
      */
     @PostMapping("/create-meeting")
     public ResponseEntity<CreateRoomResponseDto> createRoom(@RequestBody CreateRoomRequestDto dto) {
-        long ownerId = commonUtil.getMember().getId();  // 현재 로그인한 사용자의 ID를 가져옴
+        long ownerId = commonUtil.getMember().getId();
+        String profile = commonUtil.getMember().getImage();
+        String nickname = commonUtil.getMember().getNickname();
 
-        MeetingRoom room = new MeetingRoom();           // 새 MeetingRoom 객체 생성
-        room.setTitle(dto.getTitle());                  // DTO에서 제목 설정
+        MeetingRoom room = new MeetingRoom();
+        room.setTitle(dto.getTitle());
 
-        MeetingRoom createdRoom = roomService.createRoom(room, ownerId); // 서비스에 room과 ownerId 전달
+        MeetingRoom createdRoom = roomService.createRoom(room, ownerId);
 
-        // CreateRoomResponseDto 생성하여 반환
         CreateRoomResponseDto response = new CreateRoomResponseDto(
                 createdRoom.getInviteCode(),
-                0,  // 상태 필드는 여기서 설정합니다. 적절한 상태 코드로 변경해주세요.
+                0, 
                 createdRoom.getTitle(),
-                "생성햇습니다",
-                createdRoom.getId()
-
+                "Room created successfully",
+                createdRoom.getId(),
+                nickname,
+                profile,
+                java.time.LocalDateTime.now(),
+                ownerId
         );
 
         return ResponseEntity.ok(response);
@@ -85,7 +89,7 @@ public class RoomController {
 
         message.setSender(nickname);
         message.setProfile(profile);
-        message.setSent_time(LocalTime.now());
+        message.setSent_time(LocalDateTime.now());
 
         log.info("chat {} send by {} to room number {}", message, nickname, roomId);
         messagingTemplate.convertAndSend("/sub/chat/" + roomId, message);
