@@ -22,8 +22,10 @@ public class MeetingDetailResponseDto {
 
     private String fileUrl;
 
-    private String nextMeeting;
+    private Long preMeetingId;
 
-    private LocalDateTime createAt;
+    private Long nextMeetingId;
+
+    private String date;
 
 }
