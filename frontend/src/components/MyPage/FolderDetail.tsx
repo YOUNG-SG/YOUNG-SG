@@ -3,10 +3,13 @@ import { fetchFolderList, fetchFolderMeetingList } from "@/services/MyPage";
 import { selectFolderStore } from "@/store/myPageStore";
 import { FolderType, FolderMeetingType } from "@/types/MyPage";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import Loading from "../@common/Loading";
 
 const FolderDetail = () => {
   // 선택된 폴더
   const { selectFolder } = selectFolderStore();
+  const [folder, setFolder] = useState({ folderId: -1, title: "", createAt: "" });
 
   // 폴더 목록에서 선택된 폴더 id 사용해 title, createAt 받아오기
   const { data: folders } = useQuery({
@@ -15,7 +18,11 @@ const FolderDetail = () => {
   });
 
   // 선택된 폴더 정보
-  const folder = folders.find((fld: FolderType) => fld.folderId === selectFolder);
+  useEffect(() => {
+    if (selectFolder > 0) {
+      setFolder(folders.find((fld: FolderType) => fld.folderId === selectFolder));
+    }
+  }, [selectFolder]);
 
   // 선택된 폴더의 회의 목록
   const { data: folderDetails, isLoading } = useQuery({
@@ -24,11 +31,19 @@ const FolderDetail = () => {
   });
 
   if (selectFolder < 0) {
-    return <div className="flex-[1.05] h-full bg-e-20 rounded-2xl">폴더를 선택해주세요</div>;
+    return (
+      <div className="flex-[1.05] min-h-full bg-e-20 rounded-2xl text-[#CCCCCC] flex justify-center items-center">
+        폴더를 선택해주세요
+      </div>
+    );
   }
 
   if (isLoading) {
-    return <div className="flex-[1.05] h-full bg-e-20 rounded-2xl">로딩 중</div>;
+    return (
+      <div className="flex-[1.05] min-h-full bg-e-20 rounded-2xl text-[#CCCCCC] flex justify-center items-center">
+        <Loading />
+      </div>
+    );
   }
 
   return (

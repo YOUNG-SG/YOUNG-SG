@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { editModeStore, selectFolderStore } from "@/store/myPageStore";
+import { useState } from "react";
+import { editModeStore } from "@/store/myPageStore";
 import Profile from "@/components/MyPage/Profile";
 import ProfileEdit from "@/components/MyPage/ProfileEdit";
 import FolderList from "@/components/MyPage/FolderList";
@@ -8,14 +8,7 @@ import Timeline from "@/components/MyPage/Timeline";
 
 const MyPage = () => {
   const [select, setSelect] = useState("folder");
-  const { selectFolder, setSelectFolder } = selectFolderStore();
   const { editMode } = editModeStore();
-
-  useEffect(() => {
-    if (selectFolder > -1) {
-      setSelectFolder(-1);
-    }
-  }, []);
 
   return (
     <div className="flex h-screen">

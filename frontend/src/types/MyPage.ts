@@ -1,7 +1,7 @@
 export type FolderType = {
   folderId: number;
   title: string;
-  // createdAt: string;
+  createAt: string;
 };
 
 export type FolderMeetingType = {
