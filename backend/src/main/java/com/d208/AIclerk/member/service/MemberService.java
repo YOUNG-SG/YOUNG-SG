@@ -2,10 +2,7 @@ package com.d208.AIclerk.member.service;
 
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.member.dto.requestDto.EditMemberRequestDto;
-import com.d208.AIclerk.member.dto.responseDto.EditMemberResponseDto;
-import com.d208.AIclerk.member.dto.responseDto.GetMemberResponse;
-import com.d208.AIclerk.member.dto.responseDto.GetMemberResponseDTO;
-import com.d208.AIclerk.member.dto.responseDto.SignInResponseDTO;
+import com.d208.AIclerk.member.dto.responseDto.*;
 import com.d208.AIclerk.member.exception.MemberNotFoundException;
 import com.d208.AIclerk.member.repository.RefreshTokenRepository;
 import com.d208.AIclerk.member.repository.MemberRepository;
@@ -38,4 +35,8 @@ public interface MemberService {
     ResponseEntity signIn(String code);
 
     ResponseEntity<EditMemberResponseDto> editProfile(EditMemberRequestDto dto) throws IOException;
+
+    ResponseEntity<TimeLineResponseDto> timeline();
+
+    ResponseEntity<String> deleteMeeting(Long usermeetingId);
 }

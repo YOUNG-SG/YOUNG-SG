@@ -34,11 +34,7 @@ import java.time.Duration;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,71 +51,14 @@ public class MeetingServiceImpl implements MeetingService {
     private final MemberMeetingRepository memberMeetingRepository;
     private final RoomRepository roomRepository;
     private final ParticipantRepository participantRepository;
-    private final FileRepository fileRepository;
-    private final MeetingRoomRepository meetingRoomRepository;
+
 
     @Autowired
     private WordDocumentUpdater wordDocumentUpdater;
-
-    // OpenAi 텍스트 요약 및 meetingDetail 저장
-//    @Override
-//    @Transactional
-//    public ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception {
-//
-//        String inputText = dto.getText();
-//
-//        StringBuilder fullSummary = new StringBuilder();
-//
-//        // 글자수 제한 확인
-//        final int MAX_LENGTH = 4000;
-//        while (!inputText.isEmpty()) {
-//            String partOfText;
-//            if (inputText.length() > MAX_LENGTH) {
-//                partOfText = inputText.substring(0, MAX_LENGTH);
-//                inputText = inputText.substring(MAX_LENGTH);
-//            } else {
-//                partOfText = inputText;
-//                inputText = "";
-//            }
-//
-//            // 텍스트 요약
-//            String result = openAiUtil.summarizeText(partOfText);
-//            fullSummary.append(result);
-//            fullSummary.append(" "); // 부분 요약들을 구분하기 위해 공백 추가
-//        }
-//
-//        MeetingRoom meetingRoom = roomRepository.findById(dto.getRoomId())
-//                .orElseThrow();
-//
-//        // Optional을 사용하여 null이면 현재 시간을 반환
-//        LocalDateTime startTime = Optional.ofNullable(meetingRoom.getStartTime())
-//                .orElse(LocalDateTime.now()); // null 일 경우 현재 시간 반환
-//
-//        LocalDateTime endTime = Optional.ofNullable(meetingRoom.getEndTime())
-//                .orElse(LocalDateTime.now()); // null 일 경우 현재 시간 반환
-//
-//
-//        // 회의 상세 저장
-//        MeetingDetail meetingDetail = MeetingDetail.builder()
-//                .summary(fullSummary.toString())
-//                .title(meetingRoom.getTitle())
-//                .meetingRoom(meetingRoom)
-//                .createAt(startTime)
-//                .totalTime(Duration.between(startTime, endTime).toMinutes())
-//                .build();
-//
-//        meetingDetailRepository.save(meetingDetail);
-//
-//        return ResponseEntity.ok("회의 상세(meeting_detail) 저장 성공");
-//    }
-
-
     @Override
     @Transactional
     public ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception {
-
         String inputText = dto.getText();
-
         StringBuilder fullSummary = new StringBuilder();
 
         // 글자수 제한 확인
@@ -137,28 +76,15 @@ public class MeetingServiceImpl implements MeetingService {
             // 텍스트 요약
             String result = openAiUtil.summarizeText(partOfText);
             fullSummary.append(result);
-            fullSummary.append(" "); // 부분 요약들을 구분하기 위해 공백 추가
+            fullSummary.append(" ");
         }
 
         MeetingRoom meetingRoom = roomRepository.findById(dto.getRoomId())
-                .orElseThrow();
+                .orElseThrow(() -> new NoSuchElementException("Meeting room not found with id: " + dto.getRoomId()));
 
-        // 이미 저장된 상세페이지가 있는지 예외처리
-        if (meetingDetailRepository.findByMeetingRoom_Id(meetingRoom.getId()) != null) {
-            throw MeetingDetailException.existDetailException();
-        }
-
-
-
-        // Optional을 사용하여 null이면 현재 시간을 반환
-        LocalDateTime startTime = Optional.ofNullable(meetingRoom.getStartTime())
-                .orElse(LocalDateTime.now()); // null 일 경우 현재 시간 반환
-
-        LocalDateTime endTime = Optional.ofNullable(meetingRoom.getEndTime())
-                .orElse(LocalDateTime.now()); // null 일 경우 현재 시간 반환
-
-
-        // 회의 상세 저장
+        // 회의 상세 정보 생성
+        LocalDateTime startTime = Optional.ofNullable(meetingRoom.getStartTime()).orElse(LocalDateTime.now());
+        LocalDateTime endTime = Optional.ofNullable(meetingRoom.getEndTime()).orElse(LocalDateTime.now());
 
         MeetingDetail meetingDetail = MeetingDetail.builder()
                 .summary(fullSummary.toString())
@@ -168,36 +94,28 @@ public class MeetingServiceImpl implements MeetingService {
                 .totalTime(Duration.between(startTime, endTime).toMinutes())
                 .build();
 
+        // 먼저 MeetingDetail 저장
         meetingDetailRepository.save(meetingDetail);
+        log.info("1 detailId{}", meetingDetail.getId());
 
+        // 파일 업로드
         String bucketName = "youngseogi";
         String key = "test_test.docx";
-        InputStream inputStream = wordDocumentUpdater.getFileFromS3(bucketName, key);  // 인스턴스 메소드 호출
+        InputStream inputStream = wordDocumentUpdater.getFileFromS3(bucketName, key);
 
-        Long meetingRoomId = meetingRoom.getId();
-        String meetingRoomTitle = meetingRoomRepository.findTitleById(meetingRoomId);
+        String meetingRoomTitle = meetingRoom.getTitle();
         String encodedTitle = URLEncoder.encode(meetingRoomTitle, StandardCharsets.UTF_8.toString()).replace("+", "%20");
         String newFileName = encodedTitle + "_" + WordDocumentUpdater.getCurrentTimeFormatted() + ".docx";
-
         String newKey = "SummaryFolder/" + newFileName;
-        List<String> attendees = List.of("홍길동", "김개똥", "이민정", "신민아", "김광석");
 
-        String content = fullSummary.toString();
-        String title = meetingRoom.getTitle();
+        try {
+            wordDocumentUpdater.updateDocument(inputStream, bucketName, newKey, meetingRoom.getTitle(), fullSummary.toString(), List.of("홍길동", "김개똥", "이민정", "신민아", "김광석"), meetingDetail.getId());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update document: " + e.getMessage());
+        }
 
-        wordDocumentUpdater.updateDocument(inputStream, bucketName, newKey, title, content, attendees, meetingRoomId);  // 인스턴스 메소드 호출
-
-        File newFile = File.builder()
-                .url(newKey)
-                .name(title)
-                .meetingDetail(meetingDetail)
-                .build();
-
-        fileRepository.save(newFile);
-
-        return ResponseEntity.ok("회의 상세(meeting_detail) 저장 성공");
+        return ResponseEntity.ok("회의 상세(meeting_detail) 저장 성공 및 파일 업로드 완료");
     }
-
 
     // 댓글 기능 구현
     @Override
@@ -381,6 +299,7 @@ public class MeetingServiceImpl implements MeetingService {
         Folder newFolder = Folder.builder()
                 .title(dto.getTitle())
                 .createAt(LocalDateTime.now())
+
                 .member(currentMember)
                 .build();
 
@@ -473,35 +392,4 @@ public class MeetingServiceImpl implements MeetingService {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-//
-//    @SneakyThrows
-//    public ResponseEntity<MeetingDetailResponse> fileTest(Long fileId) {
-//        String bucketName = "youngseogi";
-//        String key = "test_test.docx";
-//        InputStream inputStream = wordDocumentUpdater.getFileFromS3(bucketName, key);  // 인스턴스 메소드 호출
-//
-//        Long meetingRoomId = null;// 필요한 meetingRoomId를 설정해야 합니다.
-//        String meetingRoomTitle = meetingRoomRepository.findTitleById(meetingRoomId);
-//        String encodedTitle = URLEncoder.encode(meetingRoomTitle, StandardCharsets.UTF_8.toString()).replace("+", "%20");
-//        String newFileName = encodedTitle + "_" + WordDocumentUpdater.getCurrentTimeFormatted() + ".docx";
-//
-//        String newKey = "SummaryFolder/" + newFileName;
-//        List<String> attendees = List.of("홍길동", "김개똥", "이민정", "신민아", "김광석");
-//
-//        MeetingDetail meetingDetail = meetingDetailRepository.findById(fileId)
-//                .orElseThrow(() -> new NoSuchElementException("Meeting detail not found with id: " + fileId));
-//        String content = meetingDetail.getSummary();
-//        String title = meetingDetail.getTitle();
-//
-//        wordDocumentUpdater.updateDocument(inputStream, bucketName, newKey, title, content, attendees, fileId);  // 인스턴스 메소드 호출
-//
-//        File newFile = File.builder()
-//                .url(newKey)
-//                .name(title)
-//                .meetingDetail(meetingDetail)
-//                .build();
-//        fileRepository.save(newFile);
-//
-//        return ResponseEntity.ok().build();
-//    }
 }
