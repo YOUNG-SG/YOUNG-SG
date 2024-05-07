@@ -1,20 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="bcde2fa6-05e8-4f67-bb55-9a8684e5a241" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/chatting/dto/requestDto/CreateRoomRequestDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/chatting/dto/requestDto/EndMeetingRequestDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/chatting/dto/responseDto/CreateRoomResponseDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/chatting/dto/responseDto/EndMeetingResponseDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/chatting/dto/responseDto/JoinRoomResponseDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/folder/controller/FolderController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/folder/dto/RequestDto/CreateFolderRequestDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/folder/dto/ResponseDto/CreateFolderResponseDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/folder/dto/ResponseDto/FolderListResponseDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/chatting/controller/RoomController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/chatting/controller/RoomController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/chatting/service/RoomService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/chatting/service/RoomService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/config/WebSocketConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/d208/AIclerk/config/WebSocketConfig.java" afterDir="false" />
-    </list>
+    <list default="true" id="bcde2fa6-05e8-4f67-bb55-9a8684e5a241" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -23,9 +10,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="2fZp8caf9sSPpYMGDRDAWRkiTKk" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -35,7 +22,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "be/chat",
+    "git-widget-placeholder": "kyuhwan",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/SSAFY/Desktop/SSAFY특화",
     "nodejs_package_manager_path": "npm",
@@ -51,6 +38,7 @@
       <option name="presentableId" value="Default" />
       <updated>1714018295592</updated>
       <workItem from="1714018296624" duration="42000" />
+      <workItem from="1715057214326" duration="8000" />
     </task>
     <servers />
   </component>

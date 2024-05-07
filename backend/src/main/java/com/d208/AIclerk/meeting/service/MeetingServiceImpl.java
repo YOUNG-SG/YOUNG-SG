@@ -26,12 +26,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.io.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -141,6 +143,13 @@ public class MeetingServiceImpl implements MeetingService {
         MeetingRoom meetingRoom = roomRepository.findById(dto.getRoomId())
                 .orElseThrow();
 
+        // 이미 저장된 상세페이지가 있는지 예외처리
+        if (meetingDetailRepository.findByMeetingRoom_Id(meetingRoom.getId()) != null) {
+            throw MeetingDetailException.existDetailException();
+        }
+
+
+
         // Optional을 사용하여 null이면 현재 시간을 반환
         LocalDateTime startTime = Optional.ofNullable(meetingRoom.getStartTime())
                 .orElse(LocalDateTime.now()); // null 일 경우 현재 시간 반환
@@ -150,6 +159,7 @@ public class MeetingServiceImpl implements MeetingService {
 
 
         // 회의 상세 저장
+
         MeetingDetail meetingDetail = MeetingDetail.builder()
                 .summary(fullSummary.toString())
                 .title(meetingRoom.getTitle())
@@ -244,6 +254,8 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     public ResponseEntity<MeetingDetailResponse> readMeetingDetail(Long roomId) {
 
+        Member currentMember = commonUtil.getMember();
+
         // 반환해 줄 dto
         MeetingDetailResponseDto dto = new MeetingDetailResponseDto();
 
@@ -257,7 +269,48 @@ public class MeetingServiceImpl implements MeetingService {
         dto.setDetailId(meetingDetail.getId());
         // 요약 내용
         dto.setSummary(meetingDetail.getSummary());
-        // 다음 회의
+
+        // 시간
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        // LocalDateTime을 원하는 문자열 형식으로 변환
+        if (meetingDetail.getCreateAt() != null) {
+            String formattedDate = meetingDetail.getCreateAt().format(formatter);
+            dto.setDate(formattedDate);
+        } else {
+            dto.setDate("생성 시간이 없습니다.");
+        }
+
+
+        //Todo 이전, 다음 회의
+        Object[] detailIds = memberMeetingRepository.findPreviousAndNextDetailIds(currentMember.getId(), roomId)
+                .orElseThrow(MeetingDetailException::preAndNextDetailNotFoundException);
+
+
+        log.info("(뭔데) {} ", detailIds);
+        Long preMeetingId = null;
+        Long nextMeetingId = null;
+
+        if (detailIds == null || detailIds.length == 0) {
+            dto.setPreMeetingId(preMeetingId);
+            dto.setNextMeetingId(nextMeetingId);
+        } else {
+            Object[] detailIdList = (Object[]) detailIds[0];
+            if (detailIdList[0] != null && !detailIdList[0].equals(0L)) {
+                preMeetingId = (Long) detailIdList[0];
+            }
+
+            if (detailIdList[1] != null && !detailIdList[1].equals(0L)) {
+                nextMeetingId = (Long) detailIdList[1];
+            }
+
+            dto.setPreMeetingId(preMeetingId);
+            dto.setNextMeetingId(nextMeetingId);
+        }
+
+
+
+        //Todo 파일 다운로드 링크
+
 
         // 참여자 목록 조회
         List<Participant> participantList = participantRepository.findAllByMeetingRoom_Id(roomId);
@@ -270,7 +323,6 @@ public class MeetingServiceImpl implements MeetingService {
                 }).collect(Collectors.toList());
 
         dto.setParticipantInfoDtoList(participantInfoDtos);
-        // 파일 다운로드 링크
 
 
         MeetingDetailResponse response = new MeetingDetailResponse("상세 페이지 조회 성공", dto);
@@ -297,9 +349,13 @@ public class MeetingServiceImpl implements MeetingService {
 
                     Long participantCnt = participantRepository.countAllByMeetingRoom_Id(meetingRoomId);
 
+                    // 날짜 형식 변환
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+                    String formattedDate = detail.getCreateAt().format(formatter);
+
                     detailListResponseDto.setDetailId(detail.getId());
                     detailListResponseDto.setTitle(detail.getTitle());
-                    detailListResponseDto.setCreateAt(detail.getCreateAt());
+                    detailListResponseDto.setDate(formattedDate);
                     detailListResponseDto.setTotalTime(detail.getTotalTime());
                     detailListResponseDto.setCommentCnt(commentCnt);
                     detailListResponseDto.setParticipantCnt(participantCnt);
@@ -340,22 +396,24 @@ public class MeetingServiceImpl implements MeetingService {
 
         Member currentMember = commonUtil.getMember();
 
-        Long totalTime = 12323L;
-
         // memberId 로 멤버의 폴더들 모두 조회
         List<Folder> folderList = folderRepository.findAllByMemberId(currentMember.getId());
 
-        if (folderList.isEmpty()){
-            throw FolderException.folderNotFoundException();
-        }
-
         List<FolderResponseDto> folderResponseDtoList = folderList.stream()
-                .map(folder -> new FolderResponseDto(
-                        folder.getId(),
-                        folder.getTitle(),
-                        totalTime
-                ))
-                .toList();
+                .map(folder -> {
+                    // 날짜 포맷을 정의 (예: 2013년 3월 10일)
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+                    // LocalDateTime을 원하는 문자열 형식으로 변환
+                    String formattedDate = folder.getCreateAt().format(formatter);
+
+                    // DTO 생성
+                    return new FolderResponseDto(
+                            folder.getId(),
+                            folder.getTitle(),
+                            formattedDate  // 문자열로 변환된 날짜 사용
+                    );
+                })
+                .collect(Collectors.toList());
 
 
         // 리스트들을 반환 해준다.
