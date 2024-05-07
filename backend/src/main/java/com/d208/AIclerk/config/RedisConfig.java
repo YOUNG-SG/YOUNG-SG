@@ -1,7 +1,11 @@
 package com.d208.AIclerk.config;
 
+import com.d208.AIclerk.chatting.repository.RoomRepository;
 import com.d208.AIclerk.chatting.util.RedisSubscriber;
+import com.d208.AIclerk.entity.MeetingDetail;
+import com.d208.AIclerk.entity.MeetingRoom;
 import com.d208.AIclerk.entity.Member;
+import com.d208.AIclerk.meeting.repository.MeetingDetailRepository;
 import com.d208.AIclerk.member.exception.MemberNotFoundException;
 import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.meeting.repository.ParticipantRepository;
@@ -19,6 +23,8 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -28,20 +34,21 @@ public class RedisConfig {
     private final ListOperations<String, String> listOperations;
     private final RedisSubscriber redisSubscriber;  // RedisSubscriber 주입
     private final SimpMessagingTemplate messagingTemplate;
-    private final CommonUtil commonUtil;
     private  final MemberRepository memberRepository;
-    private final ParticipantRepository participantRepository;
+    private final MeetingDetailRepository meetingDetailRepository;
+
+    private final RoomRepository roomRepository;
 
     @Autowired
-    public RedisConfig(StringRedisTemplate redisTemplate, RedisSubscriber redisSubscriber, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, MemberRepository memberRepository, ParticipantRepository participantRepository) {
+    public RedisConfig(StringRedisTemplate redisTemplate, RedisSubscriber redisSubscriber, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, MemberRepository memberRepository, ParticipantRepository participantRepository, MeetingDetailRepository meetingDetailRepository, RoomRepository roomRepository) {
         this.redisTemplate = redisTemplate;
         this.hashOperations = redisTemplate.opsForHash();
         this.listOperations = redisTemplate.opsForList();
         this.redisSubscriber = redisSubscriber;
         this.messagingTemplate = messagingTemplate;
-        this.commonUtil = commonUtil;
         this.memberRepository = memberRepository;
-        this.participantRepository = participantRepository;
+        this.meetingDetailRepository = meetingDetailRepository;
+        this.roomRepository = roomRepository;
     }
 
     public void createRoom(Long roomId, Long owner) {
@@ -158,6 +165,8 @@ public class RedisConfig {
         String roomKey = "room:" + roomId.toString();
         hashOperations.put(roomKey, "status", "1");
         updateRoomInfo(roomId);
+        String startMessage = "미팅이 시작되었슴니다";
+        messagingTemplate.convertAndSend("/topic/meetingStatus/" + roomId, startMessage);
     }
 
 
@@ -170,20 +179,35 @@ public class RedisConfig {
 
 
     public void endMeeting(Long roomId) {
-        hashOperations.put("room:" + roomId, "status", "2");
+        String roomKey = "room:" + roomId.toString();
+        hashOperations.put(roomKey, "status", "2");
         updateRoomInfo(roomId);
+        String endMessage = "미팅이 종료되었슴다";
+        messagingTemplate.convertAndSend("/topic/meetingStatus/" + roomId, endMessage);
+
+        List<String> chatLogs = redisTemplate.opsForList().range("chatlog:" + roomId, 0, -1);
+        String summary = String.join(" ", chatLogs); // 모든 로그를 하나의 문자열로 결합
+        saveChatLogsToDatabase(roomId, summary); // DB에 저장
+        redisTemplate.delete("chatlog:" + roomId); // Redis에서 채팅 로그 삭제
+    }
+
+    private void saveChatLogsToDatabase(Long roomId, String summary) {
+        MeetingRoom meetingRoom = roomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid room ID: " + roomId));
+
+        MeetingDetail meetingDetail = MeetingDetail.builder()
+                .title(meetingRoom.getTitle()) // MeetingRoom에서 제목 가져오기
+                .summary(summary)
+                .createAt(LocalDateTime.now())
+                .meetingRoom(meetingRoom)
+                .build();
+
+        meetingDetailRepository.save(meetingDetail); // 저장
     }
 
 
-    // RedisConfig.java 내부에 채팅 로그 관리를 위한 메서드 추가
-    public void appendChatLog(Long roomId, String message) {
-        String key = "chatlog:" + roomId;
-        redisTemplate.opsForList().rightPush(key, message);
-    }
 
-
-
-
+    
     // 방 상태 및 멤버 수 업데이트 메서드
 
 

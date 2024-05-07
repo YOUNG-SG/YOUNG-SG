@@ -17,7 +17,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
          * sub 이 채팅방 구독합니다!!
              * pub /pub/chat/123/SendMessage [ 이방에 메시지..합니다!]
          * */
-        registry.enableSimpleBroker("/sub");  //수신임
+        registry.enableSimpleBroker("/sub","/topic");  //수신임
 
          registry.setApplicationDestinationPrefixes("/pub"); //발신 어미사?임
     }
