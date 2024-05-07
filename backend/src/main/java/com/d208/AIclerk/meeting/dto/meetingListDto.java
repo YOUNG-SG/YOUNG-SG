@@ -1,4 +1,4 @@
-package com.d208.AIclerk.member.dto;
+package com.d208.AIclerk.meeting.dto;
 
 import lombok.Builder;
 import lombok.Getter;

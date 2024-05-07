@@ -13,13 +13,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DetailListResponseDto {
 
+    private Long detailId;
+
     private String title;
 
     private Long participantCnt;
 
     private Long commentCnt;
 
-    private LocalDateTime createAt;
+    private String date;
 
     private Long totalTime;
 

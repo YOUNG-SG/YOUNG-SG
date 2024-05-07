@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -21,6 +22,10 @@ public class MeetingDetailResponseDto {
 
     private String fileUrl;
 
-    private String nextMeeting;
+    private Long preMeetingId;
+
+    private Long nextMeetingId;
+
+    private String date;
 
 }

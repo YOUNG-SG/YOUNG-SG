@@ -15,4 +15,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findAllByMeetingDetail_Id(Long detailId);
 
+    Long countAllByMeetingDetail_Id(Long detailId);
 }

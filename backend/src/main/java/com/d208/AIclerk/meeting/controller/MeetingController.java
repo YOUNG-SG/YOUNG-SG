@@ -35,7 +35,7 @@ public class MeetingController {
     }
 
     @DeleteMapping("/comment/{commentId}")
-    @Operation(summary = "코멘트 삭제", description = "책 코멘트 삭제")
+    @Operation(summary = "코멘트 삭제", description = "코멘트 삭제")
     public ResponseEntity<CommentDeleteResponse> deleteComment(@PathVariable("commentId") Long commentId) {
         return meetingService.deleteComment(commentId);
     }
@@ -76,4 +76,9 @@ public class MeetingController {
         return meetingService.saveMeeting(dto);
     }
 
+    @GetMapping("/filetest/{fileId}")
+    @Operation(summary = "파일 생성 테스트", description = "파일 생성 테스트 api")
+    ResponseEntity<MeetingDetailResponse> fileTest(@PathVariable Long fileId) {
+        return meetingService.fileTest(fileId);
+    }
 }

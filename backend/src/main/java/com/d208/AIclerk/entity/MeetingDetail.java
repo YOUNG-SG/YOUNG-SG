@@ -3,6 +3,10 @@ package com.d208.AIclerk.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.sql.Time;
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @Builder
@@ -21,6 +25,12 @@ public class MeetingDetail {
 
     @Column(name = "summary", columnDefinition = "TEXT")
     private String summary;
+
+    @Column(name = "create_at")
+    private LocalDateTime createAt;
+
+    @Column(name = "total_time")
+    private Long totalTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")

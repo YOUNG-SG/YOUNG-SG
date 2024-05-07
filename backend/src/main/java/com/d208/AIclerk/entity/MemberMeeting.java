@@ -23,10 +23,6 @@ public class MemberMeeting {
     @JoinColumn(name = "folder_id", nullable = false)
     private Folder folder;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "detail_id", nullable = false)
-//    private MeetingDetail meetingDetail;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;

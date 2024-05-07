@@ -17,4 +17,13 @@ public class MeetingDetailException extends RuntimeException{
         return new MeetingDetailException("해당 회의 상세 페이지가 없습니다.", HttpStatus.NOT_FOUND);
     }
 
+    public static MeetingDetailException existDetailException() {
+        return new MeetingDetailException("이미 해당 room의 상세페이지가 있습니다.", HttpStatus.BAD_REQUEST);
+    }
+
+    public static MeetingDetailException preAndNextDetailNotFoundException() {
+        return new MeetingDetailException("이전, 이후 회의 목록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+    }
+
+
 }

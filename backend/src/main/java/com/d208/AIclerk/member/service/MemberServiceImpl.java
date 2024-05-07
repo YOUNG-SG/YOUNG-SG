@@ -4,10 +4,10 @@ import com.d208.AIclerk.common.S3Uploader;
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.entity.MemberMeeting;
 import com.d208.AIclerk.exception.member.MemberException;
-import com.d208.AIclerk.member.dto.meetingListDto;
+import com.d208.AIclerk.meeting.dto.meetingListDto;
 import com.d208.AIclerk.meeting.repository.MeetingRoomRepository;
+import com.d208.AIclerk.meeting.repository.MemberMeetingRepository;
 import com.d208.AIclerk.member.dto.responseDto.*;
-import com.d208.AIclerk.member.repository.MemberMeetingRepository;
 import com.d208.AIclerk.member.dto.requestDto.EditMemberRequestDto;
 import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.member.repository.RefreshTokenRepository;
@@ -20,7 +20,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -54,7 +53,7 @@ public class MemberServiceImpl implements MemberService{
     @Value("${REDIRECT_URI}")
     String RedirectUri;
 
-    private int accessTokenMinute = 720;
+    private int accessTokenMinute = 20160;
     private int refreshTokenMinute = 3000;
 
     @Override
@@ -74,8 +73,6 @@ public class MemberServiceImpl implements MemberService{
         params.add("redirect_uri", RedirectUri);
         params.add("code", code);
         params.add("client_secret", SecretKey);
-
-        //url 테스트
 
         //(5)
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
@@ -261,11 +258,11 @@ public class MemberServiceImpl implements MemberService{
     public ResponseEntity<TimeLineResponseDto> timeline() {
         Member member = commonUtil.getMember();
         // List 비었는지 체크해야함
-        List<meetingListDto> meetingList = memberMeetingRepository.findAllByMember(member);
+        List<meetingListDto> meetingList = memberMeetingRepository.findAllByMemberOrderByStartTime(member);
         int month = LocalDateTime.now().getMonthValue();
         int year = LocalDateTime.now().getYear();
 
-        // hashmap response 생성
+        // treemap response 생성
         TreeMap<Integer, TreeMap<Integer, List<TimeLineDayDto>>> response =  new TreeMap<>(Comparator.reverseOrder());
         for (meetingListDto meeting:meetingList) {
             // 연도와 월 체크 => 다르면 싹 갱신 연도 리스트에 월 리스트로 체크
