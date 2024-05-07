@@ -6,6 +6,7 @@ import com.d208.AIclerk.member.dto.requestDto.EditMemberRequestDto;
 import com.d208.AIclerk.member.dto.responseDto.EditMemberResponseDto;
 import com.d208.AIclerk.member.dto.responseDto.GetMemberResponse;
 import com.d208.AIclerk.member.dto.responseDto.SignInResponseDTO;
+import com.d208.AIclerk.member.dto.responseDto.TimeLineResponseDto;
 import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.member.repository.RefreshTokenRepository;
 import com.d208.AIclerk.member.service.MemberService;
@@ -55,7 +56,7 @@ public class MemberController {
 
     @GetMapping("/mypage/timeline")
     @Operation(summary = "타임라인", description = "메인페이지의 타임라인을 조회합니다.")
-    public ResponseEntity<EditMemberResponseDto> timeline() {
+    public ResponseEntity<TimeLineResponseDto> timeline() {
         return memberService.timeline();
     }
 

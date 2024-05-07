@@ -1,18 +1,14 @@
 package com.d208.AIclerk.member.service;
 
 import com.d208.AIclerk.common.S3Uploader;
-import com.d208.AIclerk.entity.MeetingRoom;
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.entity.MemberMeeting;
-import com.d208.AIclerk.exception.meeting.CommentException;
 import com.d208.AIclerk.exception.member.MemberException;
+import com.d208.AIclerk.member.dto.meetingListDto;
 import com.d208.AIclerk.meeting.repository.MeetingRoomRepository;
-import com.d208.AIclerk.meeting.repository.MemberMeetingRepository;
+import com.d208.AIclerk.member.dto.responseDto.*;
+import com.d208.AIclerk.member.repository.MemberMeetingRepository;
 import com.d208.AIclerk.member.dto.requestDto.EditMemberRequestDto;
-import com.d208.AIclerk.member.dto.responseDto.EditMemberResponseDto;
-import com.d208.AIclerk.member.dto.responseDto.GetMemberResponse;
-import com.d208.AIclerk.member.dto.responseDto.GetMemberResponseDTO;
-import com.d208.AIclerk.member.dto.responseDto.SignInResponseDTO;
 import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.member.repository.RefreshTokenRepository;
 import com.d208.AIclerk.security.jwt.JWTUtil;
@@ -24,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -32,10 +29,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -263,21 +258,39 @@ public class MemberServiceImpl implements MemberService{
     }
 
     @Override
-    public ResponseEntity<EditMemberResponseDto> timeline() {
+    public ResponseEntity<TimeLineResponseDto> timeline() {
         Member member = commonUtil.getMember();
-        // 레파지토리에서 날짜 최신순으로 설정 => meetingroom이랑 join해서 사용
-        List<MemberMeeting> meetingList = memberMeetingRepository.findAllByMember(member);
         // List 비었는지 체크해야함
-        for (MemberMeeting meeting:meetingList) {
-            // 이전 연도와 다르면 추가 : 초기값은 현재 일자로 체크
-            System.out.println(meeting.getFolder().getTitle());
-            MeetingRoom meetingRoom = meetingRoomRepository.findById(meeting.getRoomId()).orElse(null);
-            System.out.println(meetingRoom.getTitle()); // 회의 제목, 연도와 월 날짜도 가져와야함
-            System.out.println(meetingRoom.getStartTime()); // 회의 제목, 연도와 월 날짜도 가져와야함
+        List<meetingListDto> meetingList = memberMeetingRepository.findAllByMember(member);
+        int month = LocalDateTime.now().getMonthValue();
+        int year = LocalDateTime.now().getYear();
+
+        // hashmap response 생성
+        TreeMap<Integer, TreeMap<Integer, List<TimeLineDayDto>>> response =  new TreeMap<>(Comparator.reverseOrder());
+        for (meetingListDto meeting:meetingList) {
+            // 연도와 월 체크 => 다르면 싹 갱신 연도 리스트에 월 리스트로 체크
+            if (meeting.getStartTime().getYear() != year || meeting.getStartTime().getMonthValue() != month) {
+                year = meeting.getStartTime().getYear();
+                month = meeting.getStartTime().getMonthValue();
+            }
+            // year 값이 존재하는지 체크 => 없으면 추가
+            if (response.getOrDefault(year, null) == null){
+                // 키를 추가
+                response.put(year, new TreeMap<>(Comparator.reverseOrder()));
+            }
+            // year의 리스트에 month 있는지 체크
+            if (response.get(year).getOrDefault(month, null) == null){
+                // 키를 추가
+                response.get(year).put(month, new ArrayList<>());
+            }
+            response.get(year).get(month)
+                    .add(TimeLineDayDto.of(meeting.getRoomId(), meeting.getStartTime().getDayOfMonth(),
+                            meeting.getFolderTitle(), meeting.getRoomTitle()));
         }
-        // folder list에서 폴더 제목
-        // room id로 회의방 제목
-        return null;
+
+        TimeLineResponseDto responseDto = TimeLineResponseDto.of(response);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @Override

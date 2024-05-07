@@ -13,6 +13,7 @@ import com.d208.AIclerk.meeting.dto.requestDto.SaveMeetingRequestDto;
 import com.d208.AIclerk.meeting.dto.response.*;
 import com.d208.AIclerk.meeting.dto.responseDto.*;
 import com.d208.AIclerk.meeting.repository.*;
+import com.d208.AIclerk.member.repository.MemberMeetingRepository;
 import com.d208.AIclerk.utill.CommonUtil;
 import com.d208.AIclerk.utill.OpenAiUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
