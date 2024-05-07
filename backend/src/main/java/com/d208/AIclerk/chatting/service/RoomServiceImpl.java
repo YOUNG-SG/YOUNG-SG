@@ -10,6 +10,7 @@ import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.entity.Participant;
 import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.meeting.repository.ParticipantRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,8 +52,10 @@ public class RoomServiceImpl implements RoomService {
     {
         redisConfig.addRoomMember(roomId, memberId);
     }
+//
 
-    public void startMeeting(long roomId) {
+    @Transactional
+    public synchronized  void startMeeting(long roomId) {
         MeetingRoom meetingRoom = roomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid room ID: " + roomId));
         meetingRoom.setStartTime(LocalDateTime.now());
@@ -64,16 +67,22 @@ public class RoomServiceImpl implements RoomService {
             Member member = memberRepository.findById(memberId)
                     .orElseThrow(() -> new RuntimeException("Member not found with ID: " + memberId));
 
-            Participant participant = Participant.builder()
-                    .member(member)
-                    .meetingRoom(meetingRoom)
-                    .build();
+            System.out.println("Member ID: " + memberId + ", Meeting Room: " + meetingRoom);
 
-            participantRepository.save(participant);
+                Participant participant = Participant.builder()
+                        .member(member)
+                        .meetingRoom(meetingRoom)
+                        .build();
+                participantRepository.save(participant);
+                System.out.println("Saved participant: " + memberId);
+
         }
 
         redisConfig.startMeeting(roomId);
     }
+
+
+
 
     public boolean leaveRoom(long roomId, long memberId) {
         redisConfig.leaveRoom(roomId, memberId);
