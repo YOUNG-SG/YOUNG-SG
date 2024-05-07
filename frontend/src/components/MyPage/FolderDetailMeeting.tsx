@@ -1,6 +1,7 @@
+import { FolderMeetingType } from "@/types/MyPage";
 import { useNavigate } from "react-router-dom";
 
-const FolderDetailMeeting = () => {
+const FolderDetailMeeting: React.FC<{ meeting: FolderMeetingType }> = ({ meeting }) => {
   const navigate = useNavigate();
 
   const GradationLine = () => {
@@ -11,20 +12,20 @@ const FolderDetailMeeting = () => {
     <div
       className="w-full h-[100px] px-[25px] py-[20px] bg-e-20 rounded-lg cursor-pointer"
       onClick={() => {
-        navigate(`/meeting/${1}`);
+        navigate(`/meeting/${meeting.detailId}`);
       }}
     >
       <div className="flex justify-between items-center">
         <div>
-          <div className="text-[14px] font-l text-[#CCCCCC]">24.04.08</div>
-          <div className="text-[24px] font-bold">프로젝트 주제 회의</div>
+          <div className="text-[14px] font-l text-[#CCCCCC]">{meeting.createAt}</div>
+          <div className="text-[24px] font-bold">{meeting.title}</div>
         </div>
         <div className="flex flex-col items-end text-[14px]">
-          <div>1시간 50분</div>
+          <div>{meeting.totalTime}</div>
           <GradationLine />
-          <div>8명</div>
+          <div>{meeting.participantCnt}명</div>
           <GradationLine />
-          <div>댓글 1개</div>
+          <div>댓글 {meeting.commentCnt}개</div>
         </div>
       </div>
     </div>
