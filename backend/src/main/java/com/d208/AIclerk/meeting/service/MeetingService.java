@@ -26,6 +26,6 @@ public interface MeetingService {
 
     ResponseEntity<SaveMeetingResponse> saveMeeting(SaveMeetingRequestDto dto);
 
-    ResponseEntity<MeetingDetailResponse> fileTest(Long fileId);
+//    ResponseEntity<MeetingDetailResponse> fileTest(Long fileId);
 
 }
