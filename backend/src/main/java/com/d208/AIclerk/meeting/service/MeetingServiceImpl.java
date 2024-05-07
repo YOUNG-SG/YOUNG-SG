@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.io.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -170,7 +171,8 @@ public class MeetingServiceImpl implements MeetingService {
         dto.setDetailId(meetingDetail.getId());
         // 요약 내용
         dto.setSummary(meetingDetail.getSummary());
-        // 다음 회의
+
+        //Todo 다음 회의
 
         // 참여자 목록 조회
         List<Participant> participantList = participantRepository.findAllByMeetingRoom_Id(roomId);
@@ -183,7 +185,8 @@ public class MeetingServiceImpl implements MeetingService {
                 }).collect(Collectors.toList());
 
         dto.setParticipantInfoDtoList(participantInfoDtos);
-        // 파일 다운로드 링크
+
+        //Todo 파일 다운로드 링크
 
 
         MeetingDetailResponse response = new MeetingDetailResponse("상세 페이지 조회 성공", dto);
@@ -253,8 +256,6 @@ public class MeetingServiceImpl implements MeetingService {
 
         Member currentMember = commonUtil.getMember();
 
-        Long totalTime = 12323L;
-
         // memberId 로 멤버의 폴더들 모두 조회
         List<Folder> folderList = folderRepository.findAllByMemberId(currentMember.getId());
 
@@ -263,12 +264,20 @@ public class MeetingServiceImpl implements MeetingService {
         }
 
         List<FolderResponseDto> folderResponseDtoList = folderList.stream()
-                .map(folder -> new FolderResponseDto(
-                        folder.getId(),
-                        folder.getTitle(),
-                        totalTime
-                ))
-                .toList();
+                .map(folder -> {
+                    // 날짜 포맷을 정의 (예: 2013년 3월 10일)
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
+                    // LocalDateTime을 원하는 문자열 형식으로 변환
+                    String formattedDate = folder.getCreateAt().format(formatter);
+
+                    // DTO 생성
+                    return new FolderResponseDto(
+                            folder.getId(),
+                            folder.getTitle(),
+                            formattedDate  // 문자열로 변환된 날짜 사용
+                    );
+                })
+                .collect(Collectors.toList());
 
 
         // 리스트들을 반환 해준다.
