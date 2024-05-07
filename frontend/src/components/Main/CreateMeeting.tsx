@@ -1,16 +1,21 @@
 import { useNavigate } from "react-router-dom";
 import { createRoom } from "@/services/createRoom";
 import createRoomStore from "@/store/createRoom";
+import userStore from "@/store/userStore";
 
 const CreateMeeting = () => {
   const navigate = useNavigate();
 
   const { title, setTitle, setRoomId } = createRoomStore();
+  const { setId, setName, setProfile } = userStore();
   const createChattingRoom = async () => {
     try {
-      const { invite_code, roomId } = await createRoom(title);
+      const { invite_code, roomId, sender, profile, sent_time, senderId } = await createRoom(title);
       setRoomId(roomId);
-      console.log(invite_code, roomId);
+      setId(senderId);
+      setName(sender);
+      setProfile(profile);
+      console.log(sent_time);
       // 이동
       navigate(`/meeting/on/${invite_code}`);
     } catch (err) {

@@ -2,6 +2,7 @@ import { axiosAuthRequest, axiosRequest } from "./axios";
 
 export const createRoom = async (roomTitle: string) => {
   const res = await axiosAuthRequest.post("/api/meeting/create-meeting", { title: roomTitle });
+  console.log(res.data);
   return res.data;
 };
 

@@ -1,24 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-// import createRoomStore from "@/store/createRoom";
-import { tokenStore } from "@/store/tokenStore";
 import SockJS from "sockjs-client";
-// import Stomp from "stompjs";
 import { Client } from "@stomp/stompjs";
 import { joinRoom } from "@/services/createRoom";
-import { client } from "stompjs";
+import userStore from "@/store/userStore";
 
 interface ChatTestProps {
   roomId: number;
 }
 
 const ChatTest = ({ roomId }: ChatTestProps) => {
-  // const { roomId } = createRoomStore();
-  const { token } = tokenStore();
   const stompClientRef = useRef<Client | null>(null); // useRef를 사용하여 stompClient를 참조합니다.
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [senderInfo, setSenderInfo] = useState({ sender: "", profile: "", senderId: "" });
   const [connected, setConnected] = useState(false); // 연결 상태를 추적하는 상태 변수 추가
+  const { id, setId, setName, setProfile } = userStore();
 
   useEffect(() => {
     if (!roomId) {
@@ -32,19 +28,16 @@ const ChatTest = ({ roomId }: ChatTestProps) => {
       try {
         const { sender, content, profile, sent_time, senderId } = await joinRoom(roomId);
         setSenderInfo({ sender, profile, senderId }); // 발신자 정보를 상태에 저장
-        console.log("쪼인");
+        setId(senderId);
+        setName(sender);
+        setProfile(profile);
+
+        console.log(content, sent_time);
       } catch (err) {
         console.log(err);
       }
     };
 
-    // const socket = new SockJS("http://localhost:8000/ws");
-    // const client = new Client({
-    //   brokerURL: socket.url,
-    //   connectHeaders: {
-    //     login: "user",
-    //     passcode: "password",
-    //   },
     const client = new Client({
       webSocketFactory: () => new SockJS("http://localhost:8000/ws"),
 
@@ -61,28 +54,22 @@ const ChatTest = ({ roomId }: ChatTestProps) => {
       console.log("Connected: " + frame);
       setConnected(true);
 
-      client.subscribe(
-        `/sub/chat/${roomId}`,
-        function (message) {
-          console.log("Message received:", message);
-          if (message.headers["content-type"] === "application/json") {
-            try {
-              // 메시지를 JSON으로 파싱하고 상태를 업데이트
-              const newMessage = JSON.parse(message.body);
-              console.log("Received JSON:", newMessage);
-              setMessages((prevMessages) => [...prevMessages, newMessage]);
-            } catch (error) {
-              console.error("Error parsing JSON:", error);
-              console.log(message);
-            }
-          } else {
-            // 텍스트 메시지를 그대로 상태에 추가
-            console.log("Received text:", message.body);
-            setMessages((prevMessages) => [...prevMessages, { content: message.body }]);
-          }
-        },
-        {},
-      );
+      client.subscribe(`/sub/chat/${roomId}`, function (message) {
+        console.log("Message received:", message.body);
+        const contentType = message.headers["content-type"];
+        let newMessage;
+        if (contentType === "application/json") {
+          newMessage = JSON.parse(message.body);
+          newMessage.contentType = contentType;
+          setMessages((prevMessages) => [...prevMessages, newMessage]);
+        } else {
+          setMessages((prevMessages) => [...prevMessages, { content: message.body }]);
+        }
+      });
+
+      client.subscribe(`/sub/room/update/${roomId}`, function (res) {
+        console.log(res.body);
+      });
     };
 
     client.onStompError = function (frame) {
@@ -94,13 +81,6 @@ const ChatTest = ({ roomId }: ChatTestProps) => {
     stompClientRef.current = client;
     joinMeetingRoom();
 
-    // return () => {
-    //   if (stompClientRef.current && connected) {
-    //     stompClientRef.current.disconnect();
-    //     console.log("Disconnected");
-    //     setConnected(false); // 연결 오류 발생 시 연결 상태를 false로 설정
-    //   }
-    // };
     return () => {
       if (client && connected) {
         client.deactivate();
@@ -116,9 +96,9 @@ const ChatTest = ({ roomId }: ChatTestProps) => {
         content: message,
         sender: senderInfo.sender, // 메시지와 함께 발신자 정보도 전송
         profile: senderInfo.profile,
-        sent_time: getCurrentLocalTime(),
         senderId: senderInfo.senderId,
       });
+      console.log(messageToSend);
 
       stompClientRef.current.publish({
         destination: `/pub/${roomId}/sendMessage`,
@@ -126,29 +106,43 @@ const ChatTest = ({ roomId }: ChatTestProps) => {
         // skipContentLengthHeader: false,
       });
 
-      console.log(messageToSend);
       setMessage(""); // 메시지 전송 후 입력 필드 초기화
-
-      const newMessage = JSON.parse(messageToSend);
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
     }
   };
-
-  function getCurrentLocalTime() {
-    const now = new Date();
-    // 시간 정보만을 HH:mm:ss 형식으로 변환
-    const hours = now.getHours().toString().padStart(2, "0");
-    const minutes = now.getMinutes().toString().padStart(2, "0");
-    const seconds = now.getSeconds().toString().padStart(2, "0");
-    return `${hours}:${minutes}:${seconds}`;
-  }
 
   return (
     <>
       <div>
         <div className="w-96 h-96 bg-black text-white overflow-auto">
           {messages.map((msg, index) => (
-            <div key={index}>{msg.content}</div> // 화면에 메시지 내용을 표시
+            <div
+              key={index}
+              className={`p-2 ${msg.senderId === id ? "justify-end" : "justify-start"} flex`}
+            >
+              {msg.contentType === "application/json" ? (
+                <>
+                  <div className="items-center flex">
+                    {msg.senderId !== id && (
+                      <img className="rounded-full w-10 h-10 mr-2" src={msg.profile} alt="" />
+                    )}
+                  </div>
+                  <div
+                    className="inline-block max-w-xs px-4 py-2 rounded-lg"
+                    style={{ background: msg.senderId === id ? "#005c99" : "#333" }}
+                  >
+                    <div>{msg.content}</div>
+                    <div className="text-sm text-gray-300">{msg.sent_time}</div>
+                  </div>
+                </>
+              ) : (
+                <div
+                  className="inline-block max-w-xs px-4 py-2 rounded-lg text-center"
+                  style={{ background: "#333" }}
+                >
+                  <div>{msg.content}</div>
+                </div>
+              )}
+            </div>
           ))}
         </div>
         <input

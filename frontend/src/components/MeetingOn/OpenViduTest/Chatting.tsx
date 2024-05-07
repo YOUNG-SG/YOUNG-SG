@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from "react";
-import SockJS from "sockjs-client";
-import { Stomp } from "@stomp/stompjs";
+import React, { useState } from "react";
 
 import send from "../../../assets/chattingIcons/send.png";
 import chat from "../../../assets/chattingIcons/messenger.png";
@@ -44,8 +42,6 @@ const Chatting = () => {
     console.log("메시지를 보냅니더", message);
     setMessage("");
   };
-
-  // socket
 
   return (
     <>
