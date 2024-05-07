@@ -1,23 +1,30 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { joinRoom } from "@/services/createRoom";
 import userStore from "@/store/userStore";
 import createRoomStore from "@/store/createRoom";
-import UserList from "./OpenVidu/Chatting/UserList";
+import UserList from "./Chatting/UserList";
+import ChatRoom from "./Chatting/ChatRoom";
 
-interface ChatTestProps {
+import chat from "../../../assets/chattingIcons/messenger.png";
+import people from "../../../assets/chattingIcons/people.png";
+
+interface ChattingProps {
   roomId: number;
 }
 
-const ChatTest = ({ roomId }: ChatTestProps) => {
-  const stompClientRef = useRef<Client | null>(null); // useRef를 사용하여 stompClient를 참조합니다.
-  const [message, setMessage] = useState("");
+const Chatting = ({ roomId }: ChattingProps) => {
+  // isChat이면 채팅창, false이면 사용자 목록
+  const [isChatting, setIsChatting] = useState<boolean>(false);
+  const [isChatStatus, setIsChatStatus] = useState<boolean>(false);
+  const stompClientRef = useRef<Client | null>(null);
+  const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState([]);
   const [senderInfo, setSenderInfo] = useState({ sender: "", profile: "", senderId: "" });
   const [connected, setConnected] = useState(false); // 연결 상태를 추적하는 상태 변수 추가
   const { id, setId, setName, setProfile } = userStore();
-  const { roomStatus, setRoomStatus, setOwner } = createRoomStore();
+  const { roomStatus, owner, setRoomStatus, setOwner } = createRoomStore();
   const [userList, setUserList] = useState([]);
 
   useEffect(() => {
@@ -26,6 +33,27 @@ const ChatTest = ({ roomId }: ChatTestProps) => {
       return;
     }
   }, []);
+
+  const handleIsChatting = () => {
+    const status = isChatting;
+    if (status === false) {
+      setIsChatting(!status);
+    }
+  };
+
+  const handleIsSubscribers = () => {
+    const status = isChatting;
+    if (status === true) {
+      setIsChatting(!status);
+    }
+  };
+
+  const handleIsChatClick = () => {
+    setIsChatStatus(true);
+  };
+  const handleIsSummaryClick = () => {
+    setIsChatStatus(false);
+  };
 
   useEffect(() => {
     const joinMeetingRoom = async () => {
@@ -119,53 +147,70 @@ const ChatTest = ({ roomId }: ChatTestProps) => {
 
   return (
     <>
-      <div>
-        <div className="w-96 h-96 bg-black text-white overflow-auto">
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`p-2 ${msg.senderId === id ? "justify-end" : "justify-start"} flex`}
-            >
-              {msg.contentType === "application/json" ? (
-                <>
-                  <div className="items-center flex">
-                    {msg.senderId !== id && (
-                      <img className="rounded-full w-10 h-10 mr-2" src={msg.profile} alt="" />
-                    )}
-                  </div>
-                  <div
-                    className="inline-block max-w-xs px-4 py-2 rounded-lg"
-                    style={{ background: msg.senderId === id ? "#005c99" : "#333" }}
-                  >
-                    <div>{msg.content}</div>
-                    <div className="text-sm text-gray-300">{msg.sent_time}</div>
-                  </div>
-                </>
-              ) : (
-                <div
-                  className="inline-block max-w-xs px-4 py-2 rounded-lg text-center"
-                  style={{ background: "#333" }}
-                >
-                  <div>{msg.content}</div>
-                </div>
-              )}
+      <div className="h-screen grid grid-rows-12 pt-4">
+        {/* 채팅 */}
+        {isChatting && (
+          <div className="row-span-10 flex flex-col border rounded-xl gap-0.5 bg-black bg-opacity-70">
+            <div className="flex w-full p-1 gap-0.5 ">
+              <button
+                className="border bg-gray-300 hover:bg-gray-500 hover:text-white rounded-md w-full"
+                onClick={handleIsChatClick}
+              >
+                <span className="text-black text">채팅</span>
+              </button>
+              <button
+                className="border bg-gray-300 hover:bg-gray-500 hover:text-white rounded-md w-full"
+                onClick={handleIsSummaryClick}
+              >
+                <span className="text-black">요약</span>
+              </button>
             </div>
-          ))}
+            {/* 채팅창 부분 */}
+            {isChatStatus && (
+              <>
+                <ChatRoom
+                  id={id}
+                  messages={messages}
+                  message={message}
+                  setMessage={setMessage}
+                  sendMessage={sendMessage}
+                />
+              </>
+            )}
+            {/* 요약 부분 */}
+            {!isChatStatus && (
+              <>
+                <div className="flex-1 m-1 overflow-y-auto rounded-xl">ㅇㅁㅇ</div>
+              </>
+            )}
+          </div>
+        )}
+        {/* 참가자 목록 */}
+        {!isChatting && (
+          <>
+            <div className="row-span-10 w-full flex flex-col border rounded-xl bg-black bg-opacity-70">
+              <UserList userList={userList} owner={owner} />
+            </div>
+          </>
+        )}
+        {/* 버튼들 */}
+        <div className="row-span-2 flex gap-2 justify-end items-center">
+          <button
+            onClick={handleIsSubscribers}
+            className="w-10 h-10 rounded-full bg-gray-400 flex justify-center items-center"
+          >
+            <img className="w-6 h-6" src={people} alt="" />
+          </button>
+          <button
+            onClick={handleIsChatting}
+            className="w-10 h-10 rounded-full bg-gray-400 flex justify-center items-center"
+          >
+            <img className="w-6 h-6" src={chat} alt="" />
+          </button>
         </div>
-        <input
-          className="text-black"
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-        />
-        <button className="text-black" onClick={sendMessage}>
-          Send Message
-        </button>
       </div>
-      <UserList userList={userList} />
     </>
   );
 };
 
-export default ChatTest;
+export default Chatting;

@@ -3,7 +3,7 @@ import useMeetingStore from "../../store/meetingStore";
 import Form from "./OpenVidu/Form";
 import Session from "./OpenVidu/Session";
 import Dictaphone from "./OpenVidu/Dictaphone";
-import Chatting from "./OpenViduTest/Chatting";
+import Chatting from "./OpenVidu/Chatting";
 
 import mute from "../../assets/chattingIcons/mute.png";
 import mic from "../../assets/chattingIcons/mic.png";
@@ -19,7 +19,11 @@ import createRoomStore from "@/store/createRoom";
 import InviteButton from "./OpenVidu/InviteButton";
 import { baseURL } from "@/services/axios";
 
-const MeetingTest = () => {
+interface MeetingTestProps {
+  roomId: number;
+}
+
+const MeetingTest = ({ roomId }: MeetingTestProps) => {
   const { sessionId, setSessionId } = createRoomStore();
   const {
     session,
@@ -358,7 +362,7 @@ const MeetingTest = () => {
               ) : null}
             </div>
             <div className="col-span-3">
-              <Chatting />
+              <Chatting roomId={roomId} />
             </div>
           </div>
         </>
