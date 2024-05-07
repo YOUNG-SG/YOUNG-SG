@@ -100,10 +100,13 @@ public class RedisConfig {
         String memberKey = "room:" + roomId + ":members";
         List<String> existingMembers = redisTemplate.opsForList().range(memberKey, 0, -1);
 
+        System.out.println(memberId);
+        System.out.println(existingMembers+"asdasdasdasdasdasd");
+
         //이미 회원방에 존재하면..
-        if (existingMembers.contains(String.valueOf(memberId))) {
-            throw new IllegalStateException("회원이 이미 방에 참여했습니다. ID: " + memberId);
-        }
+//        if (existingMembers.contains(String.valueOf(memberId))) {
+//            throw new IllegalStateException("회원이 이미 방에 참여했습니다. ID: " + memberId);
+//        }
 
         //멤버예외처리
         Member currentMember = memberRepository.findById(memberId)
