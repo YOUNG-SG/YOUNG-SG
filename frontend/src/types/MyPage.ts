@@ -1,3 +1,4 @@
+// 폴더
 export type FolderType = {
   folderId: number;
   title: string;
@@ -11,4 +12,16 @@ export type FolderMeetingType = {
   commentCnt: number;
   participantCnt: number;
   totalTime: string;
+};
+
+// 타임라인
+export type TimelineDayType = {
+  meetingId: number;
+  createdDay: number;
+  folderTitle: string;
+  roomTitle: string;
+};
+
+export type TimelineMonthsType = {
+  [month: string]: TimelineDayType[];
 };

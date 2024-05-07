@@ -1,9 +1,16 @@
 import { clickButtonStore } from "@/store/myPageStore";
 import TimelineYear from "@/components/MyPage/TimelineYear";
+import { useQuery } from "@tanstack/react-query";
+import { fetchTimeline } from "@/services/MyPage";
+import { TimelineMonthsType } from "@/types/MyPage";
 
 const Timeline = () => {
-  // const expandList = [];
   const { setIsClick, setIsAllExpanded } = clickButtonStore();
+
+  const { data: timeline, isLoading } = useQuery({
+    queryKey: ["timeline"],
+    queryFn: () => fetchTimeline(),
+  });
 
   const ExpandBtn: React.FC<{ btnName: string; handleExpand: () => void }> = (props) => {
     return (
@@ -15,6 +22,10 @@ const Timeline = () => {
       </div>
     );
   };
+
+  if (isLoading) {
+    return <div>로딩중</div>;
+  }
 
   return (
     <div className="w-full h-full relative">
@@ -40,9 +51,9 @@ const Timeline = () => {
           className="w-full overflow-scroll flex flex-col gap-[80px]"
           style={{ height: "calc(100% - 64px)" }}
         >
-          <TimelineYear />
-          <TimelineYear />
-          <TimelineYear />
+          {Object.entries(timeline).map(([year, months]) => (
+            <TimelineYear year={year} months={months as TimelineMonthsType[]} />
+          ))}
         </div>
       </div>
     </div>
