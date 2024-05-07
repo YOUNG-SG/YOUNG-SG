@@ -9,4 +9,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
     List<Participant> findAllByMeetingRoom_Id(Long roomId);
 
+    Long countAllByMeetingRoom_Id(Long roomId);
+
 }
