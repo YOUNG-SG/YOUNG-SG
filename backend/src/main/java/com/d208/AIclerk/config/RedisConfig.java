@@ -58,39 +58,31 @@ public class RedisConfig {
 
     public void updateRoomInfo(long roomId) {
         String roomKey = "room:" + roomId;
-        String status = (String) hashOperations.get(roomKey, "status");
         List<String> memberIds = listOperations.range(roomKey + ":members", 0, -1);
-        String ownerId = (String) hashOperations.get(roomKey, "owner");
-        List<String> memberNicknames = new ArrayList<>();
+        List<Map<String, Object>> memberDetails = new ArrayList<>();
 
-
-        System.out.print(memberIds+"zzdasdasd");
-        //멤버목록이니라
-        assert memberIds != null;
         for (String memberId : memberIds) {
-            Member member = memberRepository.findById(Long.parseLong(memberId))
-                    .orElseThrow(() -> new MemberNotFoundException("Member not found ID: " + memberId));
-            memberNicknames.add(member.getNickname());
+            Optional<Member> memberOpt = memberRepository.findById(Long.parseLong(memberId));
+            if (memberOpt.isPresent()) {
+                Member member = memberOpt.get();
+                Map<String, Object> details = new HashMap<>();
+                details.put("id", member.getId());
+                details.put("nickname", member.getNickname());
+                details.put("profile", member.getImage());
+                memberDetails.add(details);
+            }
         }
 
-        //어이 방장닉이니라
-        Member owner = memberRepository.findById(Long.parseLong(ownerId))
-                .orElseThrow(() -> new MemberNotFoundException("Owner not found ID: " + ownerId));
-        String ownerNickname = owner.getNickname();
+        String message = toJson(memberDetails);
+        messagingTemplate.convertAndSend("/sub/room/update/" + roomId, message);
+    }
 
-        Map<String, Object> updateInfo = new HashMap<>();
-        updateInfo.put("status", status);
-        updateInfo.put("members", memberNicknames);
-        updateInfo.put("owner", ownerNickname);
-
-        ObjectMapper mapper = new ObjectMapper();
+    private String toJson(Object object) {
         try {
-            String message = mapper.writeValueAsString(updateInfo);
-            messagingTemplate.convertAndSend("/sub/room/update/" + roomId, message);
-//        redisTemplate.convertAndSend("roomUpdates:" + roomId, message); // For debugging
-
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error converting to JSON", e);
         }
     }
 
