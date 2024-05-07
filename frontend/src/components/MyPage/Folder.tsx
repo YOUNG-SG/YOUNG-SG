@@ -12,11 +12,7 @@ const Folder: React.FC<{ folder: FolderType }> = ({ folder }) => {
       }}
     >
       <div className="text-[32px] font-extrabold">{folder.title}</div>
-      {/* FIXME folder.createdAt */}
-      <div className="text-[#CCCCCC]">
-        23.04.23
-        {/* {folder.createdAt} */}
-      </div>
+      <div className="text-[#CCCCCC]">{folder.createAt}</div>
     </div>
   );
 };
