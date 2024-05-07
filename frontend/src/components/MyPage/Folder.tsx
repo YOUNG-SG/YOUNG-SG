@@ -12,7 +12,7 @@ const Folder: React.FC<{ folder: FolderType }> = ({ folder }) => {
       }}
     >
       <div className="text-[32px] font-extrabold">{folder.title}</div>
-      <div className="text-[#CCCCCC]">{folder.createAt}</div>
+      <div className="text-[#CCCCCC]">{folder.createAt.slice(2)}</div>
     </div>
   );
 };
