@@ -20,6 +20,7 @@ import org.w3c.dom.html.HTMLHeadElement;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -82,15 +83,10 @@ public class RoomController {
      */
     @MessageMapping("/{roomId}/sendMessage")
     public void sendMessage(@DestinationVariable Long roomId, MessageDto message) {
-////        Member currentMember = commonUtil.getMember();
-//
-//        String profile = currentMember.getImage();
-//        String nickname = currentMember.getNickname();
-//        message.setSender(nickname);
-//        message.setProfile(profile);
-//        message.setSent_time(LocalDateTime.now());
-        message.setSent_time(LocalDateTime.now());
-
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        String formattedTime = now.format(formatter); // 현재 시간을 "HH:mm" 형식으로 포맷팅
+        message.setSent_time(formattedTime);
         log.info("Received message from {} ({}): {}", message.getSender(), message.getSenderId(), message.getContent());
         messagingTemplate.convertAndSend("/sub/chat/" + roomId, message);
         // rabbitMqService.sendMessage(roomId, message);

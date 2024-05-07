@@ -110,6 +110,17 @@ const ChatTest = ({ roomId }: ChatTestProps) => {
     }
   };
 
+<<<<<<< HEAD
+=======
+  function getCurrentLocalTime() {
+    const now = new Date();
+    // 시간 정보만을 HH:mm:ss 형식으로 변환
+    const hours = now.getHours().toString().padStart(2, "0");
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
+  }
+
+>>>>>>> 4facd859a618cd7f0364997835d038a8bf64d2b6
   return (
     <>
       <div>

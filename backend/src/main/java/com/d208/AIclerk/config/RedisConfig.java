@@ -52,45 +52,37 @@ public class RedisConfig {
         roomInfo.put("owner", owner.toString());
         roomInfo.put("status", "0");
         hashOperations.putAll(roomKey, roomInfo);
-        listOperations.rightPush(roomKey + ":members", owner.toString());
+//        listOperations.rightPush(roomKey + ":members", owner.toString());
         System.out.println("방 정보가 Redis에 저장되었습니다: " + roomKey);
     }
 
     public void updateRoomInfo(long roomId) {
         String roomKey = "room:" + roomId;
-        String status = (String) hashOperations.get(roomKey, "status");
         List<String> memberIds = listOperations.range(roomKey + ":members", 0, -1);
-        String ownerId = (String) hashOperations.get(roomKey, "owner");
-        List<String> memberNicknames = new ArrayList<>();
+        List<Map<String, Object>> memberDetails = new ArrayList<>();
 
-
-        System.out.print(memberIds+"zzdasdasd");
-        //멤버목록이니라
-        assert memberIds != null;
         for (String memberId : memberIds) {
-            Member member = memberRepository.findById(Long.parseLong(memberId))
-                    .orElseThrow(() -> new MemberNotFoundException("Member not found ID: " + memberId));
-            memberNicknames.add(member.getNickname());
+            Optional<Member> memberOpt = memberRepository.findById(Long.parseLong(memberId));
+            if (memberOpt.isPresent()) {
+                Member member = memberOpt.get();
+                Map<String, Object> details = new HashMap<>();
+                details.put("id", member.getId());
+                details.put("nickname", member.getNickname());
+                details.put("profile", member.getImage());
+                memberDetails.add(details);
+            }
         }
 
-        //어이 방장닉이니라
-        Member owner = memberRepository.findById(Long.parseLong(ownerId))
-                .orElseThrow(() -> new MemberNotFoundException("Owner not found ID: " + ownerId));
-        String ownerNickname = owner.getNickname();
+        String message = toJson(memberDetails);
+        messagingTemplate.convertAndSend("/sub/room/update/" + roomId, message);
+    }
 
-        Map<String, Object> updateInfo = new HashMap<>();
-        updateInfo.put("status", status);
-        updateInfo.put("members", memberNicknames);
-        updateInfo.put("owner", ownerNickname);
-
-        ObjectMapper mapper = new ObjectMapper();
+    private String toJson(Object object) {
         try {
-            String message = mapper.writeValueAsString(updateInfo);
-            messagingTemplate.convertAndSend("/sub/room/update/" + roomId, message);
-//        redisTemplate.convertAndSend("roomUpdates:" + roomId, message); // For debugging
-
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error converting to JSON", e);
         }
     }
 
@@ -103,10 +95,9 @@ public class RedisConfig {
         System.out.println(memberId);
         System.out.println(existingMembers+"asdasdasdasdasdasd");
 
-        //이미 회원방에 존재하면..
-//        if (existingMembers.contains(String.valueOf(memberId))) {
-//            throw new IllegalStateException("회원이 이미 방에 참여했습니다. ID: " + memberId);
-//        }
+        if (existingMembers.contains(String.valueOf(memberId))) {
+            throw new IllegalStateException("회원이 이미 방에 참여했습니다. ID: " + memberId);
+        }
 
         //멤버예외처리
         Member currentMember = memberRepository.findById(memberId)
