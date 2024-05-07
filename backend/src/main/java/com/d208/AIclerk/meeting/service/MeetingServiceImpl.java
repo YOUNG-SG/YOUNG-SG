@@ -95,6 +95,9 @@ public class MeetingServiceImpl implements MeetingService {
         LocalDateTime endTime = Optional.ofNullable(meetingRoom.getEndTime())
                 .orElse(LocalDateTime.now()); // null 일 경우 현재 시간 반환
 
+        log.info("(진짜 시간) {}, {}", meetingRoom.getStartTime(), meetingRoom.getEndTime());
+        log.info("시간 테스트{}, {}", startTime, endTime);
+
 
         // 회의 상세 저장
 
@@ -264,11 +267,16 @@ public class MeetingServiceImpl implements MeetingService {
 
                     // 날짜 형식 변환
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-                    String formattedDate = detail.getCreateAt().format(formatter);
+
+                    if (detail.getCreateAt() == null) {
+                        detailListResponseDto.setDate("시간이 등록되어있지 않습니다.");
+                    } else {
+                        String formattedDate = detail.getCreateAt().format(formatter);
+                        detailListResponseDto.setDate(formattedDate);
+                    }
 
                     detailListResponseDto.setDetailId(detail.getId());
                     detailListResponseDto.setTitle(detail.getTitle());
-                    detailListResponseDto.setDate(formattedDate);
                     detailListResponseDto.setTotalTime(detail.getTotalTime());
                     detailListResponseDto.setCommentCnt(commentCnt);
                     detailListResponseDto.setParticipantCnt(participantCnt);
