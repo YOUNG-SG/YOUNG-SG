@@ -20,7 +20,7 @@ public class MessageDto {
     private String sender;
     private String content;
     private String profile;
-    private LocalDateTime sent_time;
+    private String sent_time;
     private long senderId;
 
 }

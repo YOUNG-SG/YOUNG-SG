@@ -52,7 +52,7 @@ public class RedisConfig {
         roomInfo.put("owner", owner.toString());
         roomInfo.put("status", "0");
         hashOperations.putAll(roomKey, roomInfo);
-        listOperations.rightPush(roomKey + ":members", owner.toString());
+//        listOperations.rightPush(roomKey + ":members", owner.toString());
         System.out.println("방 정보가 Redis에 저장되었습니다: " + roomKey);
     }
 
@@ -103,10 +103,9 @@ public class RedisConfig {
         System.out.println(memberId);
         System.out.println(existingMembers+"asdasdasdasdasdasd");
 
-        //이미 회원방에 존재하면..
-//        if (existingMembers.contains(String.valueOf(memberId))) {
-//            throw new IllegalStateException("회원이 이미 방에 참여했습니다. ID: " + memberId);
-//        }
+        if (existingMembers.contains(String.valueOf(memberId))) {
+            throw new IllegalStateException("회원이 이미 방에 참여했습니다. ID: " + memberId);
+        }
 
         //멤버예외처리
         Member currentMember = memberRepository.findById(memberId)

@@ -43,7 +43,6 @@ public class RoomServiceImpl implements RoomService {
         room.setInviteCode(inviteCodeGenerator.generateInviteCode()); // 초대 코드 생성 및 설정
         MeetingRoom savedRoom = roomRepository.save(room);            // DB에 방 저장
         redisConfig.createRoom(savedRoom.getId(), ownerId);           // Redis에 방 정보 저장
-
         return savedRoom; // 저장된 방 객체 반환
     }
 
