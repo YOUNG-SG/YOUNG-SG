@@ -82,9 +82,31 @@ public class MeetingServiceImpl implements MeetingService {
         MeetingRoom meetingRoom = roomRepository.findById(dto.getRoomId())
                 .orElseThrow(() -> new NoSuchElementException("Meeting room not found with id: " + dto.getRoomId()));
 
+<<<<<<< HEAD
+        // 이미 저장된 상세페이지가 있는지 예외처리
+        if (meetingDetailRepository.findByMeetingRoom_Id(meetingRoom.getId()) != null) {
+            throw MeetingDetailException.existDetailException();
+        }
+
+
+
+        // Optional을 사용하여 null이면 현재 시간을 반환
+        LocalDateTime startTime = Optional.ofNullable(meetingRoom.getStartTime())
+                .orElse(LocalDateTime.now()); // null 일 경우 현재 시간 반환
+
+        LocalDateTime endTime = Optional.ofNullable(meetingRoom.getEndTime())
+                .orElse(LocalDateTime.now()); // null 일 경우 현재 시간 반환
+
+        log.info("(진짜 시간) {}, {}", meetingRoom.getStartTime(), meetingRoom.getEndTime());
+        log.info("시간 테스트{}, {}", startTime, endTime);
+
+
+        // 회의 상세 저장
+=======
         // 회의 상세 정보 생성
         LocalDateTime startTime = Optional.ofNullable(meetingRoom.getStartTime()).orElse(LocalDateTime.now());
         LocalDateTime endTime = Optional.ofNullable(meetingRoom.getEndTime()).orElse(LocalDateTime.now());
+>>>>>>> fa1ee2cfab745370400dc1e74fba8d1e0b7ca8fb
 
         MeetingDetail meetingDetail = MeetingDetail.builder()
                 .summary(fullSummary.toString())
@@ -269,11 +291,16 @@ public class MeetingServiceImpl implements MeetingService {
 
                     // 날짜 형식 변환
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-                    String formattedDate = detail.getCreateAt().format(formatter);
+
+                    if (detail.getCreateAt() == null) {
+                        detailListResponseDto.setDate("시간이 등록되어있지 않습니다.");
+                    } else {
+                        String formattedDate = detail.getCreateAt().format(formatter);
+                        detailListResponseDto.setDate(formattedDate);
+                    }
 
                     detailListResponseDto.setDetailId(detail.getId());
                     detailListResponseDto.setTitle(detail.getTitle());
-                    detailListResponseDto.setDate(formattedDate);
                     detailListResponseDto.setTotalTime(detail.getTotalTime());
                     detailListResponseDto.setCommentCnt(commentCnt);
                     detailListResponseDto.setParticipantCnt(participantCnt);
