@@ -2,11 +2,13 @@ package com.d208.AIclerk.member.service;
 
 import com.d208.AIclerk.common.S3Uploader;
 import com.d208.AIclerk.entity.Member;
+import com.d208.AIclerk.entity.MemberMeeting;
+import com.d208.AIclerk.exception.member.MemberException;
+import com.d208.AIclerk.meeting.dto.meetingListDto;
+import com.d208.AIclerk.meeting.repository.MeetingRoomRepository;
+import com.d208.AIclerk.meeting.repository.MemberMeetingRepository;
+import com.d208.AIclerk.member.dto.responseDto.*;
 import com.d208.AIclerk.member.dto.requestDto.EditMemberRequestDto;
-import com.d208.AIclerk.member.dto.responseDto.EditMemberResponseDto;
-import com.d208.AIclerk.member.dto.responseDto.GetMemberResponse;
-import com.d208.AIclerk.member.dto.responseDto.GetMemberResponseDTO;
-import com.d208.AIclerk.member.dto.responseDto.SignInResponseDTO;
 import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.member.repository.RefreshTokenRepository;
 import com.d208.AIclerk.security.jwt.JWTUtil;
@@ -26,8 +28,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +40,8 @@ public class MemberServiceImpl implements MemberService{
     private final RefreshTokenRepository refreshTokenRepository;
     private final CommonUtil commonUtil;
     private final S3Uploader s3Uploader;
+    private final MemberMeetingRepository memberMeetingRepository;
+    private final MeetingRoomRepository meetingRoomRepository;
 
 
     @Value("${KAKAO_CLIENT_ID}")
@@ -49,7 +53,7 @@ public class MemberServiceImpl implements MemberService{
     @Value("${REDIRECT_URI}")
     String RedirectUri;
 
-    private int accessTokenMinute = 720;
+    private int accessTokenMinute = 20160;
     private int refreshTokenMinute = 3000;
 
     @Override
@@ -141,12 +145,12 @@ public class MemberServiceImpl implements MemberService{
 
         GetMemberResponseDTO getMemberResponseDTO = GetMemberResponseDTO.builder()
                 .email(member.getEmail())
-                .nickname(member.getNickname())
-                .image(member.getImage())
+                .nickName(member.getNickname())
+                .profileImg(member.getImage())
                 .build();
 
         GetMemberResponse response = GetMemberResponse.creategetMemberResponse(
-                "Success",
+                "내 정보 조회 성공",
                 getMemberResponseDTO
         );
 
@@ -248,6 +252,59 @@ public class MemberServiceImpl implements MemberService{
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
 
+    }
+
+    @Override
+    public ResponseEntity<TimeLineResponseDto> timeline() {
+        Member member = commonUtil.getMember();
+        // List 비었는지 체크해야함
+        List<meetingListDto> meetingList = memberMeetingRepository.findAllByMemberOrderByStartTime(member);
+        int month = LocalDateTime.now().getMonthValue();
+        int year = LocalDateTime.now().getYear();
+
+        // treemap response 생성
+        TreeMap<Integer, TreeMap<Integer, List<TimeLineDayDto>>> response =  new TreeMap<>(Comparator.reverseOrder());
+        for (meetingListDto meeting:meetingList) {
+            // 연도와 월 체크 => 다르면 싹 갱신 연도 리스트에 월 리스트로 체크
+            if (meeting.getStartTime().getYear() != year || meeting.getStartTime().getMonthValue() != month) {
+                year = meeting.getStartTime().getYear();
+                month = meeting.getStartTime().getMonthValue();
+            }
+            // year 값이 존재하는지 체크 => 없으면 추가
+            if (response.getOrDefault(year, null) == null){
+                // 키를 추가
+                response.put(year, new TreeMap<>(Comparator.reverseOrder()));
+            }
+            // year의 리스트에 month 있는지 체크
+            if (response.get(year).getOrDefault(month, null) == null){
+                // 키를 추가
+                response.get(year).put(month, new ArrayList<>());
+            }
+            response.get(year).get(month)
+                    .add(TimeLineDayDto.of(meeting.getRoomId(), meeting.getStartTime().getDayOfMonth(),
+                            meeting.getFolderTitle(), meeting.getRoomTitle()));
+        }
+
+        TimeLineResponseDto responseDto = TimeLineResponseDto.of(response);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @Override
+    public ResponseEntity<String> deleteMeeting(Long usermeetingId) {
+        // memberid 체크 -> 아니면 권한 없음 띄우기 : usermeetingId로 가능
+        Member member = commonUtil.getMember();
+        // 회의 목록 조회
+        MemberMeeting memberMeeting = memberMeetingRepository.findById(usermeetingId)
+                .orElseThrow(MemberException::memberMeetingNotFound);
+        // 회의 목록 멤버 일치 확인
+        if (!member.getId().equals(memberMeeting.getMember().getId())) {
+            throw MemberException.memberMeetingNotEqualException();
+        }
+
+        memberMeetingRepository.deleteById(usermeetingId);
+
+        return ResponseEntity.status(HttpStatus.OK).body("회의가 삭제되었습니다.");
     }
 
 }
