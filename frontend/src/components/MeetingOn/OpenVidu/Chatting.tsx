@@ -53,7 +53,6 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
   const stompClientRef = useRef<Client | null>(null);
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [summaryMessage, setSummaryMessage] = useState<string>("");
   const [summaryMessages, setSummaryMessages] = useState<SummaryMessage[]>([]);
   const [senderInfo, setSenderInfo] = useState({ sender: "", profile: "", senderId: "" });
   const [connected, setConnected] = useState(false); // 연결 상태를 추적하는 상태 변수 추가
@@ -156,7 +155,7 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
     };
 
     const client = new Client({
-      webSocketFactory: () => new SockJS("http://localhost:8000/ws"),
+      webSocketFactory: () => new SockJS(import.meta.env.VITE_API_BASE_URL + "/ws"),
 
       debug: function (str) {
         console.log(str, "버그라고?");
@@ -256,18 +255,18 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
         {/* 채팅 */}
         {isChatting && (
           <div className="row-span-10 flex flex-col border rounded-xl gap-0.5 bg-black bg-opacity-70">
-            <div className="flex w-full p-1 gap-0.5 ">
+            <div className="flex w-full p-1 gap-0.5 h-10">
               <button
-                className="border bg-gray-300 hover:bg-gray-500 hover:text-white rounded-md w-full"
+                className={`w-full ${isChatStatus ? "border-b-2 " : "text-gray-500 hover:text-gray-300"}`}
                 onClick={handleIsChatClick}
               >
-                <span className="text-black text">채팅</span>
+                <span>채팅</span>
               </button>
               <button
-                className="border bg-gray-300 hover:bg-gray-500 hover:text-white rounded-md w-full"
+                className={`hover:text-white  w-full ${isChatStatus ? "text-gray-500 hover:text-gray-300" : "border-b-2 "}`}
                 onClick={handleIsSummaryClick}
               >
-                <span className="text-black">요약</span>
+                <span>요약</span>
               </button>
             </div>
             {/* 채팅창 부분 */}
