@@ -2,10 +2,11 @@ import crown from "../../../../assets/chattingIcons/crown.png";
 
 interface ChatTestProps {
   userList?: string[];
-  owner: string;
+  owner: string | null;
 }
 
 const UserList = ({ userList, owner }: ChatTestProps) => {
+  console.log(userList);
   return (
     <>
       <div className="p-2 flex flex-col">

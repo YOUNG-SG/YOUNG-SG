@@ -13,18 +13,20 @@ import invite from "../../assets/chattingIcons/add-user.png";
 import disconnect from "../../assets/chattingIcons/disconnected.png";
 import screen from "../../assets/chattingIcons/screen.png";
 import bg from "../../assets/chattingIcons/bgImage.jpg";
+import record from "../../assets/chattingIcons/button.png";
 import { OpenVidu, Publisher, Subscriber } from "openvidu-browser";
 import axios, { AxiosError } from "axios";
-import createRoomStore from "@/store/createRoom";
+import createRoomStore from "@/store/createRoomStore";
 import InviteButton from "./OpenVidu/InviteButton";
 import { baseURL } from "@/services/axios";
+import { meetingRecordStart, meetingRecordEnd } from "@/services/Chatting";
 
 interface MeetingTestProps {
   roomId: number;
 }
 
 const MeetingTest = ({ roomId }: MeetingTestProps) => {
-  const { sessionId, setSessionId } = createRoomStore();
+  const { sessionId, setSessionId, setRoomStatus } = createRoomStore();
   const {
     session,
     setSession,
@@ -53,6 +55,7 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
   const OPENVIDU_SERVER_URL = "https://youngseogi.duckdns.org";
   const OPENVIDU_SERVER_SECRET = "MYSECRET";
   const [isClickInvite, setIsClickInvite] = useState(false);
+  const [isRecord, setIsRecord] = useState(false);
 
   const leaveSession = useCallback(() => {
     if (session) session.disconnect();
@@ -261,6 +264,39 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
     setIsClickInvite(!isClickInvite);
   };
 
+  const toggleRecord = () => {
+    if (isRecord === false) {
+      setIsRecord(!isRecord);
+      startRecord();
+      console.log("구독시작");
+    } else {
+      setIsRecord(!isRecord);
+      endRecord();
+      console.log("끝");
+    }
+  };
+
+  // 녹음 시작하면 녹음 채팅 구독 및 status 상태 1로 갱신
+  const startRecord = async () => {
+    try {
+      const msg = await meetingRecordStart(roomId);
+      if (msg === "미팅시작.,..") {
+        setRoomStatus("1");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const endRecord = async () => {
+    try {
+      const msg = await meetingRecordEnd(roomId);
+      if (msg === "미팅종료...") {
+        setRoomStatus("2");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
   return (
     <>
       <div>
@@ -295,17 +331,26 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
 
               {/* 버튼들 */}
               <div className="row-span-2 flex items-center justify-center w-full">
-                <div className="justify-items-start pr-5">
+                <div className="justify-items-start pr-5 flex gap-5">
+                  {/* 초대코드 */}
                   <button
                     onClick={toggleInvite}
                     className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center"
                   >
                     <img className="h-7 w-7" src={invite} alt="" />
                   </button>
+                  {/* 녹음 시작 */}
+                  <button
+                    onClick={toggleRecord}
+                    className="h-10 w-10 rounded-full bg-red-500 hover:bg-red-600 flex justify-center items-center"
+                  >
+                    <img className="h-7 w-7" src={record} alt="" />
+                  </button>
                 </div>
                 {publisher && (
                   <>
                     <div className="flex gap-5 justify-items-center self-center">
+                      {/* 음소거 */}
                       <button
                         className={`h-10 w-10 rounded-full flex justify-center items-center ${isAudioEnabled ? "bg-red-500 hover:bg-red-400" : "bg-sky-500 hover:bg-sky-400"}`}
                         onClick={toggleAudio}
@@ -316,6 +361,7 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
                           <img className="h-7 w-7" src={mic} alt="" />
                         )}
                       </button>
+                      {/* 화면 on, off */}
                       <button
                         className={`h-10 w-10 rounded-full flex justify-center items-center ${isVideoEnabled ? "bg-red-500 hover:bg-red-400" : "bg-sky-500 hover:bg-sky-400"}`}
                         onClick={toggleVideo}
@@ -326,12 +372,14 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
                           <img className="h-7 w-7" src={monitorOn} alt="" />
                         )}
                       </button>
+                      {/* 화면 공유 */}
                       <button
                         className={`h-10 w-10 rounded-full bg-sky-500 hover:bg-sky-400 flex justify-center items-center`}
                         onClick={joinScreenSession}
                       >
                         <img className="h-7 w-7" src={screen} alt="" />
                       </button>
+                      {/* 연결 끊기 (나가기) */}
                       <button className="h-10 w-10 rounded-full bg-red-500 hover:bg-red-400 flex justify-center items-center">
                         <img className="h-7 w-7" src={disconnect} alt="" />
                       </button>

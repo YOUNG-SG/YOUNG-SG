@@ -5,9 +5,9 @@ import MeetingOff from "../../components/MeetingOn/MeetingOff/Folders";
 // import ChatTest from "../../components/MeetingOn/ChatTest";
 
 import { tokenStore } from "@/store/tokenStore";
-import createRoomStore from "@/store/createRoom";
+import createRoomStore from "@/store/createRoomStore";
 import { useEffect } from "react";
-import { getRoomId } from "@/services/createRoom";
+import { getRoomId } from "@/services/Room";
 
 const MeetingOn = () => {
   const { token } = tokenStore();

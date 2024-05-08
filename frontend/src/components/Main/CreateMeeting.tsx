@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { createRoom } from "@/services/createRoom";
-import createRoomStore from "@/store/createRoom";
+import { createRoom } from "@/services/Room";
+import createRoomStore from "@/store/createRoomStore";
 import userStore from "@/store/userStore";
 
 const CreateMeeting = () => {
