@@ -30,8 +30,8 @@ export const fetchTimeline = async () => {
   return res.data.timeLineList;
 };
 
-// TODO 회의 삭제
+// 회의 삭제
 export const deleteMeeting = async (meetingId: number) => {
-  const res = await axiosAuthRequest.delete(`/api/mypage/delete/${meetingId}`);
+  const res = await axiosAuthRequest.delete(`/api/oauth/mypage/delete/${meetingId}`);
   return res;
 };

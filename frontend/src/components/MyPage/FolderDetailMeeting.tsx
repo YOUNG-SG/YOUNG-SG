@@ -1,7 +1,7 @@
-import { FolderMeetingType } from "@/types/MyPage";
+import { FolderMeetingProps } from "@/types/MyPage";
 import { useNavigate } from "react-router-dom";
 
-const FolderDetailMeeting: React.FC<{ meeting: FolderMeetingType }> = ({ meeting }) => {
+const FolderDetailMeeting: React.FC<FolderMeetingProps> = ({ meeting }) => {
   const navigate = useNavigate();
 
   const GradationLine = () => {
@@ -17,11 +17,11 @@ const FolderDetailMeeting: React.FC<{ meeting: FolderMeetingType }> = ({ meeting
     >
       <div className="flex justify-between items-center">
         <div>
-          <div className="text-[14px] font-l text-[#CCCCCC]">{meeting.createAt}</div>
+          <div className="text-[14px] font-l text-[#CCCCCC]">{meeting.date.slice(2)}</div>
           <div className="text-[24px] font-bold">{meeting.title}</div>
         </div>
         <div className="flex flex-col items-end text-[14px]">
-          <div>{meeting.totalTime}</div>
+          <div>{meeting.totalTime}분</div>
           <GradationLine />
           <div>{meeting.participantCnt}명</div>
           <GradationLine />

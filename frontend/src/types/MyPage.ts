@@ -5,13 +5,17 @@ export type FolderType = {
   createAt: string;
 };
 
-export type FolderMeetingType = {
+export type FolderMeetingData = {
   detailId: number;
   title: string;
-  createAt: string;
-  commentCnt: number;
   participantCnt: number;
+  commentCnt: number;
+  date: string;
   totalTime: string;
+};
+
+export type FolderMeetingProps = {
+  meeting: FolderMeetingData;
 };
 
 /* 타임라인 */
