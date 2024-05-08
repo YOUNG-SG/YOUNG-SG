@@ -13,4 +13,6 @@ public interface RoomService {
     void startMeeting(long roomId);
 
     void endMeeting(long roomId);
+
+    void pauseMeeting(Long roomId);
 }

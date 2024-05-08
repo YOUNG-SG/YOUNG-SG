@@ -8,7 +8,7 @@ import LoginPage from "@/pages/Login/LoginPage";
 import KakaoLoginPage from "@/pages/Login/KakaoLoginPage";
 import "./App.css";
 import MeetingOnPage from "./pages/MeetingOn/MeetingOnPage";
-
+import ChatTest from "./components/MeetingOn/ChatTest";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -28,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "/meeting/:id",
         element: <MeetingDetailPage />,
+      },
+      {
+        path: "/testchat",
+        element: <ChatTest />,
       },
     ],
   },

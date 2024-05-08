@@ -1,25 +1,27 @@
 import { useNavigate } from "react-router-dom";
-import { createRoom } from "@/services/createRoom";
-import createRoomStore from "@/store/createRoom";
+import { createRoom } from "@/services/Room";
+import createRoomStore from "@/store/createRoomStore";
+import userStore from "@/store/userStore";
 
 const CreateMeeting = () => {
   const navigate = useNavigate();
 
-  const { title, setTitle, setSessionId, setRoomId } = createRoomStore();
+  const { title, setTitle, setRoomId } = createRoomStore();
+  const { setId, setName, setProfile } = userStore();
   const createChattingRoom = async () => {
     try {
-      const { invite_code, roomId } = await createRoom(title);
-      setSessionId(invite_code);
+      const { invite_code, roomId, sender, profile, sent_time, senderId } = await createRoom(title);
       setRoomId(roomId);
-      console.log(invite_code, roomId);
+      setId(senderId);
+      setName(sender);
+      setProfile(profile);
+      console.log(sent_time);
       // 이동
       navigate(`/meeting/on/${invite_code}`);
     } catch (err) {
       console.log(err);
     }
   };
-
-  console.log(title);
 
   return (
     <div className="w-[1100px] h-[600px] bg-e-20 rounded-lg backdrop-blur-10 flex flex-col justify-center items-center gap-[30px]">

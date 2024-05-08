@@ -25,4 +25,7 @@ export default defineConfig({
   resolve: {
     alias: [{ find: "@", replacement: "/src" }],
   },
+  define: {
+    global: "window", // 이 방식으로 global을 window에 매핑
+  },
 });
