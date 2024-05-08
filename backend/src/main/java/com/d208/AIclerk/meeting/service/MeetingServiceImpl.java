@@ -81,7 +81,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         MeetingRoom meetingRoom = roomRepository.findById(dto.getRoomId())
                 .orElseThrow(() -> new NoSuchElementException("Meeting room not found with id: " + dto.getRoomId()));
-
+        
         // 이미 저장된 상세페이지가 있는지 예외처리
         if (meetingDetailRepository.findByMeetingRoom_Id(meetingRoom.getId()) != null) {
             throw MeetingDetailException.existDetailException();
