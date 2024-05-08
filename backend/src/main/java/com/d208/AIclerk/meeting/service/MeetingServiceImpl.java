@@ -81,8 +81,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         MeetingRoom meetingRoom = roomRepository.findById(dto.getRoomId())
                 .orElseThrow(() -> new NoSuchElementException("Meeting room not found with id: " + dto.getRoomId()));
-
-<<<<<<< HEAD
+        
         // 이미 저장된 상세페이지가 있는지 예외처리
         if (meetingDetailRepository.findByMeetingRoom_Id(meetingRoom.getId()) != null) {
             throw MeetingDetailException.existDetailException();
@@ -102,11 +101,6 @@ public class MeetingServiceImpl implements MeetingService {
 
 
         // 회의 상세 저장
-=======
-        // 회의 상세 정보 생성
-        LocalDateTime startTime = Optional.ofNullable(meetingRoom.getStartTime()).orElse(LocalDateTime.now());
-        LocalDateTime endTime = Optional.ofNullable(meetingRoom.getEndTime()).orElse(LocalDateTime.now());
->>>>>>> fa1ee2cfab745370400dc1e74fba8d1e0b7ca8fb
 
         MeetingDetail meetingDetail = MeetingDetail.builder()
                 .summary(fullSummary.toString())

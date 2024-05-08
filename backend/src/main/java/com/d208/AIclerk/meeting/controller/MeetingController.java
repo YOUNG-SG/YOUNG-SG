@@ -21,6 +21,7 @@ public class MeetingController {
 
     private final MeetingService meetingService;
 
+    // 녹음 종료 후 실행 되는 컨트롤러
     @PostMapping("/send-text")
     @Operation(summary = "텍스트 요약", description = "텍스트 요약 후 roomId에 맞게 meeting detail 까지 생성(title, roomId, summary")
     public ResponseEntity<String> summaryText(@RequestBody OpenAiRequestDto dto) throws Exception {
