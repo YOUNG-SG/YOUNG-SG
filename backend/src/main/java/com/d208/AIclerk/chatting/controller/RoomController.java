@@ -55,17 +55,11 @@ public class RoomController {
         long ownerId = commonUtil.getMember().getId();
         String profile = commonUtil.getMember().getImage();
         String nickname = commonUtil.getMember().getNickname();
-
         MeetingRoom room = new MeetingRoom();
         room.setTitle(dto.getTitle());
-
         MeetingRoom createdRoom = roomService.createRoom(room, ownerId);
-
         CreateRoomResponseDto response = new CreateRoomResponseDto(
                 createdRoom.getInviteCode(),
-//                0,
-//                createdRoom.getTitle(),
-//                "Room created successfully",
                 createdRoom.getId(),
                 nickname,
                 profile,
@@ -76,14 +70,13 @@ public class RoomController {
         return ResponseEntity.ok(response);
     }
 
-
-
     /**
      * endpoint: ws://localhost:8000/ws
      * /pub/{roomid}/sendMessage  메시지를 보내기
      * /sub/chat/123  //방구독하기 입장임 ( 소켓개념)
      * 보내야할 형식 MessageDto
      */
+
     @MessageMapping("/{roomId}/sendMessage")
     public void sendMessage(@DestinationVariable Long roomId, MessageDto message) {
         LocalDateTime now = LocalDateTime.now();
@@ -94,7 +87,6 @@ public class RoomController {
         messagingTemplate.convertAndSend("/sub/chat/" + roomId, message);
         // rabbitMqService.sendMessage(roomId, message);
     }
-
     /**
      *
      * STT매새지기록
@@ -115,9 +107,6 @@ public class RoomController {
 
 
 
-
-
-
     @PostMapping("/get-room-id")
     public ResponseEntity<ResnposeRoomIdDTO> getRoomIdByInviteCode(@RequestBody RequestRoomIdDTO requestDto) {
         Optional<MeetingRoom> roomOptional = roomRepository.findByInviteCode(requestDto.getCode());
@@ -133,7 +122,6 @@ public class RoomController {
     public ResponseEntity<MessageDto> joinRoom(@PathVariable Long roomId) {
         Member currentMember = commonUtil.getMember();
         long userId= currentMember.getId();
-
         String profile = currentMember.getImage();
         String nickname = currentMember.getNickname();
         long memberid = currentMember.getId();
@@ -172,7 +160,6 @@ public class RoomController {
         Member currentMember = commonUtil.getMember();
         String nickname = currentMember.getNickname();
         long userId = currentMember.getId();
-
         boolean result = roomService.leaveRoom(request.getRoomId(), userId);
         if (result) {
             return ResponseEntity.ok(nickname + "님이 퇴장하셨습니다.");
