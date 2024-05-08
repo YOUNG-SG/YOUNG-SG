@@ -12,12 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class CreateRoomResponseDto {
     private String invite_code;
-//    private long state;
-//    private String title;
-//    private String message;
     private long roomId;
-
-
     private String sender;
     private String profile;
     private LocalDateTime sent_time;

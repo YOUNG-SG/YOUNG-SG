@@ -68,6 +68,13 @@ public class RedisConfig {
         List<String> memberIds = listOperations.range(roomKey + ":members", 0, -1);
         List<Map<String, Object>> memberDetails = new ArrayList<>();
 
+        // owner ID를 가져와서 닉네임도 조회
+        String ownerId = (String) hashOperations.get(roomKey, "owner");
+        String status = (String) hashOperations.get(roomKey, "status");
+
+        Member owner = memberRepository.findById(Long.parseLong(ownerId))
+                .orElseThrow(() -> new MemberNotFoundException("Member not found for ID: " + ownerId));
+
         for (String memberId : memberIds) {
             Optional<Member> memberOpt = memberRepository.findById(Long.parseLong(memberId));
             if (memberOpt.isPresent()) {
@@ -80,9 +87,16 @@ public class RedisConfig {
             }
         }
 
-        String message = toJson(memberDetails);
+        Map<String, Object> roomInfo = new HashMap<>();
+        roomInfo.put("owner", owner.getNickname()); // owner 닉네임
+        roomInfo.put("status", status);
+        roomInfo.put("members", memberDetails);
+
+        String message = toJson(roomInfo);
         messagingTemplate.convertAndSend("/sub/room/update/" + roomId, message);
     }
+
+
 
     private String toJson(Object object) {
         try {
