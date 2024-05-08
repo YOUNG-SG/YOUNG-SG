@@ -26,8 +26,8 @@ const Profile = () => {
     return <div>{error.message}</div>;
   }
 
-  const nickname = myProfile.nickname;
-  const image = myProfile.image;
+  const nickname = myProfile.nickName;
+  const image = myProfile.profileImg;
 
   const EditButton = () => {
     return (

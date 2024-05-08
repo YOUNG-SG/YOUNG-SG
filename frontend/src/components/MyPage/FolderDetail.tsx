@@ -1,7 +1,7 @@
 import FolderDetailMeeting from "./FolderDetailMeeting";
 import { fetchFolderList, fetchFolderMeetingList } from "@/services/MyPage";
 import { selectFolderStore } from "@/store/myPageStore";
-import { FolderType, FolderMeetingType } from "@/types/MyPage";
+import { FolderType, FolderMeetingData } from "@/types/MyPage";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import Loading from "../@common/Loading";
@@ -60,7 +60,7 @@ const FolderDetail = () => {
           style={{ height: "calc(100% - 118px)" }}
         >
           {/* FIXME folderDetails.length == 0 일때 ? */}
-          {folderDetails?.map((meeting: FolderMeetingType) => (
+          {folderDetails?.map((meeting: FolderMeetingData) => (
             <FolderDetailMeeting key={meeting.detailId} meeting={meeting} />
           ))}
         </div>

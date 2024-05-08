@@ -28,8 +28,8 @@ const ProfileEdit = () => {
   });
 
   /* 닉네임, 프리뷰, 업로드 파일이미지 */
-  const [nickname, setNickname] = useState(myProfile.nickname);
-  const [preview, setPreview] = useState(myProfile.image);
+  const [nickname, setNickname] = useState(myProfile.nickName);
+  const [preview, setPreview] = useState(myProfile.profileImg);
   const [file, setFile] = useState<File | null>(null);
 
   if (isLoading) {

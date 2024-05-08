@@ -23,7 +23,7 @@ const Navbar = () => {
         <div className="bg-white w-[50px] h-[50px] rounded-full"></div>
       ) : (
         <img
-          src={myProfile.image}
+          src={myProfile.profileImg}
           className="w-[50px] h-[50px] rounded-full object-cover cursor-pointer"
           onClick={() => {
             navigate("/mypage");

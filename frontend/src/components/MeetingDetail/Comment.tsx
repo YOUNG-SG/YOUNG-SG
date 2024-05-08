@@ -30,7 +30,7 @@ const Comment: React.FC<{
   return (
     <div className="flex w-full justify-between">
       <div className="w-[160px]">
-        <UserInfo img={comment.profileUrl} nickname={comment.nickname} />
+        <UserInfo profileImg={comment.profileUrl} nickName={comment.nickname} />
       </div>
       <div className="text-[20px] mt-[1px] font-l" style={{ width: "calc(100% - 190px)" }}>
         {comment.content}

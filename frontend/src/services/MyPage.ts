@@ -18,20 +18,20 @@ export const fetchFolderList = async () => {
   return res.data.data;
 };
 
-// TODO 폴더 상세, 회의 목록 조회
+// 폴더 회의 목록 조회
 export const fetchFolderMeetingList = async (folderId: number) => {
   const res = await axiosAuthRequest.get(`/api/meeting/detail-list/${folderId}`);
   return res.data.data;
 };
 
-// TODO 타임라인
+// 타임라인
 export const fetchTimeline = async () => {
-  const res = await axiosAuthRequest.get("/api/mypage/timeline");
-  return res;
+  const res = await axiosAuthRequest.get("/api/oauth/mypage/timeline");
+  return res.data.timeLineList;
 };
 
-// TODO 회의 삭제
+// 회의 삭제
 export const deleteMeeting = async (meetingId: number) => {
-  const res = await axiosAuthRequest.delete(`/api/mypage/delete/${meetingId}`);
+  const res = await axiosAuthRequest.delete(`/api/oauth/mypage/delete/${meetingId}`);
   return res;
 };
