@@ -51,6 +51,7 @@ public class MeetingServiceImpl implements MeetingService {
     private final MemberMeetingRepository memberMeetingRepository;
     private final RoomRepository roomRepository;
     private final ParticipantRepository participantRepository;
+    private final FileRepository fileRepository;
 
 
     @Autowired
@@ -187,6 +188,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         // 하나씩 찾아서 넣어주기
 
+        dto.setTitle(meetingDetail.getTitle());
         // detailId
         dto.setDetailId(meetingDetail.getId());
         // 요약 내용
@@ -229,9 +231,11 @@ public class MeetingServiceImpl implements MeetingService {
             dto.setNextMeetingId(nextMeetingId);
         }
 
-
-
         //Todo 파일 다운로드 링크
+        File file = fileRepository.findByMeetingDetail(meetingDetail);
+        dto.setFileUrl(file.getUrl());
+        dto.setName(file.getName());
+
 
 
         // 참여자 목록 조회
@@ -245,6 +249,7 @@ public class MeetingServiceImpl implements MeetingService {
                 }).collect(Collectors.toList());
 
         dto.setParticipantInfoDtoList(participantInfoDtos);
+        log.info("(참여자) {}", participantList);
 
 
         MeetingDetailResponse response = new MeetingDetailResponse("상세 페이지 조회 성공", dto);
@@ -308,7 +313,6 @@ public class MeetingServiceImpl implements MeetingService {
         Folder newFolder = Folder.builder()
                 .title(dto.getTitle())
                 .createAt(LocalDateTime.now())
-
                 .member(currentMember)
                 .build();
 
