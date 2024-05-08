@@ -3,9 +3,9 @@ import { clickButtonStore } from "@/store/myPageStore";
 import TimelineMeeting from "@/components/MyPage/TimelineMeeting";
 import UnfoldState from "@/assets/MyPage/CaretDown.svg?react"; // 펼친 상태
 import FoldState from "@/assets/MyPage/CaretRight.svg?react"; // 접힌 상태
-import { TimelineMonthsType } from "@/types/MyPage";
+import { TimelineMonthProps } from "@/types/MyPage";
 
-const TimelineMonth: React.FC<{ month: string; days: TimelineMonthsType }> = ({ month, days }) => {
+const TimelineMonth: React.FC<TimelineMonthProps> = ({ month, days }) => {
   const { isClick, setIsClick, isAllExpanded } = clickButtonStore();
   const [isShow, setIsShow] = useState(true);
 
@@ -38,7 +38,7 @@ const TimelineMonth: React.FC<{ month: string; days: TimelineMonthsType }> = ({ 
       {isShow && (
         <div className="flex flex-col gap-[16px] my-[16px]">
           {Object.values(days).map((day) => (
-            <TimelineMeeting month={month} day={day} />
+            <TimelineMeeting month={month} day={day as TimelineDayType} />
           ))}
         </div>
       )}

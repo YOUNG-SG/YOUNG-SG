@@ -52,7 +52,7 @@ const Timeline = () => {
           style={{ height: "calc(100% - 64px)" }}
         >
           {Object.entries(timeline).map(([year, months]) => (
-            <TimelineYear year={year} months={months as TimelineMonthsType[]} />
+            <TimelineYear key={year} year={year} months={months} />
           ))}
         </div>
       </div>

@@ -1,10 +1,7 @@
 import TimelineMonth from "@/components/MyPage/TimelineMonth";
-import { TimelineMonthsType } from "@/types/MyPage";
+import { TimelineYearProps } from "@/types/MyPage";
 
-const TimelineYear: React.FC<{ year: string; months: TimelineMonthsType[] }> = ({
-  year,
-  months,
-}) => {
+const TimelineYear: React.FC<TimelineYearProps> = ({ year, months }) => {
   console.log(months);
   return (
     <div>

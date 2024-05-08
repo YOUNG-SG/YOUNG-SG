@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { TimelineDayType } from "@/types/MyPage";
+import { TimelineMeetingProps } from "@/types/MyPage";
 
-const TimelineMeeting: React.FC<{ month: string; day: TimelineDayType }> = ({ month, day }) => {
+const TimelineMeeting: React.FC<TimelineMeetingProps> = ({ month, day }) => {
   const navigate = useNavigate();
 
   // FIXME 삭제버튼
