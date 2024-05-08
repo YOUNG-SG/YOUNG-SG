@@ -17,6 +17,6 @@ public class FolderResponseDto {
 
     private String title;
 
-    private String createAt;
+    private String date;
 
 }

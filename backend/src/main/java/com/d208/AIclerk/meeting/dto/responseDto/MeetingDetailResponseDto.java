@@ -28,4 +28,6 @@ public class MeetingDetailResponseDto {
 
     private String date;
 
+    private String title;
+
 }
