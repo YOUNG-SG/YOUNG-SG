@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
-import { joinRoom } from "@/services/createRoom";
+import { joinRoom } from "@/services/Room";
 import userStore from "@/store/userStore";
-import createRoomStore from "@/store/createRoom";
+import createRoomStore from "@/store/createRoomStore";
 import UserList from "./OpenVidu/Chatting/UserList";
 
 interface ChatTestProps {
@@ -17,7 +17,7 @@ const ChatTest = ({ roomId }: ChatTestProps) => {
   const [senderInfo, setSenderInfo] = useState({ sender: "", profile: "", senderId: "" });
   const [connected, setConnected] = useState(false); // 연결 상태를 추적하는 상태 변수 추가
   const { id, setId, setName, setProfile } = userStore();
-  const { roomStatus, setRoomStatus, setOwner } = createRoomStore();
+  const { setRoomStatus, owner, setOwner } = createRoomStore();
   const [userList, setUserList] = useState([]);
 
   useEffect(() => {
@@ -163,7 +163,7 @@ const ChatTest = ({ roomId }: ChatTestProps) => {
           Send Message
         </button>
       </div>
-      <UserList userList={userList} />
+      <UserList userList={userList} owner={owner} />
     </>
   );
 };

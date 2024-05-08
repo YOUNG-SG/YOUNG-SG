@@ -1,31 +1,82 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
-import { joinRoom } from "@/services/createRoom";
+import { joinRoom } from "@/services/Room";
 import userStore from "@/store/userStore";
-import createRoomStore from "@/store/createRoom";
+import createRoomStore from "@/store/createRoomStore";
 import UserList from "./Chatting/UserList";
 import ChatRoom from "./Chatting/ChatRoom";
+import ChatSummary from "./Chatting/ChatSummary";
+import { useSpeechRecognition } from "react-speech-recognition";
 
 import chat from "../../../assets/chattingIcons/messenger.png";
 import people from "../../../assets/chattingIcons/people.png";
 
-interface ChattingProps {
-  roomId: number;
+interface Command {
+  command: string;
+  callback: () => void;
 }
 
-const Chatting = ({ roomId }: ChattingProps) => {
+interface ChattingProps {
+  roomId: number;
+  roomStatus: string | null;
+}
+
+interface Message {
+  content: string;
+  sender?: string;
+  profile?: string;
+  senderId?: number;
+  sent_time?: string;
+  contentType?: string;
+}
+
+interface SummaryMessage {
+  content: string;
+  sender?: string;
+  profile?: string;
+  senderId?: number;
+  sent_time?: string;
+  contentType?: string;
+}
+
+interface Member {
+  id: number;
+  nickname: string;
+  profile: string;
+}
+
+const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
   // isChat이면 채팅창, false이면 사용자 목록
   const [isChatting, setIsChatting] = useState<boolean>(false);
   const [isChatStatus, setIsChatStatus] = useState<boolean>(false);
   const stompClientRef = useRef<Client | null>(null);
   const [message, setMessage] = useState<string>("");
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [summaryMessage, setSummaryMessage] = useState<string>("");
+  const [summaryMessages, setSummaryMessages] = useState<SummaryMessage[]>([]);
   const [senderInfo, setSenderInfo] = useState({ sender: "", profile: "", senderId: "" });
   const [connected, setConnected] = useState(false); // 연결 상태를 추적하는 상태 변수 추가
   const { id, setId, setName, setProfile } = userStore();
-  const { roomStatus, owner, setRoomStatus, setOwner } = createRoomStore();
-  const [userList, setUserList] = useState([]);
+  const [userList, setUserList] = useState<Member[]>([]);
+  const { owner, setRoomStatus, setOwner } = createRoomStore();
+  const commands: Command[] = [
+    {
+      command: "reset",
+      callback: () => resetTranscript(),
+    },
+    {
+      command: "shut up",
+      callback: () => setMessage("I wasn't talking."),
+    },
+    {
+      command: "Hello",
+      callback: () => setMessage("Hi there!"),
+    },
+  ];
+  const { transcript, interimTranscript, finalTranscript, resetTranscript } = useSpeechRecognition({
+    commands,
+  });
 
   useEffect(() => {
     if (!roomId) {
@@ -33,6 +84,40 @@ const Chatting = ({ roomId }: ChattingProps) => {
       return;
     }
   }, []);
+
+  // 음성인식
+  useEffect(() => {
+    if (finalTranscript !== "") {
+      console.log("Got final result:", transcript);
+      sendSummaryMessage();
+    }
+  }, [interimTranscript, finalTranscript]);
+
+  useEffect(() => {
+    if (!stompClientRef.current) {
+      console.log("WebSocket client not available");
+      return;
+    }
+
+    if (roomStatus === "1") {
+      stompClientRef.current.subscribe(`/sub/meetingChat/${roomId}`, (message) => {
+        console.log("Meeting Chat Message received:", message.body);
+        const contentType = message.headers["content-type"];
+        let newMessage: SummaryMessage;
+        if (contentType === "application/json") {
+          newMessage = JSON.parse(message.body);
+          newMessage.contentType = contentType;
+          setSummaryMessages((prevMessages) => [...prevMessages, newMessage]);
+        } else {
+          setSummaryMessages((prevMessages) => [...prevMessages, { content: message.body }]);
+        }
+      });
+    } else if (roomStatus === "2") {
+      console.log("Unsubscribing from meeting chat for roomId:", roomId);
+      // roomStatus가 2일 때 채팅 구독 해제
+      stompClientRef.current.unsubscribe(`/sub/meetingChat/${roomId}`);
+    }
+  }, [roomStatus]);
 
   const handleIsChatting = () => {
     const status = isChatting;
@@ -64,7 +149,7 @@ const Chatting = ({ roomId }: ChattingProps) => {
         setName(sender);
         setProfile(profile);
 
-        console.log(content, sent_time);
+        console.log(content, sent_time, "content, sent_time");
       } catch (err) {
         console.log(err);
       }
@@ -88,7 +173,7 @@ const Chatting = ({ roomId }: ChattingProps) => {
       client.subscribe(`/sub/chat/${roomId}`, function (message) {
         console.log("Message received:", message.body);
         const contentType = message.headers["content-type"];
-        let newMessage;
+        let newMessage: Message;
         if (contentType === "application/json") {
           newMessage = JSON.parse(message.body);
           newMessage.contentType = contentType;
@@ -138,10 +223,30 @@ const Chatting = ({ roomId }: ChattingProps) => {
       stompClientRef.current.publish({
         destination: `/pub/${roomId}/sendMessage`,
         body: messageToSend,
-        // skipContentLengthHeader: false,
       });
 
       setMessage(""); // 메시지 전송 후 입력 필드 초기화
+    }
+  };
+
+  const sendSummaryMessage = () => {
+    console.log("if 전");
+    if (transcript && stompClientRef.current) {
+      console.log(transcript, "해줘");
+      const messageToSend = JSON.stringify({
+        content: transcript,
+        sender: senderInfo.sender,
+        profile: senderInfo.profile,
+        senderId: senderInfo.senderId,
+      });
+      console.log(messageToSend);
+
+      stompClientRef.current.publish({
+        destination: `/pub/${roomId}/sendMeetingChat`,
+        body: messageToSend,
+      });
+
+      resetTranscript();
     }
   };
 
@@ -180,7 +285,9 @@ const Chatting = ({ roomId }: ChattingProps) => {
             {/* 요약 부분 */}
             {!isChatStatus && (
               <>
-                <div className="flex-1 m-1 overflow-y-auto rounded-xl">ㅇㅁㅇ</div>
+                <div className="flex-1 m-1 overflow-y-auto rounded-xl">
+                  <ChatSummary summaryMessages={summaryMessages} />
+                </div>
               </>
             )}
           </div>

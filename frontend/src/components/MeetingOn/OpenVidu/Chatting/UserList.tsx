@@ -1,8 +1,14 @@
 import crown from "../../../../assets/chattingIcons/crown.png";
 
+interface Member {
+  id: number;
+  nickname: string;
+  profile: string;
+}
+
 interface ChatTestProps {
-  userList?: string[];
-  owner: string;
+  userList?: Member[];
+  owner: string | null;
 }
 
 const UserList = ({ userList, owner }: ChatTestProps) => {
@@ -14,8 +20,8 @@ const UserList = ({ userList, owner }: ChatTestProps) => {
           {userList &&
             userList.map((user, index) => (
               <div key={index} className="flex flex-row items-center">
-                <div className="pr-2">{user}</div>
-                {user === owner ? <img className="w-5 h-5" src={crown} alt="" /> : null}
+                <div className="pr-2">{user.nickname}</div>
+                {user.nickname === owner ? <img className="w-5 h-5" src={crown} alt="" /> : null}
               </div>
             ))}
         </div>

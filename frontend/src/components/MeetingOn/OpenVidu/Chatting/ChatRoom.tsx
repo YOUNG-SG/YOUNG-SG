@@ -1,8 +1,16 @@
 import send from "../../../../assets/chattingIcons/send.png";
 
+interface Message {
+  content: string;
+  senderId?: number;
+  contentType?: string;
+  profile?: string;
+  sent_time?: string;
+}
+
 interface ChattingProps {
   id: number | null;
-  messages: string[];
+  messages: Message[];
   message: string;
   setMessage: (message: string) => void;
   sendMessage: () => void;
