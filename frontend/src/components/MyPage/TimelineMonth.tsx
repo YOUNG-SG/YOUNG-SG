@@ -37,8 +37,8 @@ const TimelineMonth: React.FC<TimelineMonthProps> = ({ month, days }) => {
       {/* 일 map 함수 */}
       {isShow && (
         <div className="flex flex-col gap-[16px] my-[16px]">
-          {Object.values(days).map((day) => (
-            <TimelineMeeting month={month} day={day as TimelineDayType} />
+          {days.map((day) => (
+            <TimelineMeeting key={day.meetingId} month={month} day={day} />
           ))}
         </div>
       )}
@@ -47,55 +47,3 @@ const TimelineMonth: React.FC<TimelineMonthProps> = ({ month, days }) => {
 };
 
 export default TimelineMonth;
-
-// 타입 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-// 타임라인
-export type TimelineDayType = {
-  meetingId: number;
-  createdDay: number;
-  folderTitle: string;
-  roomTitle: string;
-};
-
-export type TimelineMonthsType_ = {
-  [month: string]: TimelineDayType[];
-};
-
-/*
-
-// year - string
-"2024": 
-
-// months - TimelineMonthsType
-{
-  // month - string
-  "5": 
-  
-  // days - TimelineDayType[]
-  [
-
-    // day - TimelineDayType
-      {
-          "meetingId": 6,
-          "createdDay": 5,
-          "folderTitle": "유나 심번이용",
-          "roomTitle": "다섯 번째 회의"
-      },
-      {
-          "meetingId": 5,
-          "createdDay": 5,
-          "folderTitle": "유나 이번이용",
-          "roomTitle": "네 번째 회의"
-      }
-  ],
-  "4": [
-      {
-          "meetingId": 4,
-          "createdDay": 12,
-          "folderTitle": "유나 이번이용",
-          "roomTitle": "세 번째 회의"
-      }
-  ]
-},
-*/

@@ -2,12 +2,12 @@ import { clickButtonStore } from "@/store/myPageStore";
 import TimelineYear from "@/components/MyPage/TimelineYear";
 import { useQuery } from "@tanstack/react-query";
 import { fetchTimeline } from "@/services/MyPage";
-import { TimelineMonthsType } from "@/types/MyPage";
+import { YearData } from "@/types/MyPage";
 
 const Timeline = () => {
   const { setIsClick, setIsAllExpanded } = clickButtonStore();
 
-  const { data: timeline, isLoading } = useQuery({
+  const { data: timeline, isLoading } = useQuery<YearData>({
     queryKey: ["timeline"],
     queryFn: () => fetchTimeline(),
   });
@@ -51,9 +51,10 @@ const Timeline = () => {
           className="w-full overflow-scroll flex flex-col gap-[80px]"
           style={{ height: "calc(100% - 64px)" }}
         >
-          {Object.entries(timeline).map(([year, months]) => (
-            <TimelineYear key={year} year={year} months={months} />
-          ))}
+          {timeline &&
+            Object.entries(timeline).map(([year, months]) => (
+              <TimelineYear key={year} year={year} months={months} />
+            ))}
         </div>
       </div>
     </div>

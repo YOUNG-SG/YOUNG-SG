@@ -2,7 +2,6 @@ import TimelineMonth from "@/components/MyPage/TimelineMonth";
 import { TimelineYearProps } from "@/types/MyPage";
 
 const TimelineYear: React.FC<TimelineYearProps> = ({ year, months }) => {
-  console.log(months);
   return (
     <div>
       <div className="flex gap-[16px] items-center mb-[30px]">
@@ -11,7 +10,7 @@ const TimelineYear: React.FC<TimelineYearProps> = ({ year, months }) => {
       </div>
       <div className="flex flex-col gap-[20px]">
         {Object.entries(months).map(([month, days]) => (
-          <TimelineMonth month={month} days={days} />
+          <TimelineMonth key={month} month={month} days={days} />
         ))}
       </div>
     </div>
