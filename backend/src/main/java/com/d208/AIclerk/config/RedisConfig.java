@@ -165,8 +165,18 @@ public class RedisConfig {
         String roomKey = "room:" + roomId.toString();
         hashOperations.put(roomKey, "status", "1");
         updateRoomInfo(roomId);
+
+        String chatLogKey = "chatlog:" + roomId;
+        redisTemplate.delete(chatLogKey); // 기존 로그가 있을 경우 삭제
+
         String startMessage = "미팅이 시작되었슴니다";
-        messagingTemplate.convertAndSend("/topic/meetingStatus/" + roomId, startMessage);
+        messagingTemplate.convertAndSend("/sub/meetingChat/" + roomId, startMessage);
+        redisTemplate.opsForList().rightPush(chatLogKey, startMessage);
+    }
+
+    public void recordMessage(Long roomId, String message) {
+        String chatLogKey = "chatlog:" + roomId;
+        redisTemplate.opsForList().rightPush(chatLogKey, message);
     }
 
 
@@ -183,7 +193,7 @@ public class RedisConfig {
         hashOperations.put(roomKey, "status", "2");
         updateRoomInfo(roomId);
         String endMessage = "미팅이 종료되었슴다";
-        messagingTemplate.convertAndSend("/topic/meetingStatus/" + roomId, endMessage);
+        messagingTemplate.convertAndSend("/sub/meetingChat/" + roomId, endMessage);
 
         List<String> chatLogs = redisTemplate.opsForList().range("chatlog:" + roomId, 0, -1);
         String summary = String.join(" ", chatLogs); // 모든 로그를 하나의 문자열로 결합

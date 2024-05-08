@@ -66,7 +66,6 @@ public class RoomServiceImpl implements RoomService {
             Long memberId = Long.parseLong(memberIdStr);
             Member member = memberRepository.findById(memberId)
                     .orElseThrow(() -> new RuntimeException("Member not found with ID: " + memberId));
-
             System.out.println("Member ID: " + memberId + ", Meeting Room: " + meetingRoom);
 
                 Participant participant = Participant.builder()

@@ -4,6 +4,7 @@ import com.d208.AIclerk.chatting.dto.requestDto.*;
 import com.d208.AIclerk.chatting.dto.responseDto.CreateRoomResponseDto;
 import com.d208.AIclerk.chatting.dto.responseDto.ResnposeRoomIdDTO;
 import com.d208.AIclerk.chatting.repository.RoomRepository;
+import com.d208.AIclerk.config.RedisConfig;
 import com.d208.AIclerk.entity.MeetingRoom;
 import com.d208.AIclerk.chatting.service.RoomService;
 import com.d208.AIclerk.chatting.service.RabbitMqService;
@@ -35,13 +36,15 @@ public class RoomController {
     private final SimpMessagingTemplate messagingTemplate;
     private final CommonUtil commonUtil;
     private final RoomRepository roomRepository;
+    private final RedisConfig redisConfig;
 
-    public RoomController(RoomService roomService, RabbitMqService rabbitMqService, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, RoomRepository roomRepository) {
+    public RoomController(RoomService roomService, RabbitMqService rabbitMqService, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, RoomRepository roomRepository, RedisConfig redisConfig) {
         this.roomService = roomService;
         this.rabbitMqService = rabbitMqService;
         this.messagingTemplate = messagingTemplate;
         this.commonUtil = commonUtil;
         this.roomRepository = roomRepository;
+        this.redisConfig = redisConfig;
     }
 
     /**
@@ -98,6 +101,23 @@ public class RoomController {
      *
      * **/
 
+    @MessageMapping("/{roomId}/sendMeetingChat")
+    public void sendMeetingChat(@DestinationVariable Long roomId, MessageDto message) {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        String formattedTime = now.format(formatter); // 현재 시간을 "HH:mm" 형식으로 포맷팅
+        message.setSent_time(formattedTime);
+        log.info("Received meeting chat from {} ({}): {}", message.getSender(), message.getSenderId(), message.getContent());
+        messagingTemplate.convertAndSend("/sub/meetingChat/" + roomId, message); //다른 사용자에게 보내기
+        String logMessage = message.getSenderId() + ": " + message.getContent();
+        redisConfig.recordMessage(roomId,logMessage);
+    }
+
+
+
+
+
+
     @PostMapping("/get-room-id")
     public ResponseEntity<ResnposeRoomIdDTO> getRoomIdByInviteCode(@RequestBody RequestRoomIdDTO requestDto) {
         Optional<MeetingRoom> roomOptional = roomRepository.findByInviteCode(requestDto.getCode());
@@ -107,17 +127,6 @@ public class RoomController {
             return ResponseEntity.notFound().build();
         }
     }
-
-
-
-    @MessageMapping("/{roomId}/recordMessage")
-    public void recordMessage(@DestinationVariable Long roomId, MessageDto message) {
-        String text = message.getContent(); // 메시지 텍스트 추출
-//        redisConfig.appendChatLog(roomId, text); // Redis에 채팅 로그 저장
-        log.info("Recorded message for room {}: {}", roomId, text);
-    }
-
-
 
 
     @PostMapping("/join/{roomId}")
