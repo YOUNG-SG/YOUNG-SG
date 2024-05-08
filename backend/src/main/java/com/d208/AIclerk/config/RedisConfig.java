@@ -1,10 +1,12 @@
 package com.d208.AIclerk.config;
 
 import com.d208.AIclerk.chatting.repository.RoomRepository;
+import com.d208.AIclerk.chatting.repository.SummaryRepository;
 import com.d208.AIclerk.chatting.util.RedisSubscriber;
 import com.d208.AIclerk.entity.MeetingDetail;
 import com.d208.AIclerk.entity.MeetingRoom;
 import com.d208.AIclerk.entity.Member;
+import com.d208.AIclerk.entity.Summary;
 import com.d208.AIclerk.meeting.repository.MeetingDetailRepository;
 import com.d208.AIclerk.member.exception.MemberNotFoundException;
 import com.d208.AIclerk.member.repository.MemberRepository;
@@ -36,11 +38,12 @@ public class RedisConfig {
     private final SimpMessagingTemplate messagingTemplate;
     private  final MemberRepository memberRepository;
     private final MeetingDetailRepository meetingDetailRepository;
+    private final SummaryRepository summaryRepository;
 
     private final RoomRepository roomRepository;
 
     @Autowired
-    public RedisConfig(StringRedisTemplate redisTemplate, RedisSubscriber redisSubscriber, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, MemberRepository memberRepository, ParticipantRepository participantRepository, MeetingDetailRepository meetingDetailRepository, RoomRepository roomRepository) {
+    public RedisConfig(StringRedisTemplate redisTemplate, RedisSubscriber redisSubscriber, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, MemberRepository memberRepository, ParticipantRepository participantRepository, MeetingDetailRepository meetingDetailRepository, SummaryRepository summaryRepository, RoomRepository roomRepository) {
         this.redisTemplate = redisTemplate;
         this.hashOperations = redisTemplate.opsForHash();
         this.listOperations = redisTemplate.opsForList();
@@ -48,6 +51,7 @@ public class RedisConfig {
         this.messagingTemplate = messagingTemplate;
         this.memberRepository = memberRepository;
         this.meetingDetailRepository = meetingDetailRepository;
+        this.summaryRepository = summaryRepository;
         this.roomRepository = roomRepository;
     }
 
@@ -212,14 +216,21 @@ public class RedisConfig {
         MeetingRoom meetingRoom = roomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid room ID: " + roomId));
 
-        MeetingDetail meetingDetail = MeetingDetail.builder()
+
+        Summary summary1 = Summary.builder()
                 .title(meetingRoom.getTitle()) // MeetingRoom에서 제목 가져오기
-                .summary(summary)
-                .createAt(LocalDateTime.now())
-                .meetingRoom(meetingRoom)
+                .content(summary)
+                .create_at(LocalDateTime.now())
                 .build();
 
-        meetingDetailRepository.save(meetingDetail); // 저장
+//        MeetingDetail meetingDetail = MeetingDetail.builder()
+//                .title(meetingRoom.getTitle()) // MeetingRoom에서 제목 가져오기
+//                .content(summary)
+//                .create_at(LocalDateTime.now())
+//                .meetingRoom(meetingRoom)
+//                .build();
+
+        summaryRepository.save(summary1); // 저장
     }
 
 
@@ -228,7 +239,7 @@ public class RedisConfig {
     public void pauseMeeting(Long roomId) {
         String roomKey = "room:" + roomId.toString();
         hashOperations.put(roomKey, "status", "3");
-        updateRoomInfo(roomId);  
+        updateRoomInfo(roomId);
         String pauseMessage = "미팅이 일시 정지되었습니다.";
         messagingTemplate.convertAndSend("/sub/meetingChat/" + roomId, pauseMessage);
     }
