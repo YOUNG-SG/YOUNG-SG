@@ -17,6 +17,8 @@ import record from "../../assets/chattingIcons/button.png";
 import { OpenVidu, Publisher, Subscriber } from "openvidu-browser";
 import axios, { AxiosError } from "axios";
 import createRoomStore from "@/store/createRoomStore";
+import SpeechRecognition from "react-speech-recognition";
+import useDictaphoneStore from "@/store/dictaphoneStore";
 import InviteButton from "./OpenVidu/InviteButton";
 import { baseURL } from "@/services/axios";
 import { meetingRecordStart, meetingRecordEnd } from "@/services/Chatting";
@@ -26,7 +28,7 @@ interface MeetingTestProps {
 }
 
 const MeetingTest = ({ roomId }: MeetingTestProps) => {
-  const { sessionId, setSessionId, setRoomStatus } = createRoomStore();
+  const { sessionId, setSessionId, roomStatus, setRoomStatus } = createRoomStore();
   const {
     session,
     setSession,
@@ -51,6 +53,7 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
     screenOV,
     setScreenOV,
   } = useMeetingStore();
+  const { listening, setListening } = useDictaphoneStore();
 
   const OPENVIDU_SERVER_URL = "https://youngseogi.duckdns.org";
   const OPENVIDU_SERVER_SECRET = "MYSECRET";
@@ -282,6 +285,7 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
       const msg = await meetingRecordStart(roomId);
       if (msg === "미팅시작.,..") {
         setRoomStatus("1");
+        listenContinuously();
       }
     } catch (err) {
       console.log(err);
@@ -292,11 +296,26 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
       const msg = await meetingRecordEnd(roomId);
       if (msg === "미팅종료...") {
         setRoomStatus("2");
+        listenStop();
       }
     } catch (err) {
       console.log(err);
     }
   };
+
+  const listenContinuously = () => {
+    SpeechRecognition.startListening({
+      continuous: true,
+      language: "ko",
+    });
+    setListening(true);
+  };
+
+  const listenStop = () => {
+    SpeechRecognition.stopListening();
+    setListening(false);
+  };
+
   return (
     <>
       <div>
@@ -344,7 +363,11 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
                     onClick={toggleRecord}
                     className="h-10 w-10 rounded-full bg-red-500 hover:bg-red-600 flex justify-center items-center"
                   >
-                    <img className="h-7 w-7" src={record} alt="" />
+                    {listening ? (
+                      <img className="h-7 w-7" src={record} alt="" />
+                    ) : (
+                      <img className="h-7 w-7" src={record} alt="" />
+                    )}
                   </button>
                 </div>
                 {publisher && (
@@ -410,7 +433,7 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
               ) : null}
             </div>
             <div className="col-span-3">
-              <Chatting roomId={roomId} />
+              <Chatting roomId={roomId} roomStatus={roomStatus} />
             </div>
           </div>
         </>

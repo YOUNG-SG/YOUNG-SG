@@ -7,12 +7,19 @@ import createRoomStore from "@/store/createRoomStore";
 import UserList from "./Chatting/UserList";
 import ChatRoom from "./Chatting/ChatRoom";
 import ChatSummary from "./Chatting/ChatSummary";
+import { useSpeechRecognition } from "react-speech-recognition";
 
 import chat from "../../../assets/chattingIcons/messenger.png";
 import people from "../../../assets/chattingIcons/people.png";
 
+interface Command {
+  command: string;
+  callback: () => void;
+}
+
 interface ChattingProps {
   roomId: number;
+  roomStatus: string | null;
 }
 
 interface Message {
@@ -33,7 +40,13 @@ interface SummaryMessage {
   contentType?: string;
 }
 
-const Chatting = ({ roomId }: ChattingProps) => {
+interface Member {
+  id: number;
+  nickname: string;
+  profile: string;
+}
+
+const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
   // isChat이면 채팅창, false이면 사용자 목록
   const [isChatting, setIsChatting] = useState<boolean>(false);
   const [isChatStatus, setIsChatStatus] = useState<boolean>(false);
@@ -45,8 +58,25 @@ const Chatting = ({ roomId }: ChattingProps) => {
   const [senderInfo, setSenderInfo] = useState({ sender: "", profile: "", senderId: "" });
   const [connected, setConnected] = useState(false); // 연결 상태를 추적하는 상태 변수 추가
   const { id, setId, setName, setProfile } = userStore();
-  const { roomStatus, owner, setRoomStatus, setOwner } = createRoomStore();
-  const [userList, setUserList] = useState([]);
+  const [userList, setUserList] = useState<Member[]>([]);
+  const { owner, setRoomStatus, setOwner } = createRoomStore();
+  const commands: Command[] = [
+    {
+      command: "reset",
+      callback: () => resetTranscript(),
+    },
+    {
+      command: "shut up",
+      callback: () => setMessage("I wasn't talking."),
+    },
+    {
+      command: "Hello",
+      callback: () => setMessage("Hi there!"),
+    },
+  ];
+  const { transcript, interimTranscript, finalTranscript, resetTranscript } = useSpeechRecognition({
+    commands,
+  });
 
   useEffect(() => {
     if (!roomId) {
@@ -55,6 +85,14 @@ const Chatting = ({ roomId }: ChattingProps) => {
     }
   }, []);
 
+  // 음성인식
+  useEffect(() => {
+    if (finalTranscript !== "") {
+      console.log("Got final result:", transcript);
+      sendSummaryMessage();
+    }
+  }, [interimTranscript, finalTranscript]);
+
   useEffect(() => {
     if (!stompClientRef.current) {
       console.log("WebSocket client not available");
@@ -62,15 +100,22 @@ const Chatting = ({ roomId }: ChattingProps) => {
     }
 
     if (roomStatus === "1") {
-      stompClientRef.current.subscribe(`/sub/meetingchat/${roomId}`, (message) => {
+      stompClientRef.current.subscribe(`/sub/meetingChat/${roomId}`, (message) => {
         console.log("Meeting Chat Message received:", message.body);
-        const newMessage = JSON.parse(message.body);
-        setSummaryMessages((prevMessages) => [...prevMessages, newMessage]);
+        const contentType = message.headers["content-type"];
+        let newMessage: SummaryMessage;
+        if (contentType === "application/json") {
+          newMessage = JSON.parse(message.body);
+          newMessage.contentType = contentType;
+          setSummaryMessages((prevMessages) => [...prevMessages, newMessage]);
+        } else {
+          setSummaryMessages((prevMessages) => [...prevMessages, { content: message.body }]);
+        }
       });
     } else if (roomStatus === "2") {
       console.log("Unsubscribing from meeting chat for roomId:", roomId);
       // roomStatus가 2일 때 채팅 구독 해제
-      stompClientRef.current.unsubscribe(`/sub/meetingchat/${roomId}`);
+      stompClientRef.current.unsubscribe(`/sub/meetingChat/${roomId}`);
     }
   }, [roomStatus]);
 
@@ -104,7 +149,7 @@ const Chatting = ({ roomId }: ChattingProps) => {
         setName(sender);
         setProfile(profile);
 
-        console.log(content, sent_time);
+        console.log(content, sent_time, "content, sent_time");
       } catch (err) {
         console.log(err);
       }
@@ -185,9 +230,11 @@ const Chatting = ({ roomId }: ChattingProps) => {
   };
 
   const sendSummaryMessage = () => {
-    if (summaryMessage && stompClientRef.current) {
+    console.log("if 전");
+    if (transcript && stompClientRef.current) {
+      console.log(transcript, "해줘");
       const messageToSend = JSON.stringify({
-        content: summaryMessage,
+        content: transcript,
         sender: senderInfo.sender,
         profile: senderInfo.profile,
         senderId: senderInfo.senderId,
@@ -199,7 +246,7 @@ const Chatting = ({ roomId }: ChattingProps) => {
         body: messageToSend,
       });
 
-      setSummaryMessage("");
+      resetTranscript();
     }
   };
 
@@ -239,10 +286,7 @@ const Chatting = ({ roomId }: ChattingProps) => {
             {!isChatStatus && (
               <>
                 <div className="flex-1 m-1 overflow-y-auto rounded-xl">
-                  <ChatSummary
-                    summaryMessages={summaryMessages}
-                    sendSummaryMessage={sendSummaryMessage}
-                  />
+                  <ChatSummary summaryMessages={summaryMessages} />
                 </div>
               </>
             )}

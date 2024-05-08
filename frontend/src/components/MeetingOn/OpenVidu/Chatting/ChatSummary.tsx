@@ -9,7 +9,6 @@ interface SummaryMessage {
 
 interface SummaryProps {
   summaryMessages: SummaryMessage[];
-  sendSummaryMessage: () => void;
 }
 
 const ChatSummary = ({ summaryMessages }: SummaryProps) => {
@@ -18,9 +17,19 @@ const ChatSummary = ({ summaryMessages }: SummaryProps) => {
       <div>
         {summaryMessages.map((msg, index) => (
           <div key={index} className="p-2 flex">
-            <div className="inline-block max-w-xs px-4 py-2 rounded-lg bg-[#333]">
-              <div>{msg.content}</div>
-            </div>
+            {msg.contentType === "application/json" ? (
+              <>
+                <div className="inline-block max-w-xs px-4 py-2 rounded-lg">
+                  <div>{msg.sender}</div>
+                  <div>{msg.content}</div>
+                  <div className="text-sm text-gray-300">{msg.sent_time}</div>
+                </div>
+              </>
+            ) : (
+              <div className="inline-block max-w-xs px-3 py-2 rounded-lg text-center bg-[#333]">
+                <div>{msg.content}</div>
+              </div>
+            )}
           </div>
         ))}
       </div>
