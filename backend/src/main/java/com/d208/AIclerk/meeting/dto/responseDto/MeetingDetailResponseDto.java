@@ -30,4 +30,6 @@ public class MeetingDetailResponseDto {
 
     private String title;
 
+    private String name;
+
 }

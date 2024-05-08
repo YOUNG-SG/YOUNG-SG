@@ -234,6 +234,7 @@ public class MeetingServiceImpl implements MeetingService {
         //Todo 파일 다운로드 링크
         File file = fileRepository.findByMeetingDetail(meetingDetail);
         dto.setFileUrl(file.getUrl());
+        dto.setName(file.getName());
 
 
 
