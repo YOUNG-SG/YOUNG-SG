@@ -25,7 +25,7 @@ pipeline {
         stage('Clone-Back') {
             steps {
                 echo '클론을 시작!'
-                git branch: 'finsalCICD', credentialsId: 'gitlab_credential', url: 'https://lab.ssafy.com/s10-final/S10P31D208.git'
+                git branch: 'finalCICD', credentialsId: 'gitlab_credential', url: 'https://lab.ssafy.com/s10-final/S10P31D208.git'
                 echo '클론을 완료!'
             }
         }
