@@ -17,7 +17,7 @@ const FolderDetailMeeting: React.FC<FolderMeetingProps> = ({ meeting }) => {
     >
       <div className="flex justify-between items-center">
         <div>
-          <div className="text-[14px] font-l text-[#CCCCCC]">{meeting.date.slice(2)}</div>
+          <div className="text-[14px] font-l text-[#CCCCCC]">{meeting.date?.slice(2)}</div>
           <div className="text-[24px] font-bold">{meeting.title}</div>
         </div>
         <div className="flex flex-col items-end text-[14px]">

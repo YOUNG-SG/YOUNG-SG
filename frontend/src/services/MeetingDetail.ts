@@ -1,15 +1,10 @@
-import { axiosRequest, axiosAuthRequest } from "./axios";
+import { axiosAuthRequest } from "./axios";
 
-// TODO - 연결 중 // 회의 상세 (id: 회의방 id)
+// 회의 상세 (id: 회의방 id)
 export const fetchMeetingDetail = async (roomId: string | undefined) => {
-  const res = await axiosRequest.get(`/api/meeting/detail/${roomId}`);
+  const res = await axiosAuthRequest.get(`/api/meeting/detail/${roomId}`);
+  // return res;
   return res.data.data;
-};
-
-// TODO 파일 다운로드
-export const downloadFile = async (fileName: string) => {
-  const res = await axiosRequest.get(`/api/meeting/file/download/${fileName}`);
-  return res;
 };
 
 // 댓글 조회 (id: 회의상세 id)
@@ -19,7 +14,10 @@ export const fetchComments = async (meetingDetailId: string | undefined) => {
 };
 
 // 댓글 작성
-export const createComment = async (comment: { meetingId: number; content: string }) => {
+export const createComment = async (comment: {
+  meetingId: string | undefined;
+  content: string;
+}) => {
   const res = await axiosAuthRequest.post("/api/meeting/comment", comment);
   console.log(res);
   return res;

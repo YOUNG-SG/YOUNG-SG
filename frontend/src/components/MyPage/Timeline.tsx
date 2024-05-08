@@ -28,6 +28,7 @@ const Timeline = () => {
   }
 
   console.log(timeline?.length); // undefined (0일때)
+  console.log(timeline);
 
   return (
     <div className="w-full h-full relative">
