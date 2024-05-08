@@ -21,7 +21,7 @@ public class DetailListResponseDto {
 
     private Long commentCnt;
 
-    private LocalDateTime createAt;
+    private String date;
 
     private Long totalTime;
 
