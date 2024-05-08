@@ -71,7 +71,6 @@ public class RedisConfig {
         // owner ID를 가져와서 닉네임도 조회
         String ownerId = (String) hashOperations.get(roomKey, "owner");
         String status = (String) hashOperations.get(roomKey, "status");
-
         Member owner = memberRepository.findById(Long.parseLong(ownerId))
                 .orElseThrow(() -> new MemberNotFoundException("Member not found for ID: " + ownerId));
 
@@ -86,14 +85,13 @@ public class RedisConfig {
                 memberDetails.add(details);
             }
         }
-
         Map<String, Object> roomInfo = new HashMap<>();
         roomInfo.put("owner", owner.getNickname()); // owner 닉네임
         roomInfo.put("status", status);
         roomInfo.put("members", memberDetails);
-
         String message = toJson(roomInfo);
         messagingTemplate.convertAndSend("/sub/room/update/" + roomId, message);
+
     }
 
 
@@ -179,21 +177,17 @@ public class RedisConfig {
         String roomKey = "room:" + roomId.toString();
         hashOperations.put(roomKey, "status", "1");
         updateRoomInfo(roomId);
-
         String chatLogKey = "chatlog:" + roomId;
         redisTemplate.delete(chatLogKey); // 기존 로그가 있을 경우 삭제
-
         String startMessage = "미팅이 시작되었슴니다";
         messagingTemplate.convertAndSend("/sub/meetingChat/" + roomId, startMessage);
-        redisTemplate.opsForList().rightPush(chatLogKey, startMessage);
+//        redisTemplate.opsForList().rightPush(chatLogKey, startMessage);
     }
 
     public void recordMessage(Long roomId, String message) {
         String chatLogKey = "chatlog:" + roomId;
         redisTemplate.opsForList().rightPush(chatLogKey, message);
     }
-
-
 
     public List<String> getRoomMembers(Long roomId) {
         String key = "room:" + roomId + ":members";
@@ -208,7 +202,6 @@ public class RedisConfig {
         updateRoomInfo(roomId);
         String endMessage = "미팅이 종료되었슴다";
         messagingTemplate.convertAndSend("/sub/meetingChat/" + roomId, endMessage);
-
         List<String> chatLogs = redisTemplate.opsForList().range("chatlog:" + roomId, 0, -1);
         String summary = String.join(" ", chatLogs); // 모든 로그를 하나의 문자열로 결합
         saveChatLogsToDatabase(roomId, summary); // DB에 저장
@@ -230,9 +223,18 @@ public class RedisConfig {
     }
 
 
-
-    
     // 방 상태 및 멤버 수 업데이트 메서드
+
+    public void pauseMeeting(Long roomId) {
+        String roomKey = "room:" + roomId.toString();
+        hashOperations.put(roomKey, "status", "3");
+        updateRoomInfo(roomId);  
+        String pauseMessage = "미팅이 일시 정지되었습니다.";
+        messagingTemplate.convertAndSend("/sub/meetingChat/" + roomId, pauseMessage);
+    }
+
+
+
 
 
 

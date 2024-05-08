@@ -29,7 +29,6 @@ public class RoomServiceImpl implements RoomService {
     private final ParticipantRepository participantRepository;
     private final MemberRepository memberRepository;
 
-
     @Autowired
     public RoomServiceImpl(RoomRepository roomRepository, InviteCodeGenerator inviteCodeGenerator, RedisConfig redisConfig, ParticipantRepository participantRepository, MemberRepository memberRepository) {
         this.roomRepository = roomRepository;
@@ -47,12 +46,13 @@ public class RoomServiceImpl implements RoomService {
         return savedRoom; // 저장된 방 객체 반환
     }
 
-
+    @Override
     public void joinRoom(long roomId, long memberId)
     {
         redisConfig.addRoomMember(roomId, memberId);
     }
 //
+
 
     @Transactional
     public synchronized  void startMeeting(long roomId) {
@@ -60,7 +60,6 @@ public class RoomServiceImpl implements RoomService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid room ID: " + roomId));
         meetingRoom.setStartTime(LocalDateTime.now());
         roomRepository.save(meetingRoom);
-
         List<String> memberIds = redisConfig.getRoomMembers(roomId);
         for (String memberIdStr : memberIds) {
             Long memberId = Long.parseLong(memberIdStr);
@@ -81,8 +80,6 @@ public class RoomServiceImpl implements RoomService {
     }
 
 
-
-
     public boolean leaveRoom(long roomId, long memberId) {
         redisConfig.leaveRoom(roomId, memberId);
         return true;
@@ -94,18 +91,14 @@ public class RoomServiceImpl implements RoomService {
         room.setEndTime(LocalDateTime.now());
         roomRepository.save(room);
         redisConfig.endMeeting(roomId);
+
+
+
     }
-
-
-
-
-
-
-
-
-
-
-
+    @Override
+    public void pauseMeeting(Long roomId) {
+        redisConfig.pauseMeeting(roomId);
+    }
 
 
 }

@@ -66,7 +66,6 @@ public class RoomController {
                 java.time.LocalDateTime.now(),
                 ownerId
         );
-
         return ResponseEntity.ok(response);
     }
 
@@ -101,7 +100,7 @@ public class RoomController {
         message.setSent_time(formattedTime);
         log.info("Received meeting chat from {} ({}): {}", message.getSender(), message.getSenderId(), message.getContent());
         messagingTemplate.convertAndSend("/sub/meetingChat/" + roomId, message); //다른 사용자에게 보내기
-        String logMessage = message.getSenderId() + ": " + message.getContent();
+        String logMessage = message.getSender() + ": " + message.getContent();
         redisConfig.recordMessage(roomId,logMessage);
     }
 
@@ -116,6 +115,18 @@ public class RoomController {
             return ResponseEntity.notFound().build();
         }
     }
+
+
+    @PostMapping("/pause/{roomId}")
+    public ResponseEntity<String> pauseMeeting(@PathVariable Long roomId) {
+        try {
+            roomService.pauseMeeting(roomId);
+            return ResponseEntity.ok("미팅이 일시 정지되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("미팅 일시 정지에 실패했습니다: " + e.getMessage());
+        }
+    }
+
 
 
     @PostMapping("/join/{roomId}")

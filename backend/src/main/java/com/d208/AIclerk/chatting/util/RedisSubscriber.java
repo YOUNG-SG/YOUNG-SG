@@ -19,13 +19,11 @@ public class RedisSubscriber implements MessageListener {
         this.messagingTemplate = messagingTemplate;
     }
 
-
     /**
      * 메세지를 받을떄 실행되는 콜백같은 느낌의 함수임 비동기함수
      *
      * channel: chatroom
      * */
-
     @Override
     public void onMessage(Message message, byte[] pattern) {
         String messageContent = new String(message.getBody());
