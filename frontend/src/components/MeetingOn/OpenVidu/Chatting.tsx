@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
-import { joinRoom, leaveRoom } from "@/services/Room";
+import { joinRoom } from "@/services/Room";
 import userStore from "@/store/userStore";
 import createRoomStore from "@/store/createRoomStore";
 import UserList from "./Chatting/UserList";
