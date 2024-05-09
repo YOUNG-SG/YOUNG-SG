@@ -2,6 +2,7 @@ package com.d208.AIclerk.meeting.service;
 
 
 import com.d208.AIclerk.chatting.repository.RoomRepository;
+import com.d208.AIclerk.chatting.repository.SummaryRepository;
 import com.d208.AIclerk.entity.*;
 import com.d208.AIclerk.entity.File;
 import com.d208.AIclerk.exception.meeting.CommentException;
@@ -52,6 +53,7 @@ public class MeetingServiceImpl implements MeetingService {
     private final RoomRepository roomRepository;
     private final ParticipantRepository participantRepository;
     private final FileRepository fileRepository;
+    private final SummaryRepository summaryRepository;
 
 
     @Autowired
@@ -59,8 +61,9 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     @Transactional
     public ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception {
-        //
-        String inputText = dto.getText();
+
+        String inputText = summaryRepository.findContentByMeetingRoomId(dto.getRoomId());
+        log.info(inputText);
         StringBuilder fullSummary = new StringBuilder();
 
         // 글자수 제한 확인
