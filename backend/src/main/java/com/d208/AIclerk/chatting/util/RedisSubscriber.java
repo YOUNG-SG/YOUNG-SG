@@ -30,13 +30,19 @@ public class RedisSubscriber implements MessageListener {
        System.out.println("메시지받기 내용: " + messageContent); //에러를 잡으십쇼
 
         String[] messageParts = messageContent.split(":");
+
+        System.out.print(messageParts.length);
         if (messageParts.length == 2) {
             String roomId = messageParts[0];
             String notification = messageParts[1];
+            System.out.print(messageContent + "0번내용:  " + notification + ": 2번내용");
 
             messagingTemplate.convertAndSend("/sub/chat/" + roomId, notification); // /sub/chat/{roomId} 에다가다 뿌려줌
-            System.out.println( roomId + "..." + notification);  // 로그 추가
+//            System.out.println( roomId + "..." + notification);  // 로그 추가
         }
+//        else {
+//            messagingTemplate.convertAndSend("/sub/chat/" + roomId, notification);
+//        }
     }
 
 }

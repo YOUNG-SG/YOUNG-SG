@@ -1,6 +1,7 @@
 package com.d208.AIclerk.chatting.controller;
 
 import com.d208.AIclerk.chatting.dto.requestDto.*;
+import com.d208.AIclerk.chatting.dto.responseDto.ChangeOwnerRespnoseDTO;
 import com.d208.AIclerk.chatting.dto.responseDto.CreateRoomResponseDto;
 import com.d208.AIclerk.chatting.dto.responseDto.ResnposeRoomIdDTO;
 import com.d208.AIclerk.chatting.repository.RoomRepository;
@@ -117,6 +118,8 @@ public class RoomController {
     }
 
 
+
+
     @PostMapping("/pause/{roomId}")
     public ResponseEntity<String> pauseMeeting(@PathVariable Long roomId) {
         try {
@@ -164,6 +167,12 @@ public class RoomController {
     public ResponseEntity<String> endMeeting(@RequestBody EndMeetingRequestDTO request) {
         roomService.endMeeting(request.getRoomId());
         return ResponseEntity.ok("미팅종료...");
+    }
+
+    @PostMapping("/change-owner")
+    public ResponseEntity<ChangeOwnerRespnoseDTO> changeRoomOwner(@RequestBody ChangeOwnerDTO request) {
+            return roomService.changeRoomOwner(request.getRoomid(), request.getOwnerid());
+
     }
 
     @PostMapping("/leave")

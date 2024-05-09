@@ -67,6 +67,20 @@ public class RedisConfig {
         System.out.println("방 정보가 Redis에 저장되었습니다: " + roomKey);
     }
 
+
+
+    public void changeRoomOwner(long roomId, long newOwnerId) {
+        String roomKey = "room:" + roomId;
+        hashOperations.put(roomKey, "owner", String.valueOf(newOwnerId));
+        updateRoomInfo(roomId);
+        String newOwnerNickname = memberRepository.findById(newOwnerId)
+                .orElseThrow(() -> new MemberNotFoundException("Member not found for ID: " + newOwnerId))
+                .getNickname();
+        String changeOwnerMessage = roomId+":"+"방장이 " + newOwnerNickname + "님(으)로 변경되었습니다.";
+        messagingTemplate.convertAndSend("/sub/room/update/" + roomId, changeOwnerMessage);
+        redisTemplate.convertAndSend("chatRoom:" + roomId, changeOwnerMessage);
+    }
+
     public void updateRoomInfo(long roomId) {
         String roomKey = "room:" + roomId;
         List<String> memberIds = listOperations.range(roomKey + ":members", 0, -1);
@@ -242,6 +256,7 @@ public class RedisConfig {
         updateRoomInfo(roomId);
         String pauseMessage = "미팅이 일시 정지되었습니다.";
         messagingTemplate.convertAndSend("/sub/meetingChat/" + roomId, pauseMessage);
+
     }
 
 

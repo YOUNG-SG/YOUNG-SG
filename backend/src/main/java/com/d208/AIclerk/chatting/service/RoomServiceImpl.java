@@ -1,24 +1,23 @@
 package com.d208.AIclerk.chatting.service;
 
-import com.d208.AIclerk.chatting.dto.requestDto.CreateRecordRequestDTO;
-import com.d208.AIclerk.chatting.dto.requestDto.CreateRoomRequestDto;
+import com.d208.AIclerk.chatting.dto.responseDto.ChangeOwnerRespnoseDTO;
 import com.d208.AIclerk.chatting.util.InviteCodeGenerator;
 import com.d208.AIclerk.config.RedisConfig;
 import com.d208.AIclerk.entity.MeetingRoom;
 import com.d208.AIclerk.chatting.repository.RoomRepository;
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.entity.Participant;
+import com.d208.AIclerk.meeting.dto.response.CreateCommentResponse;
 import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.meeting.repository.ParticipantRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class RoomServiceImpl implements RoomService {
@@ -36,6 +35,15 @@ public class RoomServiceImpl implements RoomService {
         this.redisConfig = redisConfig;
         this.participantRepository = participantRepository;
         this.memberRepository = memberRepository;
+    }
+
+
+    @Transactional
+    @Override
+    public ResponseEntity<ChangeOwnerRespnoseDTO> changeRoomOwner(Long roomId, Long newOwnerId) {
+        redisConfig.changeRoomOwner(roomId, newOwnerId);
+        ChangeOwnerRespnoseDTO response = new ChangeOwnerRespnoseDTO("반장이변경됬소");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Override
