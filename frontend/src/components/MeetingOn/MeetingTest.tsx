@@ -1,9 +1,10 @@
 import React, { useEffect, useCallback, useState } from "react";
 import useMeetingStore from "../../store/meetingStore";
+import { leaveRoom } from "@/services/Room";
 import Form from "./OpenVidu/Form";
 import Session from "./OpenVidu/Session";
-import Dictaphone from "./OpenVidu/Dictaphone";
 import Chatting from "./OpenVidu/Chatting";
+import InviteModal from "./OpenVidu/InviteModal";
 
 import mute from "../../assets/chattingIcons/mute.png";
 import mic from "../../assets/chattingIcons/mic.png";
@@ -14,13 +15,15 @@ import disconnect from "../../assets/chattingIcons/disconnected.png";
 import screen from "../../assets/chattingIcons/screen.png";
 import bg from "../../assets/chattingIcons/bgImage.jpg";
 import record from "../../assets/chattingIcons/button.png";
+import stop from "../../assets/chattingIcons/stop.png";
+import pause from "../../assets/chattingIcons/pause.png";
 import { OpenVidu, Publisher, Subscriber } from "openvidu-browser";
 import axios, { AxiosError } from "axios";
 import createRoomStore from "@/store/createRoomStore";
 import SpeechRecognition from "react-speech-recognition";
 import useDictaphoneStore from "@/store/dictaphoneStore";
-import { baseURL } from "@/services/axios";
-import { meetingRecordStart, meetingRecordEnd } from "@/services/Chatting";
+import { meetingRecordStart, meetingRecordEnd, meetingRecordPause } from "@/services/Chatting";
+import { useNavigate } from "react-router-dom";
 
 interface MeetingTestProps {
   roomId: number;
@@ -53,11 +56,12 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
     setScreenOV,
   } = useMeetingStore();
   const { listening, setListening } = useDictaphoneStore();
+  const navigate = useNavigate();
 
   const OPENVIDU_SERVER_URL = "https://youngseogi.duckdns.org";
   const OPENVIDU_SERVER_SECRET = "MYSECRET";
   const [isClickInvite, setIsClickInvite] = useState(false);
-  const [isRecord, setIsRecord] = useState(false);
+  // const [isRecord, setIsRecord] = useState(false);
 
   const leaveSession = useCallback(() => {
     if (session) session.disconnect();
@@ -261,41 +265,41 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
       setIsVideoEnabled(newVideoState);
     }
   };
+  const [isRecording, setIsRecording] = useState(false);
 
-  const toggleInvite = () => {
-    setIsClickInvite(!isClickInvite);
-  };
-
-  const toggleRecord = () => {
-    if (isRecord === false) {
-      setIsRecord(!isRecord);
-      startRecord();
-      console.log("구독시작");
-    } else {
-      setIsRecord(!isRecord);
-      endRecord();
-      console.log("끝");
-    }
-  };
-
-  // 녹음 시작하면 녹음 채팅 구독 및 status 상태 1로 갱신
-  const startRecord = async () => {
-    try {
-      const msg = await meetingRecordStart(roomId);
-      if (msg === "미팅시작.,..") {
-        setRoomStatus("1");
-        listenContinuously();
+  const toggleRecord = async () => {
+    if (!isRecording) {
+      try {
+        const msg = await meetingRecordStart(roomId); // roomId는 적절한 값으로 대체 필요
+        if (msg === "미팅시작.,..") {
+          setRoomStatus("1");
+          listenContinuously();
+          setIsRecording(true);
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.log(err);
+    } else {
+      try {
+        const msg = await meetingRecordPause(roomId);
+        if (msg === "미팅이 일시 정지되었습니다.") {
+          setRoomStatus("3");
+          listenStop();
+          setIsRecording(false);
+        }
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
+
   const endRecord = async () => {
     try {
       const msg = await meetingRecordEnd(roomId);
       if (msg === "미팅종료...") {
         setRoomStatus("2");
         listenStop();
+        setIsRecording(false);
       }
     } catch (err) {
       console.log(err);
@@ -315,6 +319,19 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
     setListening(false);
   };
 
+  const leaveMeetingRoom = async () => {
+    try {
+      await leaveRoom(roomId);
+      leaveSession;
+      navigate(`/meeting/off/${sessionId}`);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const toggleInvite = () => {
+    setIsClickInvite(!isClickInvite);
+  };
   return (
     <>
       <div>
@@ -360,13 +377,20 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
                   {/* 녹음 시작 */}
                   <button
                     onClick={toggleRecord}
-                    className="h-10 w-10 rounded-full bg-red-500 hover:bg-red-600 flex justify-center items-center"
+                    className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-600 flex justify-center items-center"
                   >
-                    {listening ? (
+                    {!listening ? (
                       <img className="h-7 w-7" src={record} alt="" />
                     ) : (
-                      <img className="h-7 w-7" src={record} alt="" />
+                      <img className="h-7 w-7" src={pause} alt="" />
                     )}
+                  </button>
+                  <button
+                    className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-600 flex justify-center items-center"
+                    onClick={endRecord}
+                    disabled={!isRecording}
+                  >
+                    <img className="h-7 w-7" src={stop} alt="녹화종료" />
                   </button>
                 </div>
                 {
@@ -397,15 +421,15 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
                       </button>
                       {/* 화면 공유 */}
                       <button
-                        className={`h-10 w-10 rounded-full bg-sky-500 hover:bg-sky-400 flex justify-center items-center`}
+                        className={`h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center`}
                         onClick={joinScreenSession}
                       >
                         <img className="h-7 w-7" src={screen} alt="" />
                       </button>
                       {/* 연결 끊기 (나가기) */}
                       <button
-                        onClick={leaveSession}
-                        className="h-10 w-10 rounded-full bg-red-500 hover:bg-red-400 flex justify-center items-center"
+                        onClick={leaveMeetingRoom}
+                        className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center"
                       >
                         <img className="h-7 w-7" src={disconnect} alt="" />
                       </button>
@@ -415,23 +439,7 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
               </div>
               {isClickInvite ? (
                 <>
-                  <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-gray-800 p-5 rounded shadow-lg">
-                      <div>초대 URL: </div>
-                      <div className="bg-white text-black p-2 rounded-lg text-lg">
-                        {`${baseURL}/meeting/on/${sessionId}`}
-                      </div>
-                      <div className="justify-end flex">
-                        {/* <InviteButton /> */}
-                        <button
-                          className="mt-4 p-2 bg-red-500 text-white rounded"
-                          onClick={toggleInvite}
-                        >
-                          닫기
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <InviteModal sessionId={sessionId} toggleInvite={toggleInvite} />
                 </>
               ) : null}
             </div>
@@ -440,9 +448,6 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
             </div>
           </div>
         </>
-        <div>
-          <Dictaphone />
-        </div>
       </div>
     </>
   );

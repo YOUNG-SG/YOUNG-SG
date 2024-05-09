@@ -11,7 +11,6 @@ import { useSpeechRecognition } from "react-speech-recognition";
 
 import chat from "../../../assets/chattingIcons/messenger.png";
 import people from "../../../assets/chattingIcons/people.png";
-// import { Navigate } from "react-router-dom";
 
 interface Command {
   command: string;
@@ -60,6 +59,7 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
   const { id, setId, setName, setProfile } = userStore();
   const [userList, setUserList] = useState<Member[]>([]);
   const { owner, setRoomStatus, setOwner } = createRoomStore();
+
   const commands: Command[] = [
     {
       command: "reset",
@@ -249,10 +249,6 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
       resetTranscript();
     }
   };
-
-  // const leaveMeetingRoom = async () => {
-  //   await leaveRoom(roomId);
-  // };
 
   return (
     <>
