@@ -1,6 +1,5 @@
 package com.d208.AIclerk.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,4 +27,7 @@ public class Summary {
     @Column(name = "create_at")
     private LocalDateTime create_at;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "meeting_room_id")
+    private MeetingRoom meetingRoom; // 미팅룸과의 연결을 위한 필드
 }

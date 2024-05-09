@@ -148,8 +148,6 @@ public class RedisConfig {
     }
 
 
-
-
     public void leaveRoom(Long roomId, Long memberId) {
         String roomKey = "room:" + roomId;
         Member currentMember = memberRepository.findById(memberId)
@@ -183,8 +181,6 @@ public class RedisConfig {
             updateRoomInfo(roomId);
         }
     }
-
-
 
     public void deleteRoom(Long roomId) {
         redisTemplate.delete("room:" + roomId);
@@ -235,6 +231,7 @@ public class RedisConfig {
                 .title(meetingRoom.getTitle()) // MeetingRoom에서 제목 가져오기
                 .content(summary)
                 .create_at(LocalDateTime.now())
+                .meetingRoom(meetingRoom)
                 .build();
 
 //        MeetingDetail meetingDetail = MeetingDetail.builder()
