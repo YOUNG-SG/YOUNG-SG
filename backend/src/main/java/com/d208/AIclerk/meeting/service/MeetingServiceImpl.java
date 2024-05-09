@@ -59,6 +59,7 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     @Transactional
     public ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception {
+        //
         String inputText = dto.getText();
         StringBuilder fullSummary = new StringBuilder();
 

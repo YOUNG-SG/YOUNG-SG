@@ -1,18 +1,25 @@
 package com.d208.AIclerk.security.jwt;
 
+import com.d208.AIclerk.member.dto.MemberDTO;
+import com.google.gson.Gson;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
+import com.d208.AIclerk.security.jwt.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
+@Log4j2
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -23,33 +30,98 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
-        final String jwtHeader = request.getHeader("Authorization");
+    protected boolean shouldNotFilter(HttpServletRequest request) {
 
-        String email = null;
-        String jwtToken = null;
-
-        if (jwtHeader != null && jwtHeader.startsWith("Bearer ")) {
-            jwtToken = jwtHeader.substring(7);
-            logger.info(jwtToken);
-            try {
-                Map<String, Object> claims = JWTUtil.validateToken(jwtToken);
-                email = (String) claims.get("iss");
-            } catch (Exception e) {
-                logger.error("JWT 토큰을 가져오지 못하였거나 토큰이 만료되었습니다");
-                request.setAttribute("exception", e.getMessage());
-            }
+        // Preflight 요청은 체크하지 않음
+        if (request.getMethod().equals("OPTIONS")) {
+            return true;
         }
 
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                    email, null, new ArrayList<>());
-        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+        String path = request.getRequestURI();
 
+        if (path.equals("/api/oauth/token")) {
+            return true;
+        }
 
-        chain.doFilter(request, response);
+        // Swagger UI 경로
+        if (path.startsWith("/swagger-ui/")) {
+            return true;
+        }
+
+        // Swagger API 경로
+        if (path.startsWith("/v3/api-docs")) {
+            return true;
+        }
+
+        return false;
     }
-    
-    
-    // swagger 로그인 왜 안됨
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws IOException {
+
+
+        String authHeaderStr = request.getHeader("Authorization");
+        if (authHeaderStr == null || !authHeaderStr.startsWith("Bearer ")) {
+            // 적절하지 않은 Authorization 헤더일 경우 401 에러 반환
+            UnauthorizedError(response);
+            return;
+        }
+
+        // Bearer // 7 Jwt 문자열
+        try {
+            String accessToken;
+
+            accessToken = authHeaderStr.substring(7);
+
+            Map<String, Object> claims = JWTUtil.validateToken(accessToken);
+
+            String username = (String) claims.get("username");
+
+            Object roleNamesObj = claims.get("roleNames");
+            List<String> roleNames = new ArrayList<>();
+
+            if (roleNamesObj instanceof List<?>) {
+                for (Object item : (List<?>) roleNamesObj) {
+                    if (item instanceof Map<?, ?> authMap) {
+                        Object authority = authMap.get("authority");
+                        if (authority instanceof String) {
+                            roleNames.add((String) authority);
+                        }
+                    }
+                }
+            }
+
+            MemberDTO memberDTO = new MemberDTO(username, roleNames);
+
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(memberDTO, null, memberDTO.getAuthorities());
+
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+            chain.doFilter(request, response);
+        } catch (Exception e) {
+            log.error("An error occurred during sign-in process", e);
+
+            Gson gson = new Gson();
+            String msg = gson.toJson(Collections.singletonMap("message", "Fail"));
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            PrintWriter printWriter = response.getWriter();
+            printWriter.println(msg);
+            printWriter.close();
+        }
+
+    }
+    private void UnauthorizedError(HttpServletResponse response) throws IOException {
+        Gson gson = new Gson();
+        String msg = gson.toJson(Collections.singletonMap("message", "Fail"));
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        PrintWriter printWriter = response.getWriter();
+        printWriter.println(msg);
+        printWriter.close();
+    }
 }
