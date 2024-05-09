@@ -9,17 +9,18 @@ import Loading from "../@common/Loading";
 const Comments = () => {
   const queryClient = useQueryClient();
   const [content, setContent] = useState("");
-  const { id: meetingDetailId } = useParams();
+
+  const { id: meetingDetailId } = useParams<string>();
 
   const { data: res, isLoading } = useQuery({
     queryKey: ["comments", meetingDetailId],
-    queryFn: () => fetchComments(meetingDetailId),
+    queryFn: () => fetchComments(meetingDetailId!),
   });
 
   const { mutate: postComment } = useMutation({
     mutationFn: createComment,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comments", meetingDetailId] });
+      queryClient.invalidateQueries({ queryKey: ["comments", meetingDetailId!] });
     },
   });
 
@@ -55,10 +56,9 @@ const Comments = () => {
         ></textarea>
         <div
           className="flex-[1] flex bg-[#000000] bg-opacity-50 hover:bg-opacity-30 justify-center items-center rounded-lg cursor-pointer"
-          // FIXME 엔터키로도 작성 가능하게 수정
           onClick={() => {
             try {
-              postComment({ meetingId: 1, content: content });
+              postComment({ meetingId: meetingDetailId!, content: content });
               setContent("");
             } catch (err) {
               console.log(err);
