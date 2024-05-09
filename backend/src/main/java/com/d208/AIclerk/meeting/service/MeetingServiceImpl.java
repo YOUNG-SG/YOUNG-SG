@@ -53,7 +53,6 @@ public class MeetingServiceImpl implements MeetingService {
     private final RoomRepository roomRepository;
     private final ParticipantRepository participantRepository;
     private final FileRepository fileRepository;
-    private final SummaryRepository summaryRepository;
 
 
     @Autowired
@@ -62,8 +61,8 @@ public class MeetingServiceImpl implements MeetingService {
     @Transactional
     public ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception {
 
-        String inputText = summaryRepository.findContentByMeetingRoomId(dto.getRoomId());
-        log.info(inputText);
+        Summary summary = summaryRepository.findContentByMeetingRoomId(dto.getRoomId());
+        String inputText = summary.getContent();
         StringBuilder fullSummary = new StringBuilder();
 
         // 글자수 제한 확인
@@ -363,9 +362,9 @@ public class MeetingServiceImpl implements MeetingService {
 
         List<Comment> comments = commentRepository.findAllByMeetingDetail_Id(detailId);
 
-//        if (comments.isEmpty()){
-//            throw CommentException.commentNotFoundException();
-//        }
+        if (comments.isEmpty()){
+            throw CommentException.commentNotFoundException();
+        }
 
         log.info("(댓글들) {}", comments);
         // CommentResponseDto 리스트로 변환
