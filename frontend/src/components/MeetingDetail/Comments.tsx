@@ -1,6 +1,6 @@
 import Comment from "@/components/MeetingDetail/Comment";
 import { fetchComments, createComment } from "@/services/MeetingDetail";
-import { CommentType } from "@/components/MeetingDetail/Comment";
+import { CommentType } from "@/types/MeetingDetail";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useState } from "react";

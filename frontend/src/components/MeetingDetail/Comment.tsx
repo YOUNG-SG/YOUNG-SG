@@ -1,15 +1,7 @@
 import UserInfo from "./UserInfo";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteComment } from "@/services/MeetingDetail";
-
-export type CommentType = {
-  commentId: number;
-  content: string;
-  createAt: string;
-  memberId: number;
-  nickname: string;
-  profileUrl: string;
-};
+import { CommentType } from "@/types/MeetingDetail";
 
 const Comment: React.FC<{
   comment: CommentType;
