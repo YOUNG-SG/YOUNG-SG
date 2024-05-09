@@ -358,9 +358,9 @@ public class MeetingServiceImpl implements MeetingService {
 
         List<Comment> comments = commentRepository.findAllByMeetingDetail_Id(detailId);
 
-        if (comments.isEmpty()){
-            throw CommentException.commentNotFoundException();
-        }
+//        if (comments.isEmpty()){
+//            throw CommentException.commentNotFoundException();
+//        }
 
         log.info("(댓글들) {}", comments);
         // CommentResponseDto 리스트로 변환
