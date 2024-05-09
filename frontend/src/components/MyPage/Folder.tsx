@@ -1,7 +1,7 @@
-import { FolderType } from "@/types/MyPage";
+import { FolderProps } from "@/types/MyPage";
 import { selectFolderStore } from "@/store/myPageStore";
 
-const Folder: React.FC<{ folder: FolderType }> = ({ folder }) => {
+const Folder: React.FC<FolderProps> = ({ folder }) => {
   const { setSelectFolder } = selectFolderStore();
 
   return (
@@ -12,7 +12,7 @@ const Folder: React.FC<{ folder: FolderType }> = ({ folder }) => {
       }}
     >
       <div className="text-[32px] font-extrabold">{folder.title}</div>
-      <div className="text-[#CCCCCC]">{folder.createAt.slice(2)}</div>
+      <div className="text-[#CCCCCC]">{folder.date.slice(2)}</div>
     </div>
   );
 };
