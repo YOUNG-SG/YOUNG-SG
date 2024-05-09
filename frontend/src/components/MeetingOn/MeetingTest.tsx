@@ -19,7 +19,6 @@ import axios, { AxiosError } from "axios";
 import createRoomStore from "@/store/createRoomStore";
 import SpeechRecognition from "react-speech-recognition";
 import useDictaphoneStore from "@/store/dictaphoneStore";
-import InviteButton from "./OpenVidu/InviteButton";
 import { baseURL } from "@/services/axios";
 import { meetingRecordStart, meetingRecordEnd } from "@/services/Chatting";
 
@@ -419,7 +418,7 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
                         {`${baseURL}/meeting/on/${sessionId}`}
                       </div>
                       <div className="justify-end flex">
-                        <InviteButton />
+                        {/* <InviteButton /> */}
                         <button
                           className="mt-4 p-2 bg-red-500 text-white rounded"
                           onClick={toggleInvite}
