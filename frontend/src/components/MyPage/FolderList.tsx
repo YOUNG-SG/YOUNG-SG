@@ -20,7 +20,7 @@ const FolderList = () => {
       {folders.length ? (
         folders.map((folder: FolderData) => <Folder key={folder.folderId} folder={folder} />)
       ) : (
-        <div className="w-full h-full flex justify-center items-center flex-col">
+        <div className="w-full h-full flex justify-center items-center flex-col text-[#CCCCCC]">
           <div>폴더가 없어요</div>
           <div>회의참여 후 폴더를 생성할 수 있어요!</div>
         </div>
