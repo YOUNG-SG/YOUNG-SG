@@ -53,6 +53,7 @@ public class MeetingServiceImpl implements MeetingService {
     private final RoomRepository roomRepository;
     private final ParticipantRepository participantRepository;
     private final FileRepository fileRepository;
+    private final SummaryRepository summaryRepository;
 
 
     @Autowired
