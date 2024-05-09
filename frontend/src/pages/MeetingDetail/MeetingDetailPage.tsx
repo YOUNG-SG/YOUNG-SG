@@ -15,15 +15,21 @@ const MeetingDetailPage = () => {
   const [showModal, setShowModal] = useState(false);
   const { id: meetingDetailId } = useParams<string>();
 
-  const { data: meetingDetail, isLoading } = useQuery<MeetingDetailData>({
+  const {
+    data: meetingDetail,
+    isLoading,
+    isError,
+  } = useQuery<MeetingDetailData>({
     queryKey: ["meetingDetail", meetingDetailId],
-    queryFn: () => fetchMeetingDetail(meetingDetailId),
+    queryFn: () => fetchMeetingDetail(meetingDetailId!),
   });
-
-  console.log(meetingDetail);
 
   if (isLoading) {
     return <div>로딩 중</div>;
+  }
+
+  if (isError) {
+    return <div>에러</div>;
   }
 
   return (

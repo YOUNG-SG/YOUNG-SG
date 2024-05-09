@@ -27,9 +27,6 @@ const Timeline = () => {
     return <div>로딩중</div>;
   }
 
-  console.log(timeline?.length); // undefined (0일때)
-  console.log(timeline);
-
   return (
     <div className="w-full h-full relative">
       <div className="h-full border-l-[4px] border-[white] ml-[40px] absolute" />
