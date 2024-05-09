@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import send from "../../../../assets/chattingIcons/send.png";
 
 interface Message {
@@ -17,6 +18,16 @@ interface ChattingProps {
 }
 
 const ChatRoom = ({ id, messages, message, setMessage, sendMessage }: ChattingProps) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   return (
     <>
       <div className="flex-1 m-1 overflow-y-auto rounded-xl">
@@ -24,6 +35,7 @@ const ChatRoom = ({ id, messages, message, setMessage, sendMessage }: ChattingPr
           <div
             key={index}
             className={`p-2 ${msg.senderId === id ? "justify-end" : "justify-start"} flex`}
+            ref={messagesEndRef}
           >
             {msg.contentType === "application/json" ? (
               <>

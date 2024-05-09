@@ -2,7 +2,7 @@ import { useState } from "react";
 import bg from "../../../assets/chattingIcons/bgImage.jpg";
 import AddFolderModal from "./AddFolder";
 
-const Folders = () => {
+const SelectFolder = () => {
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [isAddFolder, setIsAddFolder] = useState<boolean>(false);
 
@@ -61,4 +61,4 @@ const Folders = () => {
   );
 };
 
-export default Folders;
+export default SelectFolder;
