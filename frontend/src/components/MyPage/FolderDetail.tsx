@@ -49,9 +49,11 @@ const FolderDetail = () => {
   return (
     <div className="flex-[1.05] h-full bg-e-20 rounded-2xl">
       <div className="p-[40px] h-full">
-        <div className="h-[24px] text-[18px] text-[#CCCCCC]">시작일 {folder.date.slice(2)}</div>
+        <div className="h-[24px] text-[18px] text-[#CCCCCC] cursor-default">
+          시작일 {folder.date.slice(2)}
+        </div>
 
-        <div className="h-[40px] mt-[14px] mb-[40px] text-[32px] font-extrabold">
+        <div className="h-[40px] mt-[14px] mb-[40px] text-[32px] font-extrabold cursor-default">
           {folder.title}
         </div>
 

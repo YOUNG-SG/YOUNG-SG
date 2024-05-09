@@ -38,7 +38,7 @@ const MeetingNavigationInfo: React.FC<MeetingNavigationInfoProps> = ({
     return (
       <>
         {info === "date" ? (
-          <div className="text-[16px] text-[#CCCCCC] cursor-pointer">{content}</div>
+          <div className="text-[16px] text-[#CCCCCC]">{content}</div>
         ) : (
           <div className={`text-center text-[${textSize}px]`}>{content}</div>
         )}
@@ -65,7 +65,7 @@ const MeetingNavigationInfo: React.FC<MeetingNavigationInfoProps> = ({
         {id ? (
           <>
             <div
-              className="cursor-pointer"
+              className="cursor-pointer hover:font-bold"
               onClick={() => {
                 navigate(`/meeting/${id}`);
                 setSelectMeeting(1);

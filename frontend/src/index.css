@@ -113,3 +113,9 @@ body::-webkit-scrollbar {
     transform: rotate(495deg);
   }
 }
+
+.disable-stroke {
+  * {
+    stroke: #222222;
+  }
+}
