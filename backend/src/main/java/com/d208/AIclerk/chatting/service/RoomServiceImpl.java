@@ -75,6 +75,11 @@ public class RoomServiceImpl implements RoomService {
                     .orElseThrow(() -> new RuntimeException("Member not found with ID: " + memberId));
             System.out.println("Member ID: " + memberId + ", Meeting Room: " + meetingRoom);
 
+            if (participantRepository.existsByMemberAndMeetingRoom(member, meetingRoom)) {
+                System.out.println("Participant already exists for Member ID: " + memberId + ", Meeting Room: " + meetingRoom);
+                continue;
+            }
+
                 Participant participant = Participant.builder()
                         .member(member)
                         .meetingRoom(meetingRoom)
