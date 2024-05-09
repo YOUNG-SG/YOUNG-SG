@@ -5,11 +5,8 @@ import Next from "@/assets/MeetingDetail/NextButton.svg?react";
 import "@/index.css";
 
 const ArrowButton: React.FC<ArrowButtonProps> = ({ prev, next }) => {
-  const buttonClass = "w-[30px] h-[30px] rounded-lg flex justify-center items-center";
-  const [enable, disable] = [
-    "bg-[#eeeeee] bg-opacity-55 cursor-pointer",
-    "bg-[#eeeeee] bg-opacity-10 cursor-default",
-  ];
+  const buttonClass = "w-[30px] h-[30px] bg-[#eeeeee] rounded-lg flex justify-center items-center";
+  const [enable, disable] = ["bg-opacity-55 cursor-pointer", "bg-opacity-10 cursor-default"];
 
   const { selectMeeting, setSelectMeeting, setMeetingId } = selectMeetingStore();
 
