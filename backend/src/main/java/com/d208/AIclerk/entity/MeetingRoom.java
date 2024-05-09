@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -31,7 +32,7 @@ public class MeetingRoom {
     @Column(name = "invite_code", unique = true)
     private String inviteCode;
 
-    @OneToOne(mappedBy = "meetingRoom")
-    private Participant participant;
-
+    @OneToMany(mappedBy = "meetingRoom", fetch = FetchType.LAZY)
+    private List<Participant> participants; // 변경된 부분
 }
+

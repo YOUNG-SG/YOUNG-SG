@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "participant")
+@Table(name = "participant", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"meeting_room_id", "member_id"})
+})
 public class Participant {
 
     @Id
@@ -23,7 +25,7 @@ public class Participant {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "meeting_room_id", nullable = false)
     private MeetingRoom meetingRoom;
 }

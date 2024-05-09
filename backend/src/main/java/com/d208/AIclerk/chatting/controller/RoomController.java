@@ -1,9 +1,11 @@
 package com.d208.AIclerk.chatting.controller;
 
 import com.d208.AIclerk.chatting.dto.requestDto.*;
+import com.d208.AIclerk.chatting.dto.responseDto.ChangeOwnerRespnoseDTO;
 import com.d208.AIclerk.chatting.dto.responseDto.CreateRoomResponseDto;
 import com.d208.AIclerk.chatting.dto.responseDto.ResnposeRoomIdDTO;
 import com.d208.AIclerk.chatting.repository.RoomRepository;
+import com.d208.AIclerk.config.RedisConfig;
 import com.d208.AIclerk.entity.MeetingRoom;
 import com.d208.AIclerk.chatting.service.RoomService;
 import com.d208.AIclerk.chatting.service.RabbitMqService;
@@ -16,9 +18,11 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.w3c.dom.html.HTMLHeadElement;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -33,13 +37,15 @@ public class RoomController {
     private final SimpMessagingTemplate messagingTemplate;
     private final CommonUtil commonUtil;
     private final RoomRepository roomRepository;
+    private final RedisConfig redisConfig;
 
-    public RoomController(RoomService roomService, RabbitMqService rabbitMqService, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, RoomRepository roomRepository) {
+    public RoomController(RoomService roomService, RabbitMqService rabbitMqService, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, RoomRepository roomRepository, RedisConfig redisConfig) {
         this.roomService = roomService;
         this.rabbitMqService = rabbitMqService;
         this.messagingTemplate = messagingTemplate;
         this.commonUtil = commonUtil;
         this.roomRepository = roomRepository;
+        this.redisConfig = redisConfig;
     }
 
     /**
@@ -47,27 +53,22 @@ public class RoomController {
      */
     @PostMapping("/create-meeting")
     public ResponseEntity<CreateRoomResponseDto> createRoom(@RequestBody CreateRoomRequestDto dto) {
-        long ownerId = commonUtil.getMember().getId();  // 현재 로그인한 사용자의 ID를 가져옴
-
-        MeetingRoom room = new MeetingRoom();           // 새 MeetingRoom 객체 생성
-        room.setTitle(dto.getTitle());                  // DTO에서 제목 설정
-
-        MeetingRoom createdRoom = roomService.createRoom(room, ownerId); // 서비스에 room과 ownerId 전달
-
-        // CreateRoomResponseDto 생성하여 반환
+        long ownerId = commonUtil.getMember().getId();
+        String profile = commonUtil.getMember().getImage();
+        String nickname = commonUtil.getMember().getNickname();
+        MeetingRoom room = new MeetingRoom();
+        room.setTitle(dto.getTitle());
+        MeetingRoom createdRoom = roomService.createRoom(room, ownerId);
         CreateRoomResponseDto response = new CreateRoomResponseDto(
                 createdRoom.getInviteCode(),
-                0,  // 상태 필드는 여기서 설정합니다. 적절한 상태 코드로 변경해주세요.
-                createdRoom.getTitle(),
-                "생성햇습니다",
-                createdRoom.getId()
-
+                createdRoom.getId(),
+                nickname,
+                profile,
+                java.time.LocalDateTime.now(),
+                ownerId
         );
-
         return ResponseEntity.ok(response);
     }
-
-
 
     /**
      * endpoint: ws://localhost:8000/ws
@@ -75,27 +76,36 @@ public class RoomController {
      * /sub/chat/123  //방구독하기 입장임 ( 소켓개념)
      * 보내야할 형식 MessageDto
      */
+
     @MessageMapping("/{roomId}/sendMessage")
     public void sendMessage(@DestinationVariable Long roomId, MessageDto message) {
-        Member currentMember = commonUtil.getMember();
-
-        String profile = currentMember.getImage();
-        String nickname = currentMember.getNickname();
-
-        message.setSender(nickname);
-        message.setProfile(profile);
-        message.setSent_time(LocalTime.now());
-
-        log.info("chat {} send by {} to room number {}", message, nickname, roomId);
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        String formattedTime = now.format(formatter); // 현재 시간을 "HH:mm" 형식으로 포맷팅
+        message.setSent_time(formattedTime);
+        log.info("Received message from {} ({}): {}", message.getSender(), message.getSenderId(), message.getContent());
         messagingTemplate.convertAndSend("/sub/chat/" + roomId, message);
         // rabbitMqService.sendMessage(roomId, message);
     }
-
     /**
      *
      * STT매새지기록
      *
      * **/
+
+    @MessageMapping("/{roomId}/sendMeetingChat")
+    public void sendMeetingChat(@DestinationVariable Long roomId, MessageDto message) {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        String formattedTime = now.format(formatter); // 현재 시간을 "HH:mm" 형식으로 포맷팅
+        message.setSent_time(formattedTime);
+        log.info("Received meeting chat from {} ({}): {}", message.getSender(), message.getSenderId(), message.getContent());
+        messagingTemplate.convertAndSend("/sub/meetingChat/" + roomId, message); //다른 사용자에게 보내기
+        String logMessage = message.getSender() + ": " + message.getContent();
+        redisConfig.recordMessage(roomId,logMessage);
+    }
+
+
 
     @PostMapping("/get-room-id")
     public ResponseEntity<ResnposeRoomIdDTO> getRoomIdByInviteCode(@RequestBody RequestRoomIdDTO requestDto) {
@@ -109,23 +119,35 @@ public class RoomController {
 
 
 
-    @MessageMapping("/{roomId}/recordMessage")
-    public void recordMessage(@DestinationVariable Long roomId, MessageDto message) {
-        String text = message.getContent(); // 메시지 텍스트 추출
-//        redisConfig.appendChatLog(roomId, text); // Redis에 채팅 로그 저장
-        log.info("Recorded message for room {}: {}", roomId, text);
+
+    @PostMapping("/pause/{roomId}")
+    public ResponseEntity<String> pauseMeeting(@PathVariable Long roomId) {
+        try {
+            roomService.pauseMeeting(roomId);
+            return ResponseEntity.ok("미팅이 일시 정지되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("미팅 일시 정지에 실패했습니다: " + e.getMessage());
+        }
     }
 
 
 
-
     @PostMapping("/join/{roomId}")
-    public ResponseEntity<String> joinRoom(@PathVariable Long roomId) {
-        long userId=commonUtil.getMember().getId();
-        System.out.println("방아이디이이이이이이"+userId);
+    public ResponseEntity<MessageDto> joinRoom(@PathVariable Long roomId) {
+        Member currentMember = commonUtil.getMember();
+        long userId= currentMember.getId();
+        String profile = currentMember.getImage();
+        String nickname = currentMember.getNickname();
+        long memberid = currentMember.getId();
+
+        MessageDto message = new MessageDto();
+        message.setSender(nickname);
+        message.setProfile(profile);
+        message.setSenderId(memberid);
 
         roomService.joinRoom(roomId, userId);
-        return ResponseEntity.ok("방참여완료...");
+
+        return ResponseEntity.ok(message);
     }
 
 
@@ -147,12 +169,17 @@ public class RoomController {
         return ResponseEntity.ok("미팅종료...");
     }
 
+    @PostMapping("/change-owner")
+    public ResponseEntity<ChangeOwnerRespnoseDTO> changeRoomOwner(@RequestBody ChangeOwnerDTO request) {
+            return roomService.changeRoomOwner(request.getRoomid(), request.getOwnerid());
+
+    }
+
     @PostMapping("/leave")
     public ResponseEntity<String> exitMeeting(@RequestBody LeaveMeetingRequestDto request) {
         Member currentMember = commonUtil.getMember();
         String nickname = currentMember.getNickname();
         long userId = currentMember.getId();
-
         boolean result = roomService.leaveRoom(request.getRoomId(), userId);
         if (result) {
             return ResponseEntity.ok(nickname + "님이 퇴장하셨습니다.");

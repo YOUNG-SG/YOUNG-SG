@@ -17,7 +17,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
          * sub 이 채팅방 구독합니다!!
              * pub /pub/chat/123/SendMessage [ 이방에 메시지..합니다!]
          * */
-        registry.enableSimpleBroker("/sub");  //수신임
+        registry.enableSimpleBroker("/sub","/topic");  //수신임
 
          registry.setApplicationDestinationPrefixes("/pub"); //발신 어미사?임
     }
@@ -26,8 +26,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("http://localhost:3000", "http://localhost:5173") // 구체적인 출처 지정
-                .withSockJS();
+                .setAllowedOriginPatterns("*")  // 모든 도메인의 WebSocket 연결 허용
+                .withSockJS();  // SockJS 클라이언트를 지원
     }
 
 
