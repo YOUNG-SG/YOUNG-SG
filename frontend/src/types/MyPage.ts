@@ -1,8 +1,12 @@
 /* 폴더 */
-export type FolderType = {
+export type FolderData = {
   folderId: number;
   title: string;
-  createAt: string;
+  date: string;
+};
+
+export type FolderProps = {
+  folder: FolderData;
 };
 
 export type FolderMeetingData = {
