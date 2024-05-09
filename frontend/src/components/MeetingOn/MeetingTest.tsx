@@ -369,7 +369,8 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
                     )}
                   </button>
                 </div>
-                {publisher && (
+                {
+                  // publisher &&
                   <>
                     <div className="flex gap-5 justify-items-center self-center">
                       {/* 음소거 */}
@@ -402,12 +403,15 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
                         <img className="h-7 w-7" src={screen} alt="" />
                       </button>
                       {/* 연결 끊기 (나가기) */}
-                      <button className="h-10 w-10 rounded-full bg-red-500 hover:bg-red-400 flex justify-center items-center">
+                      <button
+                        onClick={leaveSession}
+                        className="h-10 w-10 rounded-full bg-red-500 hover:bg-red-400 flex justify-center items-center"
+                      >
                         <img className="h-7 w-7" src={disconnect} alt="" />
                       </button>
                     </div>
                   </>
-                )}
+                }
               </div>
               {isClickInvite ? (
                 <>
