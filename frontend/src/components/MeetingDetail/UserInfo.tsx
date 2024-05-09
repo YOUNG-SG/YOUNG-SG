@@ -1,8 +1,8 @@
-const UserInfo: React.FC<{ img: string; nickname: string }> = (user) => {
+const UserInfo: React.FC<{ profileImg: string; nickName: string }> = (user) => {
   return (
     <div className="flex gap-[10px] items-center">
-      <img src={user.img} className="w-[32px] h-[32px] rounded-full" />
-      <div className="text-[20px] font-b">{user.nickname}</div>
+      <img src={user.profileImg} className="w-[32px] h-[32px] rounded-full" />
+      <div className="text-[20px] font-b">{user.nickName}</div>
     </div>
   );
 };

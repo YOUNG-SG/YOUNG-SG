@@ -80,7 +80,7 @@ const MeetingDetailPage = () => {
                 >
                   {meetingDetail.participantInfoDtoList.map(
                     (p: { profile: string; nickName: string }) => (
-                      <UserInfo img={p.profile} nickname={p.nickName} />
+                      <UserInfo profileImg={p.profile} nickName={p.nickName} />
                     ),
                   )}
                 </div>
