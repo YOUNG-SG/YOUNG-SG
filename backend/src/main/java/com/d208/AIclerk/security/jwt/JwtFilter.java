@@ -3,7 +3,6 @@ package com.d208.AIclerk.security.jwt;
 import com.d208.AIclerk.member.dto.MemberDTO;
 import com.google.gson.Gson;
 import jakarta.servlet.FilterChain;
-import com.d208.AIclerk.security.jwt.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
