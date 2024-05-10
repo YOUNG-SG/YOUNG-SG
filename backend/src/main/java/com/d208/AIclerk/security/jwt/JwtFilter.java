@@ -38,7 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        if (path.equals("/api/oauth/token")) {
+        if (path.startsWith("/api/oauth/token")) {
             return true;
         }
 
