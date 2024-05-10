@@ -7,25 +7,25 @@ pipeline {
     }
 
     stages {
-        // stage('MM-Alarm'){
-        //     steps{
-        //         script {
-        //             def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
-        //             def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
-        //             mattermostSend (
-        //                 color: '#D0E0E3',
-        //                 icon: "https://jenkins.io/images/logos/jenkins/jenkins.png",
-        //                 message: "파이프라인 시작: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)"
-        //             )
-        //         }
-        //     }
-        // }
+        stage('MM-Alarm'){
+            steps{
+                script {
+                    def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
+                    def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
+                    mattermostSend (
+                        color: '#D0E0E3',
+                        icon: "https://jenkins.io/images/logos/jenkins/jenkins.png",
+                        message: "파이프라인 시작: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)"
+                    )
+                }
+            }
+        }
 
 
         stage('Clone-Back') {
             steps {
                 echo '클론을 시작!'
-                git branch: 'finalCICD', credentialsId: 'gitlab_credential', url: 'https://lab.ssafy.com/s10-final/S10P31D208.git'
+                git branch: 'final2', credentialsId: 'gitlab_credential', url: 'https://lab.ssafy.com/s10-final/S10P31D208.git'
                 echo '클론을 완료!'
             }
         }
@@ -98,15 +98,6 @@ pipeline {
             }
         }
 
-        // stage('Clone-Front') {
-        //     steps {
-        //         echo '클론을 시작!'
-        //         git branch: 'fe/dev', credentialsId: 'gitlab_credential', url: 'https://lab.ssafy.com/s10-final/S10P31D208.git'
-        //         echo '클론을 완료!'
-        //     }
-        // }
-
-
 
         stage('Add Front Env') {
             steps {
@@ -124,8 +115,8 @@ pipeline {
             steps {
                 echo '프론트 빌드 및 테스트 시작!'
                 dir("./frontend") {
-                    sh 'rm -rf node_modules package-lock.json'
-                    sh "npm install"
+                    // sh 'rm -rf node_modules package-lock.json'
+                    sh "npm ci"
                     sh "npm run build"
                 }
                 echo '프론트 빌드 및 테스트 완료!'
@@ -178,11 +169,11 @@ pipeline {
             script {
                 def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
                 def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
-                // mattermostSend (
-                //     color: '#D0E0E3',
-                //     icon: "https://jenkins.io/images/logos/jenkins/jenkins.png",
-                //     message: "빌드 성공: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)"
-                // )
+                mattermostSend (
+                    color: '#D0E0E3',
+                    icon: "https://jenkins.io/images/logos/jenkins/jenkins.png",
+                    message: "빌드 성공: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)"
+                )
             }
         }
         failure {
@@ -190,11 +181,11 @@ pipeline {
             script {
                 def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
                 def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
-                // mattermostSend (
-                //     color: '#D0E0E3',
-                //     icon: "https://4.bp.blogspot.com/-52EtGjEhW-k/UtOBXa1fhVI/AAAAAAAABbU/Lk4ZBYcvZrY/s1600/download.jpeg",
-                //     message: "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)"
-                // )
+                mattermostSend (
+                    color: '#D0E0E3',
+                    icon: "https://4.bp.blogspot.com/-52EtGjEhW-k/UtOBXa1fhVI/AAAAAAAABbU/Lk4ZBYcvZrY/s1600/download.jpeg",
+                    message: "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)"
+                )
             }
         }
     }

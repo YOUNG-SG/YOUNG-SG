@@ -29,34 +29,41 @@ const Timeline = () => {
 
   return (
     <div className="w-full h-full relative">
-      <div className="h-full border-l-[4px] border-[white] ml-[40px] absolute" />
-      <div className="w-full h-full">
-        <div className="flex justify-end gap-[16px]">
-          <ExpandBtn
-            btnName="모두 펼치기"
-            handleExpand={() => {
-              setIsAllExpanded(false);
-              setIsClick(true);
-            }}
-          />
-          <ExpandBtn
-            btnName="모두 접기"
-            handleExpand={() => {
-              setIsAllExpanded(true);
-              setIsClick(true);
-            }}
-          />
+      {timeline && Object.entries(timeline).length ? (
+        <>
+          <div className="h-full border-l-[4px] border-[white] ml-[40px] absolute" />
+          <div className="w-full h-full">
+            <div className="flex justify-end gap-[16px]">
+              <ExpandBtn
+                btnName="모두 펼치기"
+                handleExpand={() => {
+                  setIsAllExpanded(false);
+                  setIsClick(true);
+                }}
+              />
+              <ExpandBtn
+                btnName="모두 접기"
+                handleExpand={() => {
+                  setIsAllExpanded(true);
+                  setIsClick(true);
+                }}
+              />
+            </div>
+            <div
+              className="w-full overflow-scroll flex flex-col gap-[80px]"
+              style={{ height: "calc(100% - 64px)" }}
+            >
+              {Object.entries(timeline).map(([year, months]) => (
+                <TimelineYear key={year} year={year} months={months} />
+              ))}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="w-full h-full flex justify-center items-center text-[#CCCCCC]">
+          <div>아직 진행된 회의가 없어요 {": ("}</div>
         </div>
-        <div
-          className="w-full overflow-scroll flex flex-col gap-[80px]"
-          style={{ height: "calc(100% - 64px)" }}
-        >
-          {timeline &&
-            Object.entries(timeline).map(([year, months]) => (
-              <TimelineYear key={year} year={year} months={months} />
-            ))}
-        </div>
-      </div>
+      )}
     </div>
   );
 };

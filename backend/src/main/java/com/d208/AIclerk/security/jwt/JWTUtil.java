@@ -58,21 +58,20 @@ public class JWTUtil {
         Map<String, Object> claim = null;
 
         try{
-            System.out.println(key);
             claim = Jwts.parser()
                     .verifyWith(key)
                     .build()
                     .parseSignedClaims(token) // 파싱 및 검증, 실패 시 에러
                     .getPayload();
-            String email = (String) claim.get("iss");
-            System.out.println("Email from token: " + email);
-
-        } catch (Exception e) {
-            log.error("Error processing token: " + e.getMessage(), e);
-            // 선택적으로 여기서 예외를 다시 던지거나, 처리 로직을 계속할 수 있습니다.
+        } catch (MalformedJwtException malformedJwtException) {
+            throw new CustomJWTException("MALFORMED_TOKEN");
+        } catch (ExpiredJwtException expiredJwtException) {
+            throw new CustomJWTException("TOKEN_EXPIRED");
+        } catch (InvalidClaimException invalidClaimException) {
+            throw new CustomJWTException("INVALID_TOKEN");
+        } catch (JwtException jwtException) {
+            throw new CustomJWTException("JWT_TOKEN_ERROR");
         }
-
-
         return claim;
     }
 }

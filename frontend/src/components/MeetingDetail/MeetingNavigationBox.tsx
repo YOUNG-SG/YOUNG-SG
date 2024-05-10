@@ -3,6 +3,7 @@ import { selectMeetingStore } from "@/store/meetingDetailStore";
 import DetailBox from "@/components/MeetingDetail/DetailBox";
 import ArrowButton from "@/components/MeetingDetail/ArrowButton";
 import MeetingNavigationInfo from "@/components/MeetingDetail/MeetingNavigationInfo";
+import { useEffect } from "react";
 
 const MeetingNavigationBox: React.FC<MeetingNavigationBoxProps> = ({
   prev,
@@ -11,7 +12,11 @@ const MeetingNavigationBox: React.FC<MeetingNavigationBoxProps> = ({
   title,
   date,
 }) => {
-  const { selectMeeting } = selectMeetingStore();
+  const { selectMeeting, setSelectMeeting } = selectMeetingStore();
+
+  useEffect(() => {
+    setSelectMeeting(1);
+  }, []);
 
   return (
     <DetailBox
