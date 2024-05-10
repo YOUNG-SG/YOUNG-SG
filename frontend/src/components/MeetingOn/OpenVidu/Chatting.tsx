@@ -11,6 +11,7 @@ import { useSpeechRecognition } from "react-speech-recognition";
 
 import chat from "../../../assets/chattingIcons/messenger.png";
 import people from "../../../assets/chattingIcons/people.png";
+import { tokenStore } from "@/store/tokenStore";
 
 interface Command {
   command: string;
@@ -59,7 +60,7 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
   const { id, setId, setName, setProfile } = userStore();
   const [userList, setUserList] = useState<Member[]>([]);
   const { setRoomStatus, setOwner } = createRoomStore();
-
+  const { token } = tokenStore();
   const commands: Command[] = [
     {
       command: "reset",
@@ -156,7 +157,12 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
     };
 
     const client = new Client({
-      webSocketFactory: () => new SockJS(import.meta.env.VITE_API_BASE_URL + "/ws"),
+      webSocketFactory: () =>
+        new SockJS(`${import.meta.env.VITE_API_BASE_URL}/ws`, {
+          Headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
 
       debug: function (str) {
         console.log(str, "버그라고?");
