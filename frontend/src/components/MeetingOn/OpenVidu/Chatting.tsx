@@ -59,8 +59,11 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
   const [connected, setConnected] = useState(false); // 연결 상태를 추적하는 상태 변수 추가
   const { id, setId, setName, setProfile } = userStore();
   const [userList, setUserList] = useState<Member[]>([]);
+  const [prevStatus, setPrevStatus] = useState<string>("0");
+
   const { setRoomStatus, setOwner } = createRoomStore();
   const { token } = tokenStore();
+
   const commands: Command[] = [
     {
       command: "reset",
@@ -100,7 +103,7 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
       return;
     }
 
-    if (roomStatus === "1") {
+    if (roomStatus === "1" && prevStatus === "0") {
       stompClientRef.current.subscribe(`/sub/meetingChat/${roomId}`, (message) => {
         console.log("Meeting Chat Message received:", message.body);
         const contentType = message.headers["content-type"];
@@ -113,7 +116,8 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
           setSummaryMessages((prevMessages) => [...prevMessages, { content: message.body }]);
         }
       });
-    } else if (roomStatus === "2" || roomStatus === "3") {
+      setPrevStatus(roomStatus);
+    } else if (roomStatus === "2") {
       console.log("Unsubscribing from meeting chat for roomId:", roomId);
       // roomStatus가 2일 때 채팅 구독 해제
       stompClientRef.current.unsubscribe(`/sub/meetingChat/${roomId}`);

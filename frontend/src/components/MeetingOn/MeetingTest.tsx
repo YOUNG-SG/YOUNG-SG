@@ -57,7 +57,6 @@ const MeetingTest = ({ roomId }: MeetingTestProps) => {
   const OPENVIDU_SERVER_URL = "https://youngseogi.duckdns.org";
   const OPENVIDU_SERVER_SECRET = "MYSECRET";
   const [isClickInvite, setIsClickInvite] = useState(false);
-  // const [isRecord, setIsRecord] = useState(false);
 
   const leaveSession = useCallback(() => {
     if (session) session.disconnect();
