@@ -1,5 +1,7 @@
 import { baseURL } from "@/services/axios";
-import kakao from "../../../assets/chattingIcons/kakao.png";
+// import kakao from "../../../assets/chattingIcons/kakao.png";
+import ShareButton from "./ShareButton";
+import createRoomStore from "@/store/createRoomStore";
 
 interface InviteModalProps {
   sessionId: string;
@@ -7,6 +9,7 @@ interface InviteModalProps {
 }
 
 const InviteModal = ({ sessionId, toggleInvite }: InviteModalProps) => {
+  const { title } = createRoomStore();
   const urlToCopy = `${baseURL}/meeting/on/${sessionId}`;
 
   const handleCopyClick = async () => {
@@ -20,7 +23,10 @@ const InviteModal = ({ sessionId, toggleInvite }: InviteModalProps) => {
   };
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="p-5 w-[400px] h-[200px] " style={{ backgroundColor: "rgb(54, 57, 63)" }}>
+      <div className="p-5 w-[400px] h-[250px] " style={{ backgroundColor: "rgb(54, 57, 63)" }}>
+        <div className="mb-2" style={{ color: "rgb(250, 250, 250)" }}>
+          {title}
+        </div>
         <div
           style={{ color: "rgb(250, 250, 250)" }}
           className="w-[300px] text-white font-bold text-xl mb-4"
@@ -49,12 +55,14 @@ const InviteModal = ({ sessionId, toggleInvite }: InviteModalProps) => {
           </button>
         </div>
         <div className="mt-4 justify-end gap-2 flex">
-          <button
+          {/* 카톡 공유 */}
+          <ShareButton sessionId={sessionId} title={title} />
+          {/* <button
             className="w-16 p-2 mt-4 flex justify-center text-center text-white rounded"
             style={{ backgroundColor: "rgb(43, 46, 51)" }}
           >
             <img className="w-7 h-7" src={kakao} alt="" />
-          </button>
+          </button> */}
           <button
             className="mt-4 p-2 w-16 text-white rounded"
             onClick={toggleInvite}
