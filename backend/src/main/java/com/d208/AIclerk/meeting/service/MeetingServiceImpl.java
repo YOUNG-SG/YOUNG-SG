@@ -19,18 +19,12 @@ import com.d208.AIclerk.security.WordDocumentUpdater;
 import com.d208.AIclerk.utill.CommonUtil;
 import com.d208.AIclerk.utill.OpenAiUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.io.*;
 import java.time.LocalDateTime;
@@ -183,19 +177,12 @@ public class MeetingServiceImpl implements MeetingService {
 
         Member currentMember = commonUtil.getMember();
 
-        // 반환해 줄 dto
         MeetingDetailResponseDto dto = new MeetingDetailResponseDto();
 
-        // 회의방에 연결되어 있는 상세페이지 찾아오기 (1개밖에 없음)
         MeetingDetail meetingDetail = meetingDetailRepository.findByMeetingRoom_Id(roomId);
 
-
-        // 하나씩 찾아서 넣어주기
-
         dto.setTitle(meetingDetail.getTitle());
-        // detailId
         dto.setDetailId(meetingDetail.getId());
-        // 요약 내용
         dto.setSummary(meetingDetail.getSummary());
 
         // 시간
@@ -209,12 +196,9 @@ public class MeetingServiceImpl implements MeetingService {
         }
 
 
-        //Todo 이전, 다음 회의
         Object[] detailIds = memberMeetingRepository.findPreviousAndNextDetailIds(currentMember.getId(), roomId)
                 .orElseThrow(MeetingDetailException::preAndNextDetailNotFoundException);
 
-
-        log.info("(뭔데) {} ", detailIds);
         Long preMeetingId = null;
         Long nextMeetingId = null;
 
@@ -235,14 +219,10 @@ public class MeetingServiceImpl implements MeetingService {
             dto.setNextMeetingId(nextMeetingId);
         }
 
-        //Todo 파일 다운로드 링크
         File file = fileRepository.findByMeetingDetail(meetingDetail);
         dto.setFileUrl(file.getUrl());
         dto.setName(file.getName());
 
-
-
-        // 참여자 목록 조회
         List<Participant> participantList = participantRepository.findAllByMeetingRoom_Id(roomId);
         List<ParticipantInfoDto> participantInfoDtos = participantList.stream()
                 .map(participant -> {
@@ -253,8 +233,6 @@ public class MeetingServiceImpl implements MeetingService {
                 }).collect(Collectors.toList());
 
         dto.setParticipantInfoDtoList(participantInfoDtos);
-        log.info("(참여자) {}", participantList);
-
 
         MeetingDetailResponse response = new MeetingDetailResponse("상세 페이지 조회 성공", dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -263,16 +241,12 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     public ResponseEntity<DetailListResponse> readDetailList(Long folderId) {
 
-
-        // Member_meeting 에 접근 : folder_id 같은 것 뽑아오기
         List<MemberMeeting> memberMeetingList = memberMeetingRepository.findAllByFolder_Id(folderId);
-        // 뽑아온 member_meeting_list를 하나씩 돌면서 detail_id에 접근하여 DetailListResponseDto 정보 뺴오기
         List<DetailListResponseDto> detailListResponseDtos = memberMeetingList.stream()
                 .map(memberMeeting -> {
                     DetailListResponseDto detailListResponseDto = new DetailListResponseDto();
                     MeetingDetail detail = meetingDetailRepository.findByMeetingRoom_Id(memberMeeting.getRoomId());
                     Long commentCnt = commentRepository.countAllByMeetingDetail_Id(detail.getId());
-
 
                     Long meetingRoomId = Optional.ofNullable(detail.getMeetingRoom())
                             .map(MeetingRoom::getId)
@@ -298,7 +272,6 @@ public class MeetingServiceImpl implements MeetingService {
                     return detailListResponseDto;
                 }).toList();
 
-        // DetailListResponseList 뽑아서 DetailListResponse에 넣어주기
         DetailListResponse response = new DetailListResponse("상세페이지 리스트 조회 성공", detailListResponseDtos);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -313,7 +286,6 @@ public class MeetingServiceImpl implements MeetingService {
             throw FolderException.folderTitleLengthException();
         }
 
-        // 폴더 이름을 받아와서 엔터티에 이름과 생성 날짜를 넣어준다. 끝?
         Folder newFolder = Folder.builder()
                 .title(dto.getTitle())
                 .createAt(LocalDateTime.now())
@@ -332,27 +304,21 @@ public class MeetingServiceImpl implements MeetingService {
 
         Member currentMember = commonUtil.getMember();
 
-        // memberId 로 멤버의 폴더들 모두 조회
         List<Folder> folderList = folderRepository.findAllByMemberId(currentMember.getId());
 
         List<FolderResponseDto> folderResponseDtoList = folderList.stream()
                 .map(folder -> {
-                    // 날짜 포맷을 정의 (예: 2013년 3월 10일)
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-                    // LocalDateTime을 원하는 문자열 형식으로 변환
                     String formattedDate = folder.getCreateAt().format(formatter);
 
-                    // DTO 생성
                     return new FolderResponseDto(
                             folder.getId(),
                             folder.getTitle(),
-                            formattedDate  // 문자열로 변환된 날짜 사용
+                            formattedDate
                     );
                 })
                 .collect(Collectors.toList());
 
-
-        // 리스트들을 반환 해준다.
         FolderResponse response = new FolderResponse("폴더 목록 조회 성공", folderResponseDtoList);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -367,8 +333,6 @@ public class MeetingServiceImpl implements MeetingService {
             throw CommentException.commentNotFoundException();
         }
 
-        log.info("(댓글들) {}", comments);
-        // CommentResponseDto 리스트로 변환
         List<CommentResponseDto> commentResponseDtoList = comments.stream()
                 .map(comment -> new CommentResponseDto(
                         comment.getId(),
@@ -379,9 +343,6 @@ public class MeetingServiceImpl implements MeetingService {
                         comment.getCreateAt()
                 ))
                 .toList();
-
-
-        log.info("(MeetingServiceImpl) 댓글리스트{}", commentResponseDtoList);
 
         ReadCommentResponse response = new ReadCommentResponse("댓글 리스트 조회", commentResponseDtoList, commonUtil.getMember().getId());
 
@@ -411,12 +372,10 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
 
-
-    // 참여자 리스트로 받아오는 로직
     public List<String> getParticipantNamesByMeetingRoomId(Long meetingRoomId) {
         List<Participant> participants = participantRepository.findAllByMeetingRoom_Id(meetingRoomId);
         return participants.stream()
-                .map(participant -> participant.getMember().getNickname()) // Member 객체의 getName() 가정
+                .map(participant -> participant.getMember().getNickname())
                 .collect(Collectors.toList());
     }
 }
