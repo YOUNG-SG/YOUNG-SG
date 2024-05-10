@@ -29,6 +29,7 @@ public class SecurityConfig {
     @Autowired
     private JWTUtil jwtUtil;
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // Cors 설정
@@ -43,7 +44,8 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(config -> {
-            config.requestMatchers("/**").permitAll();
+            config.requestMatchers("/ws/**").permitAll()  // WebSocket 경로 모두 허용
+                    .anyRequest().authenticated();      // 나머지 요청은 인증 필요
         });
 
         http.formLogin(AbstractHttpConfigurer::disable)
@@ -64,19 +66,14 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-
         CorsConfiguration config = new CorsConfiguration();
-
-
         config.setAllowCredentials(true);
         config.addAllowedOriginPattern("*");
         config.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
         source.registerCorsConfiguration("/**", config);
-        source.registerCorsConfiguration("/ws/**", config);  // WebSocket 경로에도 CORS 설정 적용
 
         return source;
     }

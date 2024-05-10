@@ -30,30 +30,24 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-
-        // Preflight 요청은 체크하지 않음
-        if (request.getMethod().equals("OPTIONS")) {
-            return true;
-        }
-
         String path = request.getRequestURI();
 
-        if (path.startsWith("/api/oauth/token")) {
+        // 웹소켓 연결 경로 추가
+        if (path.startsWith("/ws/")) {
             return true;
         }
 
-        // Swagger UI 경로
-        if (path.startsWith("/swagger-ui/")) {
-            return true;
-        }
-
-        // Swagger API 경로
-        if (path.startsWith("/v3/api-docs")) {
+        // 기존 제외 경로
+        if (request.getMethod().equals("OPTIONS") ||
+                path.startsWith("/api/oauth/token") ||
+                path.startsWith("/swagger-ui/") ||
+                path.startsWith("/v3/api-docs")) {
             return true;
         }
 
         return false;
     }
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
