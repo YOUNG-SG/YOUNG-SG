@@ -39,8 +39,8 @@ public class RedisConfig {
     private  final MemberRepository memberRepository;
     private final MeetingDetailRepository meetingDetailRepository;
     private final SummaryRepository summaryRepository;
-
     private final RoomRepository roomRepository;
+
 
     @Autowired
     public RedisConfig(StringRedisTemplate redisTemplate, RedisSubscriber redisSubscriber, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, MemberRepository memberRepository, ParticipantRepository participantRepository, MeetingDetailRepository meetingDetailRepository, SummaryRepository summaryRepository, RoomRepository roomRepository) {
@@ -103,8 +103,11 @@ public class RedisConfig {
                 memberDetails.add(details);
             }
         }
+
+        
         Map<String, Object> roomInfo = new HashMap<>();
         roomInfo.put("owner", owner.getNickname()); // owner 닉네임
+        roomInfo.put("ownerid", owner.getId()); // owner 닉네임
         roomInfo.put("status", status);
         roomInfo.put("members", memberDetails);
         String message = toJson(roomInfo);
