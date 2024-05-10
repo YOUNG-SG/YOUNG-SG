@@ -1,3 +1,5 @@
+import { useRef, useEffect } from "react";
+
 interface SummaryMessage {
   content: string;
   sender?: string;
@@ -12,11 +14,21 @@ interface SummaryProps {
 }
 
 const ChatSummary = ({ summaryMessages }: SummaryProps) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [summaryMessages]);
+
   return (
     <>
       <div>
         {summaryMessages.map((msg, index) => (
-          <div key={index} className="p-2 flex">
+          <div key={index} className="p-2 flex" ref={messagesEndRef}>
             {msg.contentType === "application/json" ? (
               <>
                 <div className="inline-block max-w-xs px-4 py-2 rounded-lg">

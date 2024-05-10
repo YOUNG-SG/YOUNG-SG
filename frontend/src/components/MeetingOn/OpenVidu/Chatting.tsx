@@ -11,7 +11,6 @@ import { useSpeechRecognition } from "react-speech-recognition";
 
 import chat from "../../../assets/chattingIcons/messenger.png";
 import people from "../../../assets/chattingIcons/people.png";
-// import { Navigate } from "react-router-dom";
 
 interface Command {
   command: string;
@@ -60,6 +59,7 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
   const { id, setId, setName, setProfile } = userStore();
   const [userList, setUserList] = useState<Member[]>([]);
   const { owner, setRoomStatus, setOwner } = createRoomStore();
+
   const commands: Command[] = [
     {
       command: "reset",
@@ -250,10 +250,6 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
     }
   };
 
-  // const leaveMeetingRoom = async () => {
-  //   await leaveRoom(roomId);
-  // };
-
   return (
     <>
       <div className="h-screen grid grid-rows-12 pt-4">
@@ -300,7 +296,7 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
         {!isChatting && (
           <>
             <div className="row-span-10 w-full flex flex-col border rounded-xl bg-black bg-opacity-70">
-              <UserList userList={userList} owner={owner} />
+              <UserList userList={userList} owner={owner} roomId={roomId} />
             </div>
           </>
         )}
