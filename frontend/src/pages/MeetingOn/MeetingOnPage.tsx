@@ -1,8 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 
 import MeetingTest from "../../components/MeetingOn/MeetingTest";
-import MeetingOff from "../../components/MeetingOn/MeetingOff/Folders";
-// import ChatTest from "../../components/MeetingOn/ChatTest";
+// import SelectFolder from "../../components/MeetingOn/MeetingOff/SelectFolders";
 
 import { tokenStore } from "@/store/tokenStore";
 import createRoomStore from "@/store/createRoomStore";
@@ -47,9 +46,7 @@ const MeetingOn = () => {
     <>
       {/* <Meeting /> */}
       {roomId && <MeetingTest roomId={roomId} />}
-      <MeetingOff />
-
-      {/* {roomId && <ChatTest roomId={roomId} />} */}
+      {/* <SelectFolder /> */}
     </>
   );
 };

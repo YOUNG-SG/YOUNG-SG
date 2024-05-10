@@ -10,3 +10,16 @@ export const meetingRecordEnd = async (roomId: number) => {
   const res = await axiosRequest.post("api/meeting/record/end", { roomId: roomId });
   return res.data;
 };
+
+export const meetingRecordPause = async (roomId: number) => {
+  const res = await axiosRequest.post(`api/meeting/pause/${roomId}`);
+  return res.data;
+};
+
+export const meetingChangeOwner = async (ownerId: number, roomId: number) => {
+  const res = await axiosRequest.post("api/meeting/change-owner", {
+    ownerid: ownerId,
+    roomid: roomId,
+  });
+  return res.data;
+};
