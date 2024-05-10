@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 
 public class MemberDTO extends User {
 
-    public MemberDTO(String nickname, List<String> roleNames) {
+    public MemberDTO(String nickname, String password, List<String> roleNames) {
         super(
                 String.valueOf(nickname),
-                null,
+                "",
                 roleNames.stream().map(str -> new SimpleGrantedAuthority("ROLE_" + str)).collect(Collectors.toList()));
     }
 }

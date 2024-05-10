@@ -76,7 +76,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             Map<String, Object> claims = JWTUtil.validateToken(accessToken);
 
-            String username = (String) claims.get("username");
+            String username = (String) claims.get("iss");
 
             Object roleNamesObj = claims.get("roleNames");
             List<String> roleNames = new ArrayList<>();
@@ -92,7 +92,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
 
-            MemberDTO memberDTO = new MemberDTO(username, roleNames);
+            MemberDTO memberDTO = new MemberDTO(username, "", roleNames);
 
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(memberDTO, null, memberDTO.getAuthorities());
