@@ -296,7 +296,7 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
         {!isChatting && (
           <>
             <div className="row-span-10 w-full flex flex-col border rounded-xl bg-black bg-opacity-70">
-              <UserList userList={userList} owner={owner} />
+              <UserList userList={userList} owner={owner} roomId={roomId} />
             </div>
           </>
         )}
