@@ -1,8 +1,7 @@
 import { editModeStore } from "@/store/myPageStore";
+import { EditButtonProps } from "@/types/MyPage";
 
-const EditButton: React.FC<{
-  handleEditProfile?: () => void;
-}> = ({ handleEditProfile }) => {
+const EditButton: React.FC<EditButtonProps> = ({ handleEditProfile }) => {
   const { editMode, setEditMode } = editModeStore();
 
   if (editMode) {

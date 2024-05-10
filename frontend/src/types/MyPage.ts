@@ -1,3 +1,8 @@
+/* 프로필 */
+export type EditButtonProps = {
+  handleEditProfile?: () => void;
+};
+
 /* 폴더 */
 export type FolderData = {
   folderId: number;
