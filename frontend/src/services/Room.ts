@@ -9,18 +9,18 @@ export const createRoom = async (roomTitle: string) => {
 
 // 다른 유저가 url로 접속할 때 얻어오는 방 번호
 export const getRoomId = async (inviteCode: string) => {
-  const res = await axiosAuthRequest.post("api/meeting/get-room-id", { code: inviteCode });
+  const res = await axiosAuthRequest.post("/api/meeting/get-room-id", { code: inviteCode });
   return res.data;
 };
 
 // 방 입장
 export const joinRoom = async (roomId: number) => {
-  const res = await axiosAuthRequest.post(`api/meeting/join/${roomId}`);
+  const res = await axiosAuthRequest.post(`/api/meeting/join/${roomId}`);
   return res.data;
 };
 
 // 방 나가기
 export const leaveRoom = async (roomId: number) => {
-  const res = await axiosAuthRequest.post("api/meeting/leave", { roomId: roomId });
+  const res = await axiosAuthRequest.post("/api/meeting/leave", { roomId: roomId });
   return res.data;
 };

@@ -157,13 +157,12 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
     };
 
     const client = new Client({
-      webSocketFactory: () =>
-        new SockJS(`${import.meta.env.VITE_API_BASE_URL}/ws`, {
-          Headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }),
-
+      webSocketFactory: () => new SockJS(`${import.meta.env.VITE_API_BASE_URL}` + "/ws"),
+      // webSocketFactory: () => new SockJS("ws://localhost:8000"),
+      // brokerURL: "ws://localhost:8000/api/ws",
+      connectHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
       debug: function (str) {
         console.log(str, "버그라고?");
       },
