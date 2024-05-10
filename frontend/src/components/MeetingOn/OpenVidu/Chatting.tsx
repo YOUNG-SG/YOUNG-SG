@@ -58,7 +58,7 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
   const [connected, setConnected] = useState(false); // 연결 상태를 추적하는 상태 변수 추가
   const { id, setId, setName, setProfile } = userStore();
   const [userList, setUserList] = useState<Member[]>([]);
-  const { owner, setRoomStatus, setOwner } = createRoomStore();
+  const { setRoomStatus, setOwner } = createRoomStore();
 
   const commands: Command[] = [
     {
@@ -296,7 +296,7 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
         {!isChatting && (
           <>
             <div className="row-span-10 w-full flex flex-col border rounded-xl bg-black bg-opacity-70">
-              <UserList userList={userList} owner={owner} roomId={roomId} />
+              <UserList userList={userList} roomId={roomId} />
             </div>
           </>
         )}
