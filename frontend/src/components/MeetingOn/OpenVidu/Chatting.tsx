@@ -113,7 +113,7 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
           setSummaryMessages((prevMessages) => [...prevMessages, { content: message.body }]);
         }
       });
-    } else if (roomStatus === "2") {
+    } else if (roomStatus === "2" || roomStatus === "3") {
       console.log("Unsubscribing from meeting chat for roomId:", roomId);
       // roomStatus가 2일 때 채팅 구독 해제
       stompClientRef.current.unsubscribe(`/sub/meetingChat/${roomId}`);
