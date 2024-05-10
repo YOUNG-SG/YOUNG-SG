@@ -1,5 +1,7 @@
 import crown from "../../../../assets/chattingIcons/crown.png";
 import { meetingChangeOwner } from "@/services/Chatting";
+import createRoomStore from "@/store/createRoomStore";
+import userStore from "@/store/userStore";
 interface Member {
   id: number;
   nickname: string;
@@ -8,11 +10,14 @@ interface Member {
 
 interface ChatTestProps {
   userList?: Member[];
-  owner: string | null;
   roomId: number;
 }
 
-const UserList = ({ userList, owner, roomId }: ChatTestProps) => {
+const UserList = ({ userList, roomId }: ChatTestProps) => {
+  const { owner } = createRoomStore();
+  const { name } = userStore();
+  const isOwner = owner === name;
+
   const clickOwnerChange = async (ownerId: number) => {
     const confirmChange = confirm("방장의 권한을 넘기시겠습니까?");
     if (confirmChange) {
@@ -34,14 +39,17 @@ const UserList = ({ userList, owner, roomId }: ChatTestProps) => {
           {userList &&
             userList.map((user, index) => (
               <div key={index} className="flex flex-row items-center">
-                {user.nickname === owner ? (
-                  <div className="pr-2">{user.nickname}</div>
+                {user.nickname === name ? (
+                  <div>{user.nickname}</div>
                 ) : (
-                  <div onClick={() => clickOwnerChange(user.id)} className="pr-2 cursor-pointer">
+                  <div
+                    className={`${isOwner ? "cursor-pointer" : ""} pr-2`}
+                    onClick={isOwner ? () => clickOwnerChange(user.id) : undefined}
+                  >
                     {user.nickname}
                   </div>
                 )}
-                {user.nickname === owner ? <img className="w-5 h-5" src={crown} alt="" /> : null}
+                {user.nickname === owner && <img className="w-5 h-5" src={crown} alt="crown" />}
               </div>
             ))}
         </div>
