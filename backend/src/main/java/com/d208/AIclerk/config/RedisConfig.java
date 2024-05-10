@@ -147,14 +147,12 @@ public class RedisConfig {
         updateRoomInfo(roomId);
     }
 
-
     public void leaveRoom(Long roomId, Long memberId) {
         String roomKey = "room:" + roomId;
         Member currentMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("404없다 ID: " + memberId));
         String nickname = currentMember.getNickname();
         String currentOwner = (String) hashOperations.get(roomKey, "owner");
-
         System.out.println(currentOwner + "현재방장아이디");
 
         if (currentOwner.equals(memberId.toString())) {
