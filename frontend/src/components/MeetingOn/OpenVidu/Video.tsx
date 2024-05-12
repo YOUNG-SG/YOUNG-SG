@@ -17,10 +17,12 @@ function Video({ streamManager }: Props) {
 
   return (
     <video
-      // className="w-80 h-60"
+      // className="w-80"
       autoPlay={autoplay}
       ref={videoRef}
-      // style={{ width: "100%" }}
+      // width={360}
+      // height={600}
+      className="w-96 h-full object-contain" // 'object-cover' 대신 사용 가능
     >
       <track kind="captions" />
     </video>

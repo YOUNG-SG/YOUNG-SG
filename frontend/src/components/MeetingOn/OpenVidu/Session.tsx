@@ -28,14 +28,32 @@ function Session({ subscriber, publisher }: SessionProps) {
     });
   };
 
+  // useEffect(() => {
+  //   if (subscriber) {
+  //     setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+  //   }
+  //   if (!mainSubscriber) {
+  //     setMainSubscriber(subscriber);
+  //   }
+  // }, [subscriber, mainSubscriber]);
+
   useEffect(() => {
     if (subscriber) {
-      setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+      setSubscribers((prevSubscribers) => {
+        // 새로운 subscriber가 이미 배열에 있는지 확인
+        const isAlreadyAdded = prevSubscribers.some(
+          (sub) => sub.stream.streamId === subscriber.stream.streamId,
+        );
+        if (!isAlreadyAdded) {
+          return [...prevSubscribers, subscriber];
+        }
+        return prevSubscribers;
+      });
     }
     if (!mainSubscriber) {
       setMainSubscriber(subscriber);
     }
-  }, [subscriber, mainSubscriber]);
+  }, [subscriber]);
 
   const handleClickSubscriber = (subscriberItem: Subscriber) => {
     setMainSubscriber(subscriberItem);
@@ -46,38 +64,33 @@ function Session({ subscriber, publisher }: SessionProps) {
     const nextSubscribers = nowSubscribers + maxSubscribers < subscribers.length;
 
     return (
-      <div className={`flex flex-row justify-center gap-5 py-5 cursor-pointer`}>
-        {
-          <button onClick={handlePreSubscribers}>
-            {"<"} {preSubscribers}
-          </button>
-        }
-        <div>
-          <Video streamManager={publisher} />
+      <div className="flex flex-row justify-center gap-5 py-5 cursor-pointer row-span-3">
+        <button onClick={handlePreSubscribers} className="focus:outline-none">
+          {"<"} {preSubscribers}
+        </button>
+        <div className="flex flex-wrap justify-center items-center space-x-4">
+          {subscribers
+            .slice(nowSubscribers, nowSubscribers + maxSubscribers)
+            .map((subscriberItem) => (
+              <div
+                className="cursor-pointer aspect-video"
+                key={subscriberItem.stream.streamId}
+                onClick={() => handleClickSubscriber(subscriberItem)}
+              >
+                <Video streamManager={subscriberItem} />
+              </div>
+            ))}
         </div>
-        {subscribers
-          .slice(nowSubscribers, nowSubscribers + maxSubscribers)
-          .map((subscriberItem) => (
-            <div
-              className="cursor-pointer aspect-video"
-              key={subscriberItem.stream.streamId}
-              onClick={() => handleClickSubscriber(subscriberItem)}
-            >
-              <Video streamManager={subscriberItem} />
-            </div>
-          ))}
-        {
-          <button onClick={handleNextSubscribers}>
-            {">"} {nextSubscribers}
-          </button>
-        }
+        <button onClick={handleNextSubscribers} className="focus:outline-none">
+          {">"} {nextSubscribers}
+        </button>
       </div>
     );
   };
 
   const renderMainSubscriber = () => {
     return (
-      <div className="flex justify-center items-center">
+      <div className="flex justify-center items-center row-span-7">
         {mainSubscriber && <Video streamManager={mainSubscriber} />}
       </div>
     );
@@ -85,8 +98,8 @@ function Session({ subscriber, publisher }: SessionProps) {
 
   return (
     <>
-      <div>{renderSubscribers()}</div>
-      <div>{renderMainSubscriber()}</div>
+      <div className="row-span-3 ">{renderSubscribers()}</div>
+      <div className="row-span-7 flex justify-center items-center">{renderMainSubscriber()}</div>
     </>
   );
 }

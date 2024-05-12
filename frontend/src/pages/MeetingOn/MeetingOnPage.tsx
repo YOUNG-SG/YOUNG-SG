@@ -1,12 +1,14 @@
 import { Navigate, useLocation } from "react-router-dom";
 
-import MeetingTest from "../../components/MeetingOn/MeetingTest";
+// import MeetingTest from "../../components/MeetingOn/MeetingTest";
 // import SelectFolder from "../../components/MeetingOn/MeetingOff/SelectFolders";
 
 import { tokenStore } from "@/store/tokenStore";
 import createRoomStore from "@/store/createRoomStore";
 import { useEffect } from "react";
 import { getRoomId } from "@/services/Room";
+import MeetingTest2 from "@/components/MeetingOn/MeetingTest2";
+// import Meeting from "@/components/MeetingOn/OpenViduTest/Meeting";
 
 const MeetingOn = () => {
   const { token } = tokenStore();
@@ -18,7 +20,6 @@ const MeetingOn = () => {
 
   useEffect(() => {
     if (code) {
-      console.log(code, "code입ㄴ다");
       setSessionId(code);
     }
   }, [code]);
@@ -45,7 +46,9 @@ const MeetingOn = () => {
   return (
     <>
       {/* <Meeting /> */}
-      {roomId && <MeetingTest roomId={roomId} />}
+      {/* {roomId && <MeetingTest roomId={roomId} />} */}
+      {roomId && <MeetingTest2 roomId={roomId} sessionId={sessionId} />}
+      {/* {roomId && <Meeting />} */}
       {/* <SelectFolder /> */}
     </>
   );
