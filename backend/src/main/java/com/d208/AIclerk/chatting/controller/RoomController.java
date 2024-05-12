@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/meeting")
 @CrossOrigin("*")
 @Slf4j
@@ -38,15 +39,6 @@ public class RoomController {
     private final CommonUtil commonUtil;
     private final RoomRepository roomRepository;
     private final RedisConfig redisConfig;
-
-    public RoomController(RoomService roomService, RabbitMqService rabbitMqService, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, RoomRepository roomRepository, RedisConfig redisConfig) {
-        this.roomService = roomService;
-        this.rabbitMqService = rabbitMqService;
-        this.messagingTemplate = messagingTemplate;
-        this.commonUtil = commonUtil;
-        this.roomRepository = roomRepository;
-        this.redisConfig = redisConfig;
-    }
 
     /**
      * 회의생성

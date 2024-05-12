@@ -11,6 +11,7 @@ import com.d208.AIclerk.meeting.dto.response.CreateCommentResponse;
 import com.d208.AIclerk.member.repository.MemberRepository;
 import com.d208.AIclerk.meeting.repository.ParticipantRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
@@ -27,15 +29,6 @@ public class RoomServiceImpl implements RoomService {
     private final RedisConfig redisConfig;
     private final ParticipantRepository participantRepository;
     private final MemberRepository memberRepository;
-
-    @Autowired
-    public RoomServiceImpl(RoomRepository roomRepository, InviteCodeGenerator inviteCodeGenerator, RedisConfig redisConfig, ParticipantRepository participantRepository, MemberRepository memberRepository) {
-        this.roomRepository = roomRepository;
-        this.inviteCodeGenerator = inviteCodeGenerator;
-        this.redisConfig = redisConfig;
-        this.participantRepository = participantRepository;
-        this.memberRepository = memberRepository;
-    }
 
 
     @Transactional
