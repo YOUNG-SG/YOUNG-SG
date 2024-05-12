@@ -14,6 +14,7 @@ import com.d208.AIclerk.meeting.repository.ParticipantRepository;
 import com.d208.AIclerk.utill.CommonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class RedisConfig {
     private final StringRedisTemplate redisTemplate;
     private final HashOperations<String, String, Object> hashOperations;
@@ -43,7 +45,7 @@ public class RedisConfig {
 
 
     @Autowired
-    public RedisConfig(StringRedisTemplate redisTemplate, RedisSubscriber redisSubscriber, SimpMessagingTemplate messagingTemplate, CommonUtil commonUtil, MemberRepository memberRepository, ParticipantRepository participantRepository, MeetingDetailRepository meetingDetailRepository, SummaryRepository summaryRepository, RoomRepository roomRepository) {
+    public RedisConfig(StringRedisTemplate redisTemplate, RedisSubscriber redisSubscriber, SimpMessagingTemplate messagingTemplate, MemberRepository memberRepository, MeetingDetailRepository meetingDetailRepository, SummaryRepository summaryRepository, RoomRepository roomRepository) {
         this.redisTemplate = redisTemplate;
         this.hashOperations = redisTemplate.opsForHash();
         this.listOperations = redisTemplate.opsForList();
