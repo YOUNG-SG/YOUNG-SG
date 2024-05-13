@@ -1,9 +1,7 @@
 import CloseButton from "@/assets/MeetingDetail/X.svg?react";
+import { SummaryModalProps } from "@/types/MeetingDetail";
 
-const SummaryModal: React.FC<{ handleModal: () => void; summary: string }> = ({
-  handleModal,
-  summary,
-}) => {
+const SummaryModal: React.FC<SummaryModalProps> = ({ handleModal, summary }) => {
   return (
     // 배경이미지 / 블랙+블러 / 흰 박스 / 내용
     <div className="fixed inset-0 bg-[url('@/assets/@common/bgImage.jpg')] bg-cover bg-bottom">

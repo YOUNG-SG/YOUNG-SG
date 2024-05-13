@@ -1,55 +1,57 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Root from "@/pages/@Layout/Root";
 import HasNavbarLayout from "@/pages/@Layout/HasNavbarLayout";
 import MainPage from "@/pages/Main/MainPage";
 import MyPage from "@/pages/MyPage/MyPage";
+import MeetingOnPage from "@/pages/MeetingOn/MeetingOnPage";
 import MeetingDetailPage from "@/pages/MeetingDetail/MeetingDetailPage";
 import LoginPage from "@/pages/Login/LoginPage";
 import KakaoLoginPage from "@/pages/Login/KakaoLoginPage";
 import "./App.css";
-import MeetingOnPage from "./pages/MeetingOn/MeetingOnPage";
-import SelectFolders from "./components/MeetingOn/MeetingOff/SelectFolders";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <HasNavbarLayout />,
+    element: <Root />,
     children: [
-      // 메인페이지
       {
-        index: true,
-        element: <MainPage />,
+        path: "/",
+        element: <HasNavbarLayout />,
+        children: [
+          // 메인페이지
+          {
+            index: true,
+            element: <MainPage />,
+          },
+          // 프로필
+          {
+            path: "/mypage",
+            element: <MyPage />,
+          },
+          // 회의 상세
+          {
+            path: "/meeting/:id",
+            element: <MeetingDetailPage />,
+          },
+        ],
       },
-      // 프로필
+      // 회의 진행
       {
-        path: "/mypage",
-        element: <MyPage />,
+        path: "/meeting/on/:sessionId",
+        element: <MeetingOnPage />,
       },
-      // 회의 상세
+      // 로그인
       {
-        path: "/meeting/:id",
-        element: <MeetingDetailPage />,
+        path: "/login",
+        element: <LoginPage />,
+      },
+      // 로그인 콜백
+      {
+        path: "/oauth/callback/kakao",
+        element: <KakaoLoginPage />,
       },
     ],
-  },
-  // 회의 진행
-  {
-    path: "/meeting/on/:sessionId",
-    element: <MeetingOnPage />,
-  },
-  {
-    path: "/meeting/off/:sessionId",
-    element: <SelectFolders />,
-  },
-  // 로그인
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
-  // 로그인 콜백
-  {
-    path: "chiwook/oauth/callback/kakao",
-    element: <KakaoLoginPage />,
   },
 ]);
 

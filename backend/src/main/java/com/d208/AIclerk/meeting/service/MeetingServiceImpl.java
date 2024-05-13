@@ -57,6 +57,11 @@ public class MeetingServiceImpl implements MeetingService {
     public ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception {
 
         Summary summary = summaryRepository.findContentByMeetingRoomId(dto.getRoomId());
+
+        if (summary == null) {
+            throw MeetingDetailException.summaryNotFoundException();
+        }
+
         String inputText = summary.getContent();
         StringBuilder fullSummary = new StringBuilder();
 

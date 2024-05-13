@@ -17,6 +17,15 @@ export type MeetingDetailData = {
   name: string; // 파일명
 };
 
+/* 상세 정보들 */
+// 박스
+export type DetailBoxProps = {
+  children?: React.ReactNode;
+  title: string;
+  icon?: React.SVGProps<SVGSVGElement>;
+  button?: React.ReactNode;
+};
+
 /* 이전, 현재, 다음 회의 */
 // 박스
 export type MeetingNavigationBoxProps = {
@@ -27,12 +36,30 @@ export type MeetingNavigationBoxProps = {
   title: string;
 };
 
+// 회의 요약
+export type SummaryModalProps = {
+  handleModal: () => void;
+  summary: string;
+};
+
+// 회의 참여자
+export type UserInfoProps = {
+  profileImg: string;
+  nickName: string;
+};
+
 // 이전/현재/다음 회의 제목, 날짜
 export type MeetingNavigationInfoProps = {
   move: [number | null, string][]; // prev or next
   cur: string;
   date: string;
   title: string;
+};
+
+//
+export type InfoProps = {
+  info: string;
+  content: string | undefined;
 };
 
 // 이전 다음 이동 버튼
@@ -49,4 +76,10 @@ export type CommentType = {
   memberId: number;
   nickname: string;
   profileUrl: string;
+};
+
+export type CommentProps = {
+  comment: CommentType;
+  meetingDetailId: string | undefined;
+  myMemberId: number;
 };

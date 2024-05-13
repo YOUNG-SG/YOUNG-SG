@@ -5,7 +5,8 @@ import Next from "@/assets/MeetingDetail/NextButton.svg?react";
 import "@/index.css";
 
 const ArrowButton: React.FC<ArrowButtonProps> = ({ prev, next }) => {
-  const buttonClass = "w-[30px] h-[30px] bg-[#eeeeee] rounded-lg flex justify-center items-center";
+  // css
+  const common = "w-[30px] h-[30px] bg-[#eeeeee] rounded-lg flex justify-center items-center";
   const [enable, disable] = ["bg-opacity-55 cursor-pointer", "bg-opacity-10 cursor-default"];
 
   const { selectMeeting, setSelectMeeting, setMeetingId } = selectMeetingStore();
@@ -13,7 +14,7 @@ const ArrowButton: React.FC<ArrowButtonProps> = ({ prev, next }) => {
   return (
     <div className="flex mt-[4px] gap-[6px]">
       <div
-        className={`${buttonClass} ${selectMeeting > 0 ? enable : disable}`}
+        className={`${common} ${selectMeeting > 0 ? enable : disable}`}
         onClick={() => {
           if (selectMeeting > 0) {
             if (prev) {
@@ -26,7 +27,7 @@ const ArrowButton: React.FC<ArrowButtonProps> = ({ prev, next }) => {
         <Prev className={selectMeeting > 0 ? "" : "disable-stroke"} />
       </div>
       <div
-        className={`${buttonClass} ${selectMeeting < 2 ? enable : disable}`}
+        className={`${common} ${selectMeeting < 2 ? enable : disable}`}
         onClick={() => {
           if (selectMeeting < 2) {
             if (next) {

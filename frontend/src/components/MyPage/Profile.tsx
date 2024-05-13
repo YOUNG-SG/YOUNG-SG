@@ -6,10 +6,11 @@ import { tokenStore } from "@/store/tokenStore";
 const Profile = () => {
   const { setEditMode } = editModeStore();
 
+  // FIXME isLoading, isError
   const {
     data: myProfile,
     isLoading,
-    error,
+    isError,
   } = useQuery({
     queryKey: ["myProfile"],
     queryFn: () => fetchMyProfile(),
@@ -22,8 +23,8 @@ const Profile = () => {
     );
   }
 
-  if (error) {
-    return <div>{error.message}</div>;
+  if (isError) {
+    return <div>에러</div>;
   }
 
   const nickname = myProfile.nickName;

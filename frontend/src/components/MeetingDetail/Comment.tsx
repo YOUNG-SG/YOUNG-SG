@@ -1,13 +1,9 @@
 import UserInfo from "./UserInfo";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteComment } from "@/services/MeetingDetail";
-import { CommentType } from "@/types/MeetingDetail";
+import { CommentProps } from "@/types/MeetingDetail";
 
-const Comment: React.FC<{
-  comment: CommentType;
-  meetingDetailId: string | undefined;
-  myMemberId: number;
-}> = ({ comment, meetingDetailId, myMemberId }) => {
+const Comment: React.FC<CommentProps> = ({ comment, meetingDetailId, myMemberId }) => {
   const queryClient = useQueryClient();
   // const comment = props.comment;
   const isWriter = myMemberId === comment.memberId;

@@ -4,7 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchFolderList } from "@/services/MyPage";
 
 const FolderList = () => {
-  const { data: folders, isLoading } = useQuery({
+  // FIXME isLoading, isError
+  const {
+    data: folders,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["folderList"],
     queryFn: () => fetchFolderList(),
   });
@@ -13,6 +18,10 @@ const FolderList = () => {
     return (
       <div className="flex-[0.95] flex flex-col gap-[16px] h-full overflow-scroll overflow-x-hidden"></div>
     );
+  }
+
+  if (isError) {
+    return <div>에러</div>;
   }
 
   return (

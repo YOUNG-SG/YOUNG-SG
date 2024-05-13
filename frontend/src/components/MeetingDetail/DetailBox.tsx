@@ -1,9 +1,6 @@
-const DetailBox: React.FC<{
-  children?: React.ReactNode;
-  title: string;
-  icon?: React.SVGProps<SVGSVGElement>;
-  button?: React.ReactNode;
-}> = (props) => {
+import { DetailBoxProps } from "@/types/MeetingDetail";
+
+const DetailBox: React.FC<DetailBoxProps> = (props) => {
   return (
     <div className="w-full h-full bg-e-20 rounded-2xl flex justify-center items-center cursor-default">
       <div style={{ width: "calc(100% - 60px)", height: "calc(100% - 60px)" }}>

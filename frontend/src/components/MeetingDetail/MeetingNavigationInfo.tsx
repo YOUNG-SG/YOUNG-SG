@@ -1,7 +1,7 @@
 import { selectMeetingStore } from "@/store/meetingDetailStore";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMeetingDetail } from "@/services/MeetingDetail";
-import { MeetingDetailData, MeetingNavigationInfoProps } from "@/types/MeetingDetail";
+import { MeetingDetailData, MeetingNavigationInfoProps, InfoProps } from "@/types/MeetingDetail";
 import { useNavigate } from "react-router-dom";
 
 const MeetingNavigationInfo: React.FC<MeetingNavigationInfoProps> = ({
@@ -20,7 +20,7 @@ const MeetingNavigationInfo: React.FC<MeetingNavigationInfoProps> = ({
     queryFn: () => fetchMeetingDetail(meetingId ? meetingId : cur),
   });
 
-  const Info: React.FC<{ info: string; content: string | undefined }> = ({ info, content }) => {
+  const Info: React.FC<InfoProps> = ({ info, content }) => {
     /* 
       - 26px:  0- 9글자
       - 24px: 10-11글자 

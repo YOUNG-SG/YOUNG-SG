@@ -1,3 +1,13 @@
+/* 프로필 */
+export type EditButtonProps = {
+  handleEditProfile?: () => void;
+};
+
+/* 탭 */
+export type TabProps = {
+  tab: string;
+};
+
 /* 폴더 */
 export type FolderData = {
   folderId: number;
