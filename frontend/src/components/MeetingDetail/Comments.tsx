@@ -12,7 +12,12 @@ const Comments = () => {
 
   const { id: meetingDetailId } = useParams<string>();
 
-  const { data: res, isLoading } = useQuery({
+  // FIXME isLoading, isError
+  const {
+    data: comments,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["comments", meetingDetailId],
     queryFn: () => fetchComments(meetingDetailId!),
   });
@@ -24,10 +29,6 @@ const Comments = () => {
     },
   });
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
   return (
     <div
       className="w-full flex flex-col gap-[20px] justify-between"
@@ -35,14 +36,24 @@ const Comments = () => {
     >
       {/* 댓글조회 */}
       <div className="w-full flex flex-col gap-[16px] overflow-scroll">
-        {res?.data.map((comment: CommentType) => (
-          <Comment
-            key={comment.commentId}
-            comment={comment}
-            myMemberId={res.currentMemberId}
-            meetingDetailId={meetingDetailId}
-          />
-        ))}
+        {isLoading ? (
+          isError ? (
+            <div>에러</div>
+          ) : (
+            <div className="min-h-full">
+              <Loading />
+            </div>
+          )
+        ) : (
+          comments.data.map((comment: CommentType) => (
+            <Comment
+              key={comment.commentId}
+              comment={comment}
+              myMemberId={comments.currentMemberId}
+              meetingDetailId={meetingDetailId}
+            />
+          ))
+        )}
       </div>
 
       {/* 댓글작성 */}

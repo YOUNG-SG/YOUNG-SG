@@ -10,10 +10,11 @@ const ProfileEdit = () => {
   const { setEditMode } = editModeStore();
 
   /* tanstack query */
+  // FIXME isLoading, isError
   const {
     data: myProfile,
     isLoading,
-    error,
+    isError,
   } = useQuery({
     queryKey: ["myProfile"],
     queryFn: () => fetchMyProfile(),
@@ -39,8 +40,8 @@ const ProfileEdit = () => {
     );
   }
 
-  if (error) {
-    return <div>{error.message}</div>;
+  if (isError) {
+    return <div>에러</div>;
   }
 
   function handleEditProfile() {

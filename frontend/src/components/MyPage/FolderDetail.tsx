@@ -12,7 +12,12 @@ const FolderDetail = () => {
   const [folder, setFolder] = useState({ folderId: -1, title: "", date: "" });
 
   // 폴더 목록에서 선택된 폴더 id 사용해 title, createAt 받아오기
-  const { data: folders } = useQuery({
+  // FIXME isLoading, isError
+  const {
+    data: folders,
+    isLoading: folderLoading,
+    isError: folderError,
+  } = useQuery({
     queryKey: ["folderList"],
     queryFn: () => fetchFolderList(),
   });
@@ -25,7 +30,12 @@ const FolderDetail = () => {
   }, [selectFolder]);
 
   // 선택된 폴더의 회의 목록
-  const { data: folderDetails, isLoading } = useQuery({
+  // FIXME isLoading, isError
+  const {
+    data: folderDetails,
+    isLoading: meetingLoading,
+    isError: meetingError,
+  } = useQuery({
     queryKey: ["folderDetails", selectFolder],
     queryFn: () => fetchFolderMeetingList(selectFolder),
   });
@@ -38,12 +48,24 @@ const FolderDetail = () => {
     );
   }
 
-  if (isLoading) {
+  if (folderLoading) {
     return (
       <div className="flex-[1.05] min-h-full bg-e-20 rounded-2xl text-[#CCCCCC] flex justify-center items-center">
         <Loading />
       </div>
     );
+  }
+
+  if (folderError) {
+    return <div>에러</div>;
+  }
+
+  if (meetingLoading) {
+    return <div>로딩</div>;
+  }
+
+  if (meetingError) {
+    return <div>에러</div>;
   }
 
   return (

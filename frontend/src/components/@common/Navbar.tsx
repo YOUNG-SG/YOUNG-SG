@@ -5,10 +5,23 @@ import { useQuery } from "@tanstack/react-query";
 const Navbar = () => {
   const navigate = useNavigate();
 
-  const { data: myProfile, isLoading } = useQuery({
+  const {
+    isLoading,
+    isError,
+    data: myProfile,
+  } = useQuery({
     queryKey: ["myProfile"],
     queryFn: () => fetchMyProfile(),
   });
+
+  // FIXME isLoading, isError
+  if (isLoading) {
+    console.log("로딩중");
+  }
+  if (isError) {
+    navigate("/login");
+    return;
+  }
 
   return (
     <nav className="min-w-[80px] h-screen bg-[#777777] bg-opacity-40 backdrop-blur-4 flex flex-col justify-between items-center py-[40px]">
@@ -19,17 +32,15 @@ const Navbar = () => {
           navigate("/");
         }}
       />
-      {isLoading ? ( // 로딩 컴포넌트 x
-        <div className="bg-white w-[50px] h-[50px] rounded-full"></div>
-      ) : (
-        <img
-          src={myProfile.profileImg}
-          className="w-[50px] h-[50px] rounded-full object-cover cursor-pointer"
-          onClick={() => {
+      <img
+        src={isLoading || isError ? "src/assets/@common/Profile.svg" : myProfile?.profileImg}
+        className="w-[50px] h-[50px] rounded-full object-cover cursor-pointer"
+        onClick={() => {
+          if (!isLoading && !isError) {
             navigate("/mypage");
-          }}
-        />
-      )}
+          }
+        }}
+      />
     </nav>
   );
 };
