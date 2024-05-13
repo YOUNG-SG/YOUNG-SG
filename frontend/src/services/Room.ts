@@ -24,3 +24,9 @@ export const leaveRoom = async (roomId: number) => {
   const res = await axiosAuthRequest.post("/api/meeting/leave", { roomId: roomId });
   return res.data;
 };
+
+// 텍스트 요약 (방 나가면서 호출)
+export const sendText = async (roomId: number) => {
+  const res = await axiosAuthRequest.post("/api/meeting/send-text", { roomId: roomId });
+  return res.data;
+};

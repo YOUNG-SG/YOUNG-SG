@@ -47,7 +47,7 @@ function Video({ streamManager }: Props) {
       <video
         autoPlay={autoplay}
         ref={videoRef}
-        className="absolute ml-auto mr-auto left-0 right-0 z-0 w-[640px] h-[480px] object-contain" // 'object-cover' 대신 사용 가능
+        className="ml-auto mr-auto left-0 right-0 z-0 w-[640px] h-[480px] object-contain" // 'object-cover' 대신 사용 가능
       >
         <track kind="captions" />
       </video>

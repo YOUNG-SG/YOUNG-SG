@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useState } from "react";
 import useMeetingStore from "../../store/meetingStore";
-import { leaveRoom } from "@/services/Room";
+import { leaveRoom, sendText } from "@/services/Room";
 import Session from "./OpenVidu/Session";
 import Chatting from "./OpenVidu/Chatting";
 import InviteModal from "./OpenVidu/InviteModal";
@@ -316,12 +316,15 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
 
   const leaveMeetingRoom = async () => {
     try {
+      // 상태 확인 필요
+      // await sendText(roomId);
       await leaveRoom(roomId);
+
       leaveSession;
-      navigate(`/meeting/off/${sessionId}`);
     } catch (err) {
       console.log(err);
     }
+    navigate(`/meeting/off/${sessionId}`);
   };
 
   const toggleInvite = () => {
