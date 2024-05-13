@@ -11,6 +11,17 @@ export const editModeStore = create<editModeState>((set) => ({
   setEditMode: (editMode: boolean) => set({ editMode }),
 }));
 
+// 탭
+type tabState = {
+  selectTab: string;
+  setSelectTab: (selectTab: string) => void;
+};
+
+export const tabStore = create<tabState>((set) => ({
+  selectTab: "folder",
+  setSelectTab: (selectTab: string) => set({ selectTab }),
+}));
+
 // 마이페이지 선택된폴더 id 관리
 type FolderState = {
   selectFolder: number;
