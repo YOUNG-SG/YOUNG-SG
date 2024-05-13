@@ -8,6 +8,7 @@ import MeetingOnPage from "@/pages/MeetingOn/MeetingOnPage";
 import MeetingDetailPage from "@/pages/MeetingDetail/MeetingDetailPage";
 import LoginPage from "@/pages/Login/LoginPage";
 import KakaoLoginPage from "@/pages/Login/KakaoLoginPage";
+import SelectFolders from "./components/MeetingOn/MeetingOff/SelectFolders";
 import "./App.css";
 
 const router = createBrowserRouter([
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: "/meeting/on/:sessionId",
         element: <MeetingOnPage />,
+      },
+      {
+        path: "/meeting/off/:sessionId",
+        element: <SelectFolders />,
       },
       // 로그인
       {
