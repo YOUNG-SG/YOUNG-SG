@@ -4,9 +4,10 @@ import { folderCreate } from "@/services/Folder";
 interface AddFolderModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onFolderCreated: () => void;
 }
 
-const AddFolderModal = ({ isOpen, onClose }: AddFolderModalProps) => {
+const AddFolderModal = ({ isOpen, onClose, onFolderCreated }: AddFolderModalProps) => {
   const [title, setTitle] = useState<string>("");
   if (!isOpen) return null;
 
@@ -19,6 +20,8 @@ const AddFolderModal = ({ isOpen, onClose }: AddFolderModalProps) => {
     if (data === true) {
       console.log(data);
       console.log(message);
+      onFolderCreated();
+      onClose(); // 모달 닫기
     }
   };
 
@@ -47,7 +50,6 @@ const AddFolderModal = ({ isOpen, onClose }: AddFolderModalProps) => {
           <button
             onClick={async () => {
               await handleFolderCreate(title); // 폴더 생성을 기다린 후
-              onClose(); // 모달 닫기
             }}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 "
           >

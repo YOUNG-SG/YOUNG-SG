@@ -15,7 +15,7 @@ const SelectFolder = () => {
   const navigate = useNavigate();
   const [selectedFolder, setSelectedFolder] = useState<number | null>(null);
   const [isAddFolder, setIsAddFolder] = useState<boolean>(false);
-  const [folders, setFolders] = useState<Folder[]>([{ folderId: null, title: "", date: "" }]);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const { roomId } = createRoomStore();
 
   const handleFolderClick = (folderId: number | null) => {
@@ -33,7 +33,7 @@ const SelectFolder = () => {
   };
 
   const handleSaveMeeting = async (folderId: number | null, roomId: number | null) => {
-    if (folderId) {
+    if (folderId && roomId) {
       console.log(folderId, roomId);
       try {
         const data = await saveMeeting(folderId, roomId);
@@ -51,7 +51,11 @@ const SelectFolder = () => {
 
   return (
     <>
-      <AddFolderModal isOpen={isAddFolder} onClose={toggleAddFolderModal} />
+      <AddFolderModal
+        isOpen={isAddFolder}
+        onClose={toggleAddFolderModal}
+        onFolderCreated={handleFolderList}
+      />
       <div
         className="h-screen w-screen items-center justify-center flex"
         style={{
