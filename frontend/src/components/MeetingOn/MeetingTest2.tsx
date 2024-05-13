@@ -435,7 +435,13 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
               ) : null}
             </div>
             <div className="col-span-3">
-              <Chatting roomId={roomId} roomStatus={roomStatus} />
+              <Chatting
+                roomId={roomId}
+                roomStatus={roomStatus}
+                listenContinuously={listenContinuously}
+                setIsRecording={setIsRecording}
+                listenStop={listenStop}
+              />
             </div>
           </div>
         </>
