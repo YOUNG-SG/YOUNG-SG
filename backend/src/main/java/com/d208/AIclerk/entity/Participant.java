@@ -1,16 +1,15 @@
 package com.d208.AIclerk.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"member", "meetingRoom"})
+
 @Table(name = "participant", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"meeting_room_id", "member_id"})
 })

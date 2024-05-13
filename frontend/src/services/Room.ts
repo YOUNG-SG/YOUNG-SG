@@ -1,4 +1,4 @@
-import { axiosAuthRequest, axiosRequest } from "./axios";
+import { axiosAuthRequest } from "./axios";
 
 // 방 만들기
 export const createRoom = async (roomTitle: string) => {
@@ -9,7 +9,7 @@ export const createRoom = async (roomTitle: string) => {
 
 // 다른 유저가 url로 접속할 때 얻어오는 방 번호
 export const getRoomId = async (inviteCode: string) => {
-  const res = await axiosRequest.post("api/meeting/get-room-id", { code: inviteCode });
+  const res = await axiosAuthRequest.post("api/meeting/get-room-id", { code: inviteCode });
   return res.data;
 };
 

@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class OpenAiResponseDto {
-    private String title; // 요약된 텍스트의 제목
-    private String summary; // 요약된 텍스트 내용
+    private String title;
+    private String summary;
 
 }

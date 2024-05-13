@@ -33,6 +33,6 @@ public class MeetingRoom {
     private String inviteCode;
 
     @OneToMany(mappedBy = "meetingRoom", fetch = FetchType.LAZY)
-    private List<Participant> participants; // 변경된 부분
+    private List<Participant> participants;
 }
 
