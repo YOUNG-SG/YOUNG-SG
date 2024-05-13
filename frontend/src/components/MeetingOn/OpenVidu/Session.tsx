@@ -69,6 +69,7 @@ function Session({ subscriber, publisher }: SessionProps) {
           {"<"} {preSubscribers}
         </button>
         <div className="flex flex-wrap justify-center items-center space-x-4">
+          <Video streamManager={publisher} />
           {subscribers
             .slice(nowSubscribers, nowSubscribers + maxSubscribers)
             .map((subscriberItem) => (

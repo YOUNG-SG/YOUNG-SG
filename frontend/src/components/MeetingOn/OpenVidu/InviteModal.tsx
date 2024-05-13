@@ -1,5 +1,4 @@
 import { baseURL } from "@/services/axios";
-// import kakao from "../../../assets/chattingIcons/kakao.png";
 import ShareButton from "./ShareButton";
 import createRoomStore from "@/store/createRoomStore";
 

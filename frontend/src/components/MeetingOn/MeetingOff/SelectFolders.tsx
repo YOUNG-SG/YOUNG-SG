@@ -1,18 +1,53 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import bg from "../../../assets/chattingIcons/bgImage.jpg";
 import AddFolderModal from "./AddFolder";
+import { saveMeeting, folderList } from "@/services/Folder";
+import { useNavigate } from "react-router-dom";
+import createRoomStore from "@/store/createRoomStore";
+
+interface Folder {
+  folderId: number | null;
+  title: string;
+  date: string;
+}
 
 const SelectFolder = () => {
-  const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const [selectedFolder, setSelectedFolder] = useState<number | null>(null);
   const [isAddFolder, setIsAddFolder] = useState<boolean>(false);
+  const [folders, setFolders] = useState<Folder[]>([{ folderId: null, title: "", date: "" }]);
+  const { roomId } = createRoomStore();
 
-  const handleFolderClick = (folderName: string) => {
-    setSelectedFolder(folderName);
+  const handleFolderClick = (folderId: number | null) => {
+    setSelectedFolder(folderId);
   };
 
   const toggleAddFolderModal = () => {
     setIsAddFolder(!isAddFolder);
   };
+
+  const handleFolderList = async () => {
+    const data: Folder[] = await folderList();
+    console.log(data);
+    setFolders(data);
+  };
+
+  const handleSaveMeeting = async (folderId: number | null, roomId: number | null) => {
+    if (folderId) {
+      console.log(folderId, roomId);
+      try {
+        const data = await saveMeeting(folderId, roomId);
+        console.log(data);
+      } catch (err) {
+        console.log(err);
+      }
+      navigate("/mypage");
+    }
+  };
+
+  useEffect(() => {
+    handleFolderList();
+  }, []);
 
   return (
     <>
@@ -38,20 +73,23 @@ const SelectFolder = () => {
               </div>
               {/* 폴더 리스트 */}
               <div className="grid grid-cols-2 gap-4 w-full">
-                {["폴더1", "폴더2", "폴더3", "폴더4", "폴더5", "1", "12"].map((folderName) => (
+                {folders.map((folder, index) => (
                   <div
-                    key={folderName}
-                    onClick={() => handleFolderClick(folderName)}
+                    key={index}
+                    onClick={() => handleFolderClick(folder.folderId)}
                     className={`rounded-lg text-white flex justify-center items-center p-4 cursor-pointer ${
-                      selectedFolder === folderName ? "bg-gray-600" : "bg-opacity-50 bg-white"
+                      selectedFolder === folder.folderId ? "bg-gray-600" : "bg-opacity-50 bg-white"
                     } hover:bg-opacity-70`}
                   >
-                    {folderName}
+                    {folder.title}
                   </div>
                 ))}
               </div>
             </div>
-            <div className="flex justify-center items-center rounded-lg text-white bg-opacity-80 bg-gray-500 h-12 cursor-pointer hover:bg-gray-600">
+            <div
+              onClick={() => handleSaveMeeting(selectedFolder, roomId)}
+              className="flex justify-center items-center rounded-lg text-white bg-opacity-80 bg-gray-500 h-12 cursor-pointer hover:bg-gray-600"
+            >
               저장
             </div>
           </div>

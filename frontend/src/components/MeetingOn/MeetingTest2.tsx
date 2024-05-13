@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import useMeetingStore from "../../store/meetingStore";
 import { leaveRoom } from "@/services/Room";
 import Session from "./OpenVidu/Session";
@@ -189,7 +189,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
                 audioSource: undefined,
                 videoSource: undefined,
                 publishAudio: false,
-                publishVideo: false,
+                publishVideo: true,
                 mirror: false,
               });
 

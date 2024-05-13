@@ -44,10 +44,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(chatPreHandler);
-    }
+//    @Override
+//    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        registration.interceptors(chatPreHandler);
+//    }
 
 
 

@@ -48,7 +48,7 @@ const router = createBrowserRouter([
   },
   // 로그인 콜백
   {
-    path: "/oauth/callback/kakao",
+    path: "chiwook/oauth/callback/kakao",
     element: <KakaoLoginPage />,
   },
 ]);
