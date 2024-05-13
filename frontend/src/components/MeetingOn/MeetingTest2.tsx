@@ -317,7 +317,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
   const leaveMeetingRoom = async () => {
     try {
       // 상태 확인 필요
-      // await sendText(roomId);
+      await sendText(roomId);
       await leaveRoom(roomId);
 
       leaveSession;
