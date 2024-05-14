@@ -5,11 +5,6 @@ export type SkeletonLoaderProps = {
   opacity: number;
 };
 
-export type DotsLoaderProps = {
-  scale: number;
-  opacity: number;
-};
-
 export type ErrorMessageProps = {
   children?: React.ReactNode;
 };

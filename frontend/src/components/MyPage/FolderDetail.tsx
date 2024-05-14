@@ -58,7 +58,7 @@ const FolderDetail = () => {
             className="w-full flex justify-center items-center"
             style={{ height: "calc(100% - 150px)" }}
           >
-            <DotsLoader scale={50} opacity={50} />
+            <DotsLoader />
           </div>
         ) : isError ? (
           <></>
