@@ -179,7 +179,6 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public ResponseEntity<MeetingDetailResponse> readMeetingDetail(Long roomId) {
-
         Member currentMember = commonUtil.getMember();
 
         MeetingDetailResponseDto dto = new MeetingDetailResponseDto();
