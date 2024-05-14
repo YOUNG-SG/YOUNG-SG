@@ -34,7 +34,7 @@ const FolderList = () => {
 
   return (
     <div className="flex-[0.95] flex flex-col gap-[16px] h-full overflow-scroll overflow-x-hidden">
-      {!folders.length ? (
+      {folders.length ? (
         folders.map((folder: FolderData) => <Folder key={folder.folderId} folder={folder} />)
       ) : (
         <ErrorMessage>
