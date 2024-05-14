@@ -246,10 +246,13 @@ public class MeetingServiceImpl implements MeetingService {
     public ResponseEntity<DetailListResponse> readDetailList(Long folderId) {
 
         List<MemberMeeting> memberMeetingList = memberMeetingRepository.findAllByFolder_Id(folderId);
+        log.info("(멤버미팅) {}", memberMeetingList);
+
         List<DetailListResponseDto> detailListResponseDtos = memberMeetingList.stream()
-                .map(memberMeeting -> {
+                .map(memberMeeting -> meetingDetailRepository.findByMeetingRoom_Id(memberMeeting.getRoomId()))
+                .filter(Objects::nonNull)
+                .map(detail -> {
                     DetailListResponseDto detailListResponseDto = new DetailListResponseDto();
-                    MeetingDetail detail = meetingDetailRepository.findByMeetingRoom_Id(memberMeeting.getRoomId());
                     Long commentCnt = commentRepository.countAllByMeetingDetail_Id(detail.getId());
 
                     Long meetingRoomId = Optional.ofNullable(detail.getMeetingRoom())
