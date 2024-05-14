@@ -48,7 +48,7 @@ const MeetingNavigationInfo: React.FC<MeetingNavigationInfoProps> = ({
   };
 
   if (isLoading) {
-    return <DotsLoader scale={50} opacity={50} />;
+    return <DotsLoader />;
   }
 
   if (selectMeeting === 1) {

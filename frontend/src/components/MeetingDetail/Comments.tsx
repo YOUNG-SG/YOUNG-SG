@@ -38,7 +38,7 @@ const Comments: React.FC<CommentsProps> = ({ detailId }) => {
       {/* 댓글조회 */}
       {getLoading ? (
         <div className="w-full h-full flex justify-center items-center">
-          <DotsLoader scale={50} opacity={50} />
+          <DotsLoader />
         </div>
       ) : (
         <div className="w-full h-full flex flex-col gap-[16px] overflow-scroll">

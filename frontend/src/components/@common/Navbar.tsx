@@ -31,7 +31,7 @@ const Navbar = () => {
         }}
       />
       {isLoading ? (
-        <SkeletonLoader round="full" w={50} h={50} opacity={50} />
+        <SkeletonLoader round="full" w={50} h={50} />
       ) : isError ? (
         <DefaultProfile className="w-[50px] h-[50px] rounded-full object-cover" />
       ) : (
