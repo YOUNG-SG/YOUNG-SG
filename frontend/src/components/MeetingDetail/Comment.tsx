@@ -8,12 +8,16 @@ const Comment: React.FC<CommentProps> = ({ comment, meetingDetailId, myMemberId 
   // const comment = props.comment;
   const isWriter = myMemberId === comment.memberId;
 
-  const { mutate: delComment } = useMutation({
+  const { isError, mutate: delComment } = useMutation({
     mutationFn: deleteComment,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments", meetingDetailId] });
     },
   });
+
+  if (isError) {
+    alert("댓글 삭제에 실패했습니다");
+  }
 
   return (
     <div className="flex w-full justify-between">

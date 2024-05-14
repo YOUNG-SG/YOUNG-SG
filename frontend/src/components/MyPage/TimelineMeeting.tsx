@@ -7,7 +7,7 @@ const TimelineMeeting: React.FC<TimelineMeetingProps> = ({ month, day }) => {
   const navigate = useNavigate();
 
   const queryClient = useQueryClient();
-  const { mutate: delMeeting } = useMutation({
+  const { isError, mutate: delMeeting } = useMutation({
     mutationFn: deleteMeeting,
     onSuccess: () => {
       // FIXME meeting detail 캐시 무효화 ?
@@ -15,6 +15,10 @@ const TimelineMeeting: React.FC<TimelineMeetingProps> = ({ month, day }) => {
       queryClient.invalidateQueries({ queryKey: ["timeline"] });
     },
   });
+
+  if (isError) {
+    alert("회의 삭제에 실패했습니다");
+  }
 
   return (
     <div className="w-full h-[110px] flex gap-[20px] ml-[62px]">

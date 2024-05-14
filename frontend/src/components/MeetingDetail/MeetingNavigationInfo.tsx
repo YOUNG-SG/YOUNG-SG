@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchMeetingDetail } from "@/services/MeetingDetail";
 import { MeetingDetailData, MeetingNavigationInfoProps, InfoProps } from "@/types/MeetingDetail";
 import { useNavigate } from "react-router-dom";
+import DotsLoader from "@/components/@common/DotsLoader";
 
 const MeetingNavigationInfo: React.FC<MeetingNavigationInfoProps> = ({
   move,
@@ -15,7 +16,7 @@ const MeetingNavigationInfo: React.FC<MeetingNavigationInfoProps> = ({
   const { selectMeeting, setSelectMeeting, meetingId } = selectMeetingStore();
   const [id, meet] = move[selectMeeting];
 
-  const { data: meetingDetail, isLoading } = useQuery<MeetingDetailData>({
+  const { isLoading, data: meetingDetail } = useQuery<MeetingDetailData>({
     queryKey: ["meetingDetail", meetingId],
     queryFn: () => fetchMeetingDetail(meetingId ? meetingId : cur),
   });
@@ -47,7 +48,7 @@ const MeetingNavigationInfo: React.FC<MeetingNavigationInfoProps> = ({
   };
 
   if (isLoading) {
-    return <div>로딩 중</div>;
+    return <DotsLoader scale={50} opacity={50} />;
   }
 
   if (selectMeeting === 1) {

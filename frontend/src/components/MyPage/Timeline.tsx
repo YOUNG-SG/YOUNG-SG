@@ -3,11 +3,17 @@ import TimelineYear from "@/components/MyPage/TimelineYear";
 import { useQuery } from "@tanstack/react-query";
 import { fetchTimeline } from "@/services/MyPage";
 import { YearData } from "@/types/MyPage";
+import SpinnerLoader from "@/components/@common/SpinnerLoader";
+import ErrorMessage from "@/components/@common/ErrorMessage";
 
 const Timeline = () => {
   const { setIsClick, setIsAllExpanded } = clickButtonStore();
 
-  const { data: timeline, isLoading } = useQuery<YearData>({
+  const {
+    isLoading,
+    isError,
+    data: timeline,
+  } = useQuery<YearData>({
     queryKey: ["timeline"],
     queryFn: () => fetchTimeline(),
   });
@@ -24,12 +30,18 @@ const Timeline = () => {
   };
 
   if (isLoading) {
-    return <div>로딩중</div>;
+    return (
+      <div className="w-full h-full">
+        <SpinnerLoader />
+      </div>
+    );
   }
 
   return (
     <div className="w-full h-full relative">
-      {timeline && Object.entries(timeline).length ? (
+      {isError ? (
+        <ErrorMessage>타임라인을 불러올 수 없습니다</ErrorMessage>
+      ) : timeline && Object.entries(timeline).length ? (
         <>
           <div className="h-full border-l-[4px] border-[white] ml-[40px] absolute" />
           <div className="w-full h-full">
@@ -60,9 +72,7 @@ const Timeline = () => {
           </div>
         </>
       ) : (
-        <div className="w-full h-full flex justify-center items-center text-[#CCCCCC]">
-          <div>아직 진행된 회의가 없어요 {": ("}</div>
-        </div>
+        <ErrorMessage>아직 진행된 회의가 없어요 {": ("}</ErrorMessage>
       )}
     </div>
   );
