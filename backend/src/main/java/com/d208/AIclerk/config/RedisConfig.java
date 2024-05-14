@@ -192,13 +192,23 @@ public class RedisConfig {
 
     public void startMeeting(Long roomId) {
         String roomKey = "room:" + roomId.toString();
+        String currentStatus = (String) hashOperations.get(roomKey, "status");
+
+        String startMessage;
+        if (!"3".equals(currentStatus)) {
+            startMessage = "미팅이 시작되었습니다...";
+            String chatLogKey = "chatlog:" + roomId;
+            redisTemplate.delete(chatLogKey); // 기존 로그가 있을 경우 삭제
+        } else {
+            startMessage = "미팅이 재개되었습니다...";
+            String chatLogKey = "chatlog:" + roomId;
+            redisTemplate.delete(chatLogKey); // 기존 로그가 있을 경우 삭제
+        }
         hashOperations.put(roomKey, "status", "1");
         updateRoomInfo(roomId);
-        String chatLogKey = "chatlog:" + roomId;
-        redisTemplate.delete(chatLogKey); // 기존 로그가 있을 경우 삭제
-        String startMessage = "미팅이 시작되었슴니다";
+        System.out.println("Sending start message: " + startMessage);
         messagingTemplate.convertAndSend("/sub/meetingChat/" + roomId, startMessage);
-//        redisTemplate.opsForList().rightPush(chatLogKey, startMessage);
+        // redisTemplate.opsForList().rightPush(chatLogKey, startMessage);
     }
 
     public void recordMessage(Long roomId, String message) {
