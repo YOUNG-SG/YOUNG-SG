@@ -316,11 +316,11 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
 
   const leaveMeetingRoom = async () => {
     try {
+      leaveSession();
+
       // 상태 확인 필요
       await sendText(roomId);
       await leaveRoom(roomId);
-
-      leaveSession;
     } catch (err) {
       console.log(err);
     }
@@ -379,7 +379,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
                   <button
                     className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-600 flex justify-center items-center"
                     onClick={endRecord}
-                    disabled={!isRecording}
+                    disabled={roomStatus === "0" || roomStatus === "2"}
                   >
                     <img className="h-7 w-7" src={stop} alt="녹화종료" />
                   </button>
