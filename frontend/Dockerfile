@@ -10,7 +10,6 @@ RUN npm run build
 FROM node:alpine
 WORKDIR /app
 COPY --from=builder /frontend/dist /app
-COPY --from=builder /frontend/node_modules /app/node_modules
 COPY --from=builder /frontend/package*.json /app/
 EXPOSE 5173
 CMD ["npm", "run", "dev"]
