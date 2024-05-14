@@ -38,6 +38,7 @@ const TimelineMonth: React.FC<TimelineMonthProps> = ({ month, days }) => {
       {isShow && (
         <div className="flex flex-col gap-[16px] my-[16px]">
           {days.map((day) => (
+            // meetingId: roomId
             <TimelineMeeting key={day.meetingId} month={month} day={day} />
           ))}
         </div>

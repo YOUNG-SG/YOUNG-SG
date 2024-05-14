@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import ChangeImage from "@/assets/MyPage/PencilSimpleLine.svg?react";
 import { updateMyProfile } from "@/services/MyPage";
 import { editModeStore } from "@/store/myPageStore";
-import SkeletonLoader from "../@common/SkeletonLoader";
+import SkeletonLoader from "@/components/@common/SkeletonLoader";
 import DefaultProfile from "@/assets/@common/Profile.svg?react";
 
 const ProfileEdit = () => {

@@ -2,7 +2,7 @@ import { fetchMyProfile } from "@/services/MyPage";
 import { useQuery } from "@tanstack/react-query";
 import { editModeStore } from "@/store/myPageStore";
 import { tokenStore } from "@/store/tokenStore";
-import SkeletonLoader from "../@common/SkeletonLoader";
+import SkeletonLoader from "@/components/@common/SkeletonLoader";
 import DefaultProfile from "@/assets/@common/Profile.svg?react";
 
 const Profile = () => {

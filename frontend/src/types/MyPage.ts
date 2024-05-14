@@ -20,6 +20,7 @@ export type FolderProps = {
 };
 
 export type FolderMeetingData = {
+  roomId: number;
   detailId: number;
   title: string;
   participantCnt: number;

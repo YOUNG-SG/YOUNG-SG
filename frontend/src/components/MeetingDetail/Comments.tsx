@@ -1,31 +1,28 @@
 import Comment from "@/components/MeetingDetail/Comment";
 import { fetchComments, createComment } from "@/services/MeetingDetail";
-import { CommentType } from "@/types/MeetingDetail";
+import { CommentType, CommentsProps } from "@/types/MeetingDetail";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
 import { useState } from "react";
 import DotsLoader from "@/components/@common/DotsLoader";
-import ErrorMessage from "../@common/ErrorMessage";
+import ErrorMessage from "@/components/@common/ErrorMessage";
 
-const Comments = () => {
+const Comments: React.FC<CommentsProps> = ({ detailId }) => {
   const queryClient = useQueryClient();
   const [content, setContent] = useState("");
-
-  const { id: meetingDetailId } = useParams<string>();
 
   const {
     isLoading: getLoading,
     isError: getError,
     data: comments,
   } = useQuery({
-    queryKey: ["comments", meetingDetailId],
-    queryFn: () => fetchComments(meetingDetailId!),
+    queryKey: ["comments", detailId],
+    queryFn: () => fetchComments(detailId!),
   });
 
   const { isError: postError, mutate: postComment } = useMutation({
     mutationFn: createComment,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comments", meetingDetailId!] });
+      queryClient.invalidateQueries({ queryKey: ["comments", detailId] });
     },
   });
 
@@ -55,7 +52,7 @@ const Comments = () => {
                 key={comment.commentId}
                 comment={comment}
                 myMemberId={comments.currentMemberId}
-                meetingDetailId={meetingDetailId}
+                detailId={detailId}
               />
             ))
           )}
@@ -75,7 +72,7 @@ const Comments = () => {
           className="flex-[1] flex bg-[#000000] bg-opacity-50 hover:bg-opacity-30 justify-center items-center rounded-lg cursor-pointer"
           onClick={() => {
             try {
-              postComment({ meetingId: meetingDetailId!, content: content });
+              postComment({ meetingId: detailId, content: content });
               setContent("");
             } catch (err) {
               console.log(err);
