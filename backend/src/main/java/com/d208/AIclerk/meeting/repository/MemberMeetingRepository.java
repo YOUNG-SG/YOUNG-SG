@@ -1,5 +1,6 @@
 package com.d208.AIclerk.meeting.repository;
 
+import com.d208.AIclerk.entity.Folder;
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.entity.MemberMeeting;
 import com.d208.AIclerk.meeting.dto.meetingListDto;
@@ -18,25 +19,14 @@ public interface MemberMeetingRepository extends JpaRepository<MemberMeeting, Lo
 
     List<MemberMeeting> findAllByMember(Member member);
 
-    @Query(value = "WITH RoomFolder AS (" +
-            "  SELECT folder_id " +
-            "  FROM member_meeting " +
-            "  WHERE room_id = :roomId" +
-            "), " +
-            "OrderedMeetings AS (" +
-            "  SELECT mm.member_meeting_id, mm.room_id AS mm_room_id, md.meeting_detail_id, " +
-            "         md.room_id AS md_room_id, mm.folder_id, " +
-            "         COALESCE(LAG(md.meeting_detail_id) OVER (PARTITION BY mm.folder_id ORDER BY mm.member_meeting_id), 0) AS prev_detail_id, " +
-            "         COALESCE(LEAD(md.meeting_detail_id) OVER (PARTITION BY mm.folder_id ORDER BY mm.member_meeting_id), 0) AS next_detail_id " +
-            "  FROM member_meeting mm " +
-            "  JOIN meeting_detail md ON mm.room_id = md.meeting_detail_id " +
-            "  WHERE mm.folder_id = (SELECT folder_id FROM RoomFolder WHERE folder_id IS NOT NULL) " +
-            ") " +
-            "SELECT prev_detail_id, next_detail_id " +
-            "FROM OrderedMeetings " +
-            "WHERE mm_room_id = :roomId",
-            nativeQuery = true)
-    Optional<Object[]> findPreviousAndNextDetailIds(@Param("roomId") Long roomId);
+    @Query(value = "SELECT mm.folder.id FROM MemberMeeting mm WHERE mm.member.id = :memberId AND mm.roomId = :roomId")
+    Long findFolderIdByMemberIdAndRoomId(@Param("memberId") Long memberId, @Param("roomId") Long roomId);
+
+    @Query(value = "SELECT mm.roomId FROM MemberMeeting mm  WHERE mm.folder.id = :folderId AND mm.roomId < :roomId ORDER BY mm.roomId DESC LIMIT 1")
+    Optional<Long> findPreRoomId(@Param("folderId") Long folderId, @Param("roomId") Long roomId);
+
+    @Query(value ="SELECT mm.roomId FROM MemberMeeting mm WHERE mm.folder.id = :folderId AND mm.roomId > :roomId ORDER BY mm.roomId ASC LIMIT 1")
+    Optional<Long> findNextRoomId(@Param("folderId") Long folderId, @Param("roomId") Long roomId);
 
     @Query("select new com.d208.AIclerk.meeting.dto.meetingListDto(m.roomId, f.title, d.title, d.startTime) " +
             "from MemberMeeting m " +

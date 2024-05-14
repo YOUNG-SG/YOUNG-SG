@@ -200,31 +200,14 @@ public class MeetingServiceImpl implements MeetingService {
             dto.setDate("생성 시간이 없습니다.");
         }
 
+        Long folderId = memberMeetingRepository.findFolderIdByMemberIdAndRoomId(currentMember.getId(), roomId);
 
-        Object[] detailIds = memberMeetingRepository.findPreviousAndNextDetailIds(roomId)
-                .orElseThrow(MeetingDetailException::preAndNextDetailNotFoundException);
+        Long preRoomId = memberMeetingRepository.findPreRoomId(folderId, roomId).orElse(null);
+        Long nxtRoomId = memberMeetingRepository.findNextRoomId(folderId, roomId).orElse(null);
 
-        log.info("이전회의 확인 {}", detailIds);
+        dto.setPreMeetingId(preRoomId);
+        dto.setNextMeetingId(nxtRoomId);
 
-        Long preMeetingId = null;
-        Long nextMeetingId = null;
-
-        if (detailIds == null || detailIds.length == 0) {
-            dto.setPreMeetingId(preMeetingId);
-            dto.setNextMeetingId(nextMeetingId);
-        } else {
-            Object[] detailIdList = (Object[]) detailIds[0];
-            if (detailIdList[0] != null && !detailIdList[0].equals(0L)) {
-                preMeetingId = (Long) detailIdList[0];
-            }
-
-            if (detailIdList[1] != null && !detailIdList[1].equals(0L)) {
-                nextMeetingId = (Long) detailIdList[1];
-            }
-
-            dto.setPreMeetingId(preMeetingId);
-            dto.setNextMeetingId(nextMeetingId);
-        }
 
         File file = fileRepository.findByMeetingDetail(meetingDetail);
         dto.setFileUrl(file.getUrl());
