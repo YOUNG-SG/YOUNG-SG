@@ -10,26 +10,28 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchMeetingDetail } from "@/services/MeetingDetail";
 import { MeetingDetailData, Participant } from "@/types/MeetingDetail";
 import MeetingNavigationBox from "@/components/MeetingDetail/MeetingNavigationBox";
+import SpinnerLoader from "@/components/@common/SpinnerLoader";
+import ErrorMessage from "@/components/@common/ErrorMessage";
 
 const MeetingDetailPage = () => {
   const [showModal, setShowModal] = useState(false);
   const { id: meetingDetailId } = useParams<string>();
 
   const {
-    data: meetingDetail,
     isLoading,
     isError,
+    data: meetingDetail,
   } = useQuery<MeetingDetailData>({
     queryKey: ["meetingDetail", meetingDetailId],
     queryFn: () => fetchMeetingDetail(meetingDetailId!),
   });
 
   if (isLoading) {
-    return <div>로딩 중</div>;
+    return <SpinnerLoader />;
   }
 
   if (isError) {
-    return <div>에러</div>;
+    return <ErrorMessage>회의를 불러올 수 없습니다</ErrorMessage>;
   }
 
   return (

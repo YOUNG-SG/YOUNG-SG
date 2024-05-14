@@ -4,7 +4,8 @@ import { selectFolderStore } from "@/store/myPageStore";
 import { FolderData, FolderMeetingData } from "@/types/MyPage";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import Loading from "../@common/Loading";
+import DotsLoader from "@/components/@common/DotsLoader";
+import ErrorMessage from "@/components/@common/ErrorMessage";
 
 const FolderDetail = () => {
   // 선택된 폴더
@@ -12,12 +13,7 @@ const FolderDetail = () => {
   const [folder, setFolder] = useState({ folderId: -1, title: "", date: "" });
 
   // 폴더 목록에서 선택된 폴더 id 사용해 title, createAt 받아오기
-  // FIXME isLoading, isError
-  const {
-    data: folders,
-    isLoading: folderLoading,
-    isError: folderError,
-  } = useQuery({
+  const { data: folders } = useQuery({
     queryKey: ["folderList"],
     queryFn: () => fetchFolderList(),
   });
@@ -30,11 +26,10 @@ const FolderDetail = () => {
   }, [selectFolder]);
 
   // 선택된 폴더의 회의 목록
-  // FIXME isLoading, isError
   const {
+    isLoading,
+    isError,
     data: folderDetails,
-    isLoading: meetingLoading,
-    isError: meetingError,
   } = useQuery({
     queryKey: ["folderDetails", selectFolder],
     queryFn: () => fetchFolderMeetingList(selectFolder),
@@ -48,26 +43,6 @@ const FolderDetail = () => {
     );
   }
 
-  if (folderLoading) {
-    return (
-      <div className="flex-[1.05] min-h-full bg-e-20 rounded-2xl text-[#CCCCCC] flex justify-center items-center">
-        <Loading />
-      </div>
-    );
-  }
-
-  if (folderError) {
-    return <div>에러</div>;
-  }
-
-  if (meetingLoading) {
-    return <div>로딩</div>;
-  }
-
-  if (meetingError) {
-    return <div>에러</div>;
-  }
-
   return (
     <div className="flex-[1.05] h-full bg-e-20 rounded-2xl">
       <div className="p-[40px] h-full">
@@ -78,21 +53,29 @@ const FolderDetail = () => {
         <div className="h-[40px] mt-[14px] mb-[40px] text-[32px] font-extrabold cursor-default">
           {folder.title}
         </div>
-
-        <div
-          className="flex flex-col gap-[10px] overflow-scroll"
-          style={{ height: "calc(100% - 118px)" }}
-        >
-          {folderDetails.length ? (
-            folderDetails.map((meeting: FolderMeetingData) => (
-              <FolderDetailMeeting key={meeting.detailId} meeting={meeting} />
-            ))
-          ) : (
-            <div className="w-full h-full flex justify-center items-center text-[#CCCCCC] cursor-default">
-              폴더에 회의가 없어요
-            </div>
-          )}
-        </div>
+        {isLoading ? (
+          <div
+            className="w-full flex justify-center items-center"
+            style={{ height: "calc(100% - 150px)" }}
+          >
+            <DotsLoader scale={50} opacity={50} />
+          </div>
+        ) : isError ? (
+          <></>
+        ) : (
+          <div
+            className="flex flex-col gap-[10px] overflow-scroll"
+            style={{ height: "calc(100% - 118px)" }}
+          >
+            {folderDetails.length ? (
+              folderDetails.map((meeting: FolderMeetingData) => (
+                <FolderDetailMeeting key={meeting.detailId} meeting={meeting} />
+              ))
+            ) : (
+              <ErrorMessage>폴더에 회의가 없어요</ErrorMessage>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

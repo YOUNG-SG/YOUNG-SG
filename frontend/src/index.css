@@ -77,43 +77,6 @@ body::-webkit-scrollbar {
   backdrop-filter: blur(2.5px);
 }
 
-/* 로딩 */
-#loading {
-  width: 70px;
-  height: 70px;
-  position: relative;
-  border-radius: 11px;
-  animation: spin 1.6s ease infinite;
-  &::before,
-  &::after {
-    content: "";
-    width: 40%;
-    height: 40%;
-    display: block;
-    position: absolute;
-    border-radius: 2rem;
-  }
-  &::before {
-    top: 3px;
-    left: 3px;
-    background: #ec6e6e;
-  }
-  &::after {
-    bottom: 3px;
-    right: 3px;
-    background: #e8dc5f;
-  }
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(135deg);
-  }
-  to {
-    transform: rotate(495deg);
-  }
-}
-
 .disable-stroke {
   * {
     stroke: #222222;
