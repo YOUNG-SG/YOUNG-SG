@@ -12,7 +12,7 @@ const FolderDetailMeeting: React.FC<FolderMeetingProps> = ({ meeting }) => {
     <div
       className="w-full h-[100px] px-[25px] py-[20px] bg-e-20 rounded-lg cursor-pointer"
       onClick={() => {
-        navigate(`/meeting/${meeting.detailId}`);
+        navigate(`/meeting/${meeting.roomId}`);
       }}
     >
       <div className="flex justify-between items-center">

@@ -15,15 +15,15 @@ import ErrorMessage from "@/components/@common/ErrorMessage";
 
 const MeetingDetailPage = () => {
   const [showModal, setShowModal] = useState(false);
-  const { id: meetingDetailId } = useParams<string>();
+  const { id: roomId } = useParams<string>();
 
   const {
     isLoading,
     isError,
     data: meetingDetail,
   } = useQuery<MeetingDetailData>({
-    queryKey: ["meetingDetail", meetingDetailId],
-    queryFn: () => fetchMeetingDetail(meetingDetailId!),
+    queryKey: ["meetingDetail", roomId],
+    queryFn: () => fetchMeetingDetail(roomId!),
   });
 
   if (isLoading) {
@@ -84,15 +84,13 @@ const MeetingDetailPage = () => {
             style={{ height: "calc((100% - 30px) * 5 / 13)" }}
           >
             <div className="h-full" style={{ width: "calc((100% - 30px) * 5 / 12)" }}>
-              {meetingDetailId && (
-                <MeetingNavigationBox
-                  prev={meetingDetail!.preMeetingId}
-                  cur={meetingDetailId}
-                  next={meetingDetail!.nextMeetingId}
-                  date={meetingDetail!.date}
-                  title={meetingDetail!.title}
-                />
-              )}
+              <MeetingNavigationBox
+                prev={meetingDetail!.preMeetingId}
+                cur={roomId!}
+                next={meetingDetail!.nextMeetingId}
+                date={meetingDetail!.date}
+                title={meetingDetail!.title}
+              />
             </div>
             <div className="h-full" style={{ width: "calc((100% - 30px) * 7 / 12)" }}>
               <DetailBox title="참여자">
@@ -113,7 +111,7 @@ const MeetingDetailPage = () => {
           </div>
           <div className="w-full" style={{ height: "calc((100% - 30px) * 8 / 13)" }}>
             <DetailBox title="댓글">
-              <Comments />
+              <Comments detailId={meetingDetail!.detailId} />
             </DetailBox>
           </div>
         </div>

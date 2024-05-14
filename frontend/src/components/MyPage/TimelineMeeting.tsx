@@ -47,6 +47,7 @@ const TimelineMeeting: React.FC<TimelineMeetingProps> = ({ month, day }) => {
           <span
             className="text-[30px] cursor-pointer transition-all duration-100 ease-in-out hover:text-[31px] hover:font-extrabold"
             onClick={() => {
+              // meetingId: roomId
               navigate(`/meeting/${day.meetingId}`);
             }}
           >

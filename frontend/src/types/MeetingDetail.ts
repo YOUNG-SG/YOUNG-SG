@@ -80,6 +80,10 @@ export type CommentType = {
 
 export type CommentProps = {
   comment: CommentType;
-  meetingDetailId: string | undefined;
+  detailId: number;
   myMemberId: number;
+};
+
+export type CommentsProps = {
+  detailId: number;
 };

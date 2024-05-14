@@ -3,15 +3,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteComment } from "@/services/MeetingDetail";
 import { CommentProps } from "@/types/MeetingDetail";
 
-const Comment: React.FC<CommentProps> = ({ comment, meetingDetailId, myMemberId }) => {
+const Comment: React.FC<CommentProps> = ({ comment, detailId, myMemberId }) => {
   const queryClient = useQueryClient();
-  // const comment = props.comment;
   const isWriter = myMemberId === comment.memberId;
 
   const { isError, mutate: delComment } = useMutation({
     mutationFn: deleteComment,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comments", meetingDetailId] });
+      queryClient.invalidateQueries({ queryKey: ["comments", detailId] });
     },
   });
 
