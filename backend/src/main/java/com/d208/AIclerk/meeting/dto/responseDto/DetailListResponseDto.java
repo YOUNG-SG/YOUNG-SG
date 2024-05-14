@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DetailListResponseDto {
 
+    private Long roomId;
+
     private Long detailId;
 
     private String title;

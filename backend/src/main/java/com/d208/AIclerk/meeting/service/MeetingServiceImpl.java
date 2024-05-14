@@ -184,16 +184,11 @@ public class MeetingServiceImpl implements MeetingService {
         MeetingDetailResponseDto dto = new MeetingDetailResponseDto();
 
         MeetingDetail meetingDetail = meetingDetailRepository.findByMeetingRoom_Id(roomId);
-        log.info("어딜까요 {}", meetingDetail);
-        log.info("룸아이디 {}", roomId);
 
         dto.setTitle(meetingDetail.getTitle());
         dto.setDetailId(meetingDetail.getId());
         dto.setSummary(meetingDetail.getSummary());
 
-        log.info("title {}", meetingDetail.getTitle());
-
-        log.info("dto {}", dto);
 
         // 시간
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
@@ -278,6 +273,7 @@ public class MeetingServiceImpl implements MeetingService {
                         detailListResponseDto.setDate(formattedDate);
                     }
 
+                    detailListResponseDto.setRoomId(detail.getMeetingRoom().getId());
                     detailListResponseDto.setDetailId(detail.getId());
                     detailListResponseDto.setTitle(detail.getTitle());
                     detailListResponseDto.setTotalTime(detail.getTotalTime());
