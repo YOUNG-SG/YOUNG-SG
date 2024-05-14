@@ -34,7 +34,6 @@ const MeetingDetailPage = () => {
 
   return (
     <div className="w-full h-full p-[50px]">
-      {meetingDetailId}
       {showModal && (
         <SummaryModal handleModal={() => setShowModal(false)} summary={meetingDetail!.summary} />
       )}
