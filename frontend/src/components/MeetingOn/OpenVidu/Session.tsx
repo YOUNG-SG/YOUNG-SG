@@ -99,8 +99,10 @@ function Session({ subscriber, publisher }: SessionProps) {
 
   return (
     <>
-      <div className="row-span-3 ">{renderSubscribers()}</div>
-      <div className="row-span-7 flex justify-center items-center">{renderMainSubscriber()}</div>
+      <div className="row-span-3 h-full w-full ">{renderSubscribers()}</div>
+      <div className="row-span-7 flex justify-center items-center w-full h-full">
+        {renderMainSubscriber()}
+      </div>
     </>
   );
 }
