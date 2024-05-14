@@ -117,6 +117,9 @@ const Chatting = ({
         ...prevMessages,
         { content: "미팅이 시작되었습니다." },
       ]);
+      listenContinuously();
+      setIsRecording(true);
+      // setRoomStatus("1"); // 상태 업데이트가 필요하다면 여기에서 처리
 
       stompClientRef.current.subscribe(`/sub/meetingChat/${roomId}`, (message) => {
         console.log("Meeting Chat Message received:", message.body);
@@ -129,11 +132,7 @@ const Chatting = ({
         } else {
           setSummaryMessages((prevMessages) => [...prevMessages, { content: message.body }]);
           // 메시지 내용이 미팅 시작이면 record on
-          if (message.body === "미팅이 시작되었슴니다") {
-            listenContinuously();
-            setIsRecording(true);
-            setRoomStatus("1"); // 상태 업데이트가 필요하다면 여기에서 처리
-          } else if (message.body === "미팅이 종료되었슴다") {
+          if (message.body === "미팅이 종료되었슴다") {
             listenStop(); // 음성 인식을 중지합니다.
             setIsRecording(false);
             setRoomStatus("2"); // 방의 상태를 '2'(종료)로 설정합니다.
