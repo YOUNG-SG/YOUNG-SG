@@ -21,6 +21,9 @@ interface Command {
 interface ChattingProps {
   roomId: number;
   roomStatus: string | null;
+  listenContinuously: () => void;
+  listenStop: () => void;
+  setIsRecording: (isRecording: boolean) => void;
 }
 
 interface Message {
@@ -47,7 +50,13 @@ interface Member {
   profile: string;
 }
 
-const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
+const Chatting = ({
+  roomId,
+  roomStatus,
+  listenContinuously,
+  listenStop,
+  setIsRecording,
+}: ChattingProps) => {
   // isChat이면 채팅창, false이면 사용자 목록
   const [isChatting, setIsChatting] = useState<boolean>(false);
   const [isChatStatus, setIsChatStatus] = useState<boolean>(false);
@@ -114,6 +123,16 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
           setSummaryMessages((prevMessages) => [...prevMessages, newMessage]);
         } else {
           setSummaryMessages((prevMessages) => [...prevMessages, { content: message.body }]);
+          // 메시지 내용이 미팅 시작이면 record on
+          if (message.body === "미팅이 시작되었습니다") {
+            listenContinuously();
+            setIsRecording(true);
+            setRoomStatus("1"); // 상태 업데이트가 필요하다면 여기에서 처리
+          } else if (message.body === "미팅이 종료되었슴다") {
+            listenStop(); // 음성 인식을 중지합니다.
+            setIsRecording(false);
+            setRoomStatus("2"); // 방의 상태를 '2'(종료)로 설정합니다.
+          }
         }
       });
       setPrevStatus(roomStatus);
@@ -239,9 +258,7 @@ const Chatting = ({ roomId, roomStatus }: ChattingProps) => {
   };
 
   const sendSummaryMessage = () => {
-    console.log("if 전");
     if (transcript && stompClientRef.current) {
-      console.log(transcript, "해줘");
       const messageToSend = JSON.stringify({
         content: transcript,
         sender: senderInfo.sender,
