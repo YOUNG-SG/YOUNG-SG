@@ -334,10 +334,6 @@ public class MeetingServiceImpl implements MeetingService {
 
         List<Comment> comments = commentRepository.findAllByMeetingDetail_Id(detailId);
 
-        if (comments.isEmpty()){
-            throw CommentException.commentNotFoundException();
-        }
-
         List<CommentResponseDto> commentResponseDtoList = comments.stream()
                 .map(comment -> new CommentResponseDto(
                         comment.getId(),
