@@ -65,6 +65,11 @@ export type TimelineMeetingProps = {
   day: MeetingData;
 };
 
+export type ExpandButtonProps = {
+  btnName: string;
+  handleExpand: () => void;
+};
+
 /*
 {
   // YearData - year: MonthData

@@ -2,7 +2,7 @@ import { clickButtonStore } from "@/store/myPageStore";
 import TimelineYear from "@/components/MyPage/TimelineYear";
 import { useQuery } from "@tanstack/react-query";
 import { fetchTimeline } from "@/services/MyPage";
-import { YearData } from "@/types/MyPage";
+import { ExpandButtonProps, YearData } from "@/types/MyPage";
 import SpinnerLoader from "@/components/@common/SpinnerLoader";
 import ErrorMessage from "@/components/@common/ErrorMessage";
 
@@ -18,13 +18,13 @@ const Timeline = () => {
     queryFn: () => fetchTimeline(),
   });
 
-  const ExpandBtn: React.FC<{ btnName: string; handleExpand: () => void }> = (props) => {
+  const ExpandButton: React.FC<ExpandButtonProps> = ({ btnName, handleExpand }) => {
     return (
       <div
         className="w-[160px] h-[48px] bg-[#EEEEEE] bg-opacity-30 hover:bg-opacity-50 rounded-lg flex justify-center items-center text-[18px] mb-[16px] cursor-pointer"
-        onClick={props.handleExpand}
+        onClick={handleExpand}
       >
-        {props.btnName}
+        {btnName}
       </div>
     );
   };
@@ -46,14 +46,14 @@ const Timeline = () => {
           <div className="h-full border-l-[4px] border-[white] ml-[40px] absolute" />
           <div className="w-full h-full">
             <div className="flex justify-end gap-[16px]">
-              <ExpandBtn
+              <ExpandButton
                 btnName="모두 펼치기"
                 handleExpand={() => {
                   setIsAllExpanded(false);
                   setIsClick(true);
                 }}
               />
-              <ExpandBtn
+              <ExpandButton
                 btnName="모두 접기"
                 handleExpand={() => {
                   setIsAllExpanded(true);

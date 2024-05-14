@@ -84,13 +84,15 @@ const MeetingDetailPage = () => {
             style={{ height: "calc((100% - 30px) * 5 / 13)" }}
           >
             <div className="h-full" style={{ width: "calc((100% - 30px) * 5 / 12)" }}>
-              <MeetingNavigationBox
-                prev={meetingDetail!.preMeetingId}
-                cur={meetingDetail!.detailId.toString()}
-                next={meetingDetail!.nextMeetingId}
-                date={meetingDetail!.date}
-                title={meetingDetail!.title}
-              />
+              {meetingDetailId && (
+                <MeetingNavigationBox
+                  prev={meetingDetail!.preMeetingId}
+                  cur={meetingDetailId}
+                  next={meetingDetail!.nextMeetingId}
+                  date={meetingDetail!.date}
+                  title={meetingDetail!.title}
+                />
+              )}
             </div>
             <div className="h-full" style={{ width: "calc((100% - 30px) * 7 / 12)" }}>
               <DetailBox title="참여자">
