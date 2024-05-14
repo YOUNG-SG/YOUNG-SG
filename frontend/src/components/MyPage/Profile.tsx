@@ -38,12 +38,12 @@ const Profile = () => {
         <div className="h-[20px]"></div>
         {isLoading ? (
           <div className="mt-[15px] mb-[25px]">
-            <SkeletonLoader round="full" w={140} h={140} opacity={50} />
+            <SkeletonLoader round="full" w={140} h={140} />
           </div>
         ) : (
           <DefaultProfile className="w-[140px] h-[140px] rounded-full object-cover mt-[15px] mb-[25px]" />
         )}
-        {isLoading ? <SkeletonLoader round="lg" w={140} h={40} opacity={50} /> : <></>}
+        {isLoading ? <SkeletonLoader round="lg" w={140} h={40} /> : <></>}
       </div>
     );
   }
