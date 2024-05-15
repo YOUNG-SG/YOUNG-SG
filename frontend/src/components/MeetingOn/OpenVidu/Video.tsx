@@ -31,7 +31,7 @@ function Video({ streamManager }: Props) {
   const [emoji, setEmoji] = useState<keyof typeof images | null>(null);
   // const [emoji, setEmoji] = useState(null);
 
-  const images = { thumbs_up: thumbs_up, victory: victory };
+  const images = { thumbs_up: thumbs_up, victory: victory, hands_up: hands_up };
 
   const updateCanvasSize = () => {
     if (videoRef.current && canvasRef.current) {
@@ -65,6 +65,7 @@ function Video({ streamManager }: Props) {
       canvasRef.current.height = videoHeight;
 
       const hand = await net.estimateHands(video, true);
+      console.log(hand);
 
       if (hand.length > 0) {
         const GE = new fp.GestureEstimator([
@@ -90,8 +91,8 @@ function Video({ streamManager }: Props) {
 
       const ctx = canvasRef.current.getContext("2d");
       if (ctx) {
-        console.log("그리기 성공!");
-        console.log(canvasRef.current.getContext);
+        // console.log("그리기 성공!");
+        // console.log(canvasRef.current.getContext("2d"));
         drawHand(hand, ctx);
       }
     }
@@ -113,7 +114,7 @@ function Video({ streamManager }: Props) {
         <video
           autoPlay={autoplay}
           ref={videoRef}
-          className="object-contain w-full h-full"
+          className="object-contain w-full h-full z-10"
           onLoadedMetadata={updateCanvasSize}
           onPlay={updateCanvasSize}
         >
@@ -121,7 +122,7 @@ function Video({ streamManager }: Props) {
         </video>
         <canvas
           ref={canvasRef}
-          className="absolute top-0 z-20 left-0 w-full h-full"
+          className="absolute top-0 z-10 left-0 w-full h-full"
           // style={{ zIndex: 50 }}
         ></canvas>
         {emoji !== null && (

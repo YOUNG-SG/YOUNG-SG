@@ -190,7 +190,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
                 videoSource: undefined,
                 publishAudio: false,
                 publishVideo: true,
-                mirror: false,
+                mirror: true,
               });
 
               setPublisher(publishers);

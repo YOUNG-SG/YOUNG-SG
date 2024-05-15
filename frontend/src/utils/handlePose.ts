@@ -1,5 +1,5 @@
-// 각 손가락 마디 포인트 정의
-const fingerJoints: Record<string, number[]> = {
+// Points for fingers
+const fingerJoints = {
   thumb: [0, 1, 2, 3, 4],
   indexFinger: [0, 5, 6, 7, 8],
   middleFinger: [0, 9, 10, 11, 12],
@@ -7,13 +7,8 @@ const fingerJoints: Record<string, number[]> = {
   pinky: [0, 17, 18, 19, 20],
 };
 
-// Infinity Gauntlet 스타일 정의
-interface Style {
-  color: string;
-  size: number;
-}
-
-const style: Record<number, Style> = {
+// Infinity Gauntlet Style
+const style = {
   0: { color: "yellow", size: 15 },
   1: { color: "gold", size: 6 },
   2: { color: "green", size: 10 },
@@ -37,56 +32,46 @@ const style: Record<number, Style> = {
   20: { color: "gold", size: 6 },
 };
 
-// 예측 타입 정의
-interface Landmark {
-  x: number;
-  y: number;
-}
-
-interface Prediction {
-  landmarks: Landmark[];
-}
-
-// 그리기 함수 정의
-export const drawHand = (predictions: Prediction[], ctx: CanvasRenderingContext2D): void => {
-  // 예측이 있는지 확인
+// Drawing function
+export const drawHand = (predictions, ctx) => {
+  // Check if we have predictions
   if (predictions.length > 0) {
-    // 각 예측을 반복 처리
+    // Loop through each prediction
     predictions.forEach((prediction) => {
-      // 랜드마크 가져오기
+      // Grab landmarks
       const landmarks = prediction.landmarks;
 
-      // 각 손가락을 반복 처리
+      // Loop through fingers
       for (let j = 0; j < Object.keys(fingerJoints).length; j++) {
-        const finger = Object.keys(fingerJoints)[j];
-        // 각 손가락의 마디 쌍을 반복 처리
+        let finger = Object.keys(fingerJoints)[j];
+        //  Loop through pairs of joints
         for (let k = 0; k < fingerJoints[finger].length - 1; k++) {
-          // 마디 쌍 가져오기
+          // Get pairs of joints
           const firstJointIndex = fingerJoints[finger][k];
           const secondJointIndex = fingerJoints[finger][k + 1];
 
-          // 경로 그리기
+          // Draw path
           ctx.beginPath();
-          ctx.moveTo(landmarks[firstJointIndex].x, landmarks[firstJointIndex].y);
-          ctx.lineTo(landmarks[secondJointIndex].x, landmarks[secondJointIndex].y);
+          ctx.moveTo(landmarks[firstJointIndex][0], landmarks[firstJointIndex][1]);
+          ctx.lineTo(landmarks[secondJointIndex][0], landmarks[secondJointIndex][1]);
           ctx.strokeStyle = "plum";
           ctx.lineWidth = 4;
           ctx.stroke();
         }
       }
 
-      // 각 랜드마크를 반복 처리하고 그리기
+      // Loop through landmarks and draw em
       for (let i = 0; i < landmarks.length; i++) {
-        // x 좌표 가져오기
-        const x = landmarks[i].x;
-        // y 좌표 가져오기
-        const y = landmarks[i].y;
-        // 그리기 시작
+        // Get x point
+        const x = landmarks[i][0];
+        // Get y point
+        const y = landmarks[i][1];
+        // Start drawing
         ctx.beginPath();
-        ctx.arc(x, y, style[i].size, 0, 3 * Math.PI);
+        ctx.arc(x, y, style[i]["size"], 0, 3 * Math.PI);
 
-        // 색상 설정
-        ctx.fillStyle = style[i].color;
+        // Set line color
+        ctx.fillStyle = style[i]["color"];
         ctx.fill();
       }
     });
