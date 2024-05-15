@@ -2,33 +2,20 @@ import { fetchMyProfile } from "@/services/MyPage";
 import { useQuery } from "@tanstack/react-query";
 import { editModeStore } from "@/store/myPageStore";
 import { tokenStore } from "@/store/tokenStore";
+import SkeletonLoader from "@/components/@common/SkeletonLoader";
+import DefaultProfile from "@/assets/@common/Profile.svg?react";
 
 const Profile = () => {
   const { setEditMode } = editModeStore();
 
-  // FIXME isLoading, isError
   const {
-    data: myProfile,
     isLoading,
     isError,
+    data: myProfile,
   } = useQuery({
     queryKey: ["myProfile"],
     queryFn: () => fetchMyProfile(),
   });
-
-  if (isLoading) {
-    // 로딩 컴포넌트 x
-    return (
-      <div className="min-w-[240px] h-full py-[40px] flex flex-col items-center bg-[#777777] bg-opacity-30"></div>
-    );
-  }
-
-  if (isError) {
-    return <div>에러</div>;
-  }
-
-  const nickname = myProfile.nickName;
-  const image = myProfile.profileImg;
 
   const EditButton = () => {
     return (
@@ -45,18 +32,32 @@ const Profile = () => {
     );
   };
 
+  if (isLoading || isError) {
+    return (
+      <div className="min-w-[240px] h-full py-[40px] flex flex-col items-center bg-[#777777] bg-opacity-30">
+        <div className="h-[20px]"></div>
+        {isLoading ? (
+          <div className="mt-[15px] mb-[25px]">
+            <SkeletonLoader round="full" w={140} h={140} />
+          </div>
+        ) : (
+          <DefaultProfile className="w-[140px] h-[140px] rounded-full object-cover mt-[15px] mb-[25px]" />
+        )}
+        {isLoading ? <SkeletonLoader round="lg" w={140} h={40} /> : <></>}
+      </div>
+    );
+  }
+
   return (
     <div className="min-w-[240px] h-full py-[40px] flex flex-col items-center bg-[#777777] bg-opacity-30">
       <EditButton />
-      <div className="relative">
-        <img
-          src={image}
-          className="w-[140px] h-[140px] rounded-full object-cover mt-[15px] mb-[25px]"
-        />
-      </div>
+      <img
+        src={myProfile.profileImg}
+        className="w-[140px] h-[140px] rounded-full object-cover mt-[15px] mb-[25px]"
+      />
 
       <div>
-        <span className="text-[24px] font-bold">{nickname}</span>
+        <span className="text-[24px] font-bold">{myProfile.nickName}</span>
         <span className="text-[20px] font-[#CCCCCC]">님</span>
       </div>
       <u

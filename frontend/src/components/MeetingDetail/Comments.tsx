@@ -1,33 +1,34 @@
 import Comment from "@/components/MeetingDetail/Comment";
 import { fetchComments, createComment } from "@/services/MeetingDetail";
-import { CommentType } from "@/types/MeetingDetail";
+import { CommentType, CommentsProps } from "@/types/MeetingDetail";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
 import { useState } from "react";
-import Loading from "../@common/Loading";
+import DotsLoader from "@/components/@common/DotsLoader";
+import ErrorMessage from "@/components/@common/ErrorMessage";
 
-const Comments = () => {
+const Comments: React.FC<CommentsProps> = ({ detailId }) => {
   const queryClient = useQueryClient();
   const [content, setContent] = useState("");
 
-  const { id: meetingDetailId } = useParams<string>();
-
-  // FIXME isLoading, isError
   const {
+    isLoading: getLoading,
+    isError: getError,
     data: comments,
-    isLoading,
-    isError,
   } = useQuery({
-    queryKey: ["comments", meetingDetailId],
-    queryFn: () => fetchComments(meetingDetailId!),
+    queryKey: ["comments", detailId],
+    queryFn: () => fetchComments(detailId!),
   });
 
-  const { mutate: postComment } = useMutation({
+  const { isError: postError, mutate: postComment } = useMutation({
     mutationFn: createComment,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comments", meetingDetailId!] });
+      queryClient.invalidateQueries({ queryKey: ["comments", detailId] });
     },
   });
+
+  if (postError) {
+    alert("댓글 작성에 실패했습니다");
+  }
 
   return (
     <div
@@ -35,26 +36,28 @@ const Comments = () => {
       style={{ height: "calc(100% - 60px" }}
     >
       {/* 댓글조회 */}
-      <div className="w-full flex flex-col gap-[16px] overflow-scroll">
-        {isLoading ? (
-          isError ? (
-            <div>에러</div>
+      {getLoading ? (
+        <div className="w-full h-full flex justify-center items-center">
+          <DotsLoader />
+        </div>
+      ) : (
+        <div className="w-full h-full flex flex-col gap-[16px] overflow-scroll">
+          {getError ? (
+            <ErrorMessage>댓글을 조회할 수 없습니다</ErrorMessage>
+          ) : comments.data.length === 0 ? (
+            <ErrorMessage>작성된 댓글이 없습니다</ErrorMessage>
           ) : (
-            <div className="min-h-full">
-              <Loading />
-            </div>
-          )
-        ) : (
-          comments.data.map((comment: CommentType) => (
-            <Comment
-              key={comment.commentId}
-              comment={comment}
-              myMemberId={comments.currentMemberId}
-              meetingDetailId={meetingDetailId}
-            />
-          ))
-        )}
-      </div>
+            comments.data.map((comment: CommentType) => (
+              <Comment
+                key={comment.commentId}
+                comment={comment}
+                myMemberId={comments.currentMemberId}
+                detailId={detailId}
+              />
+            ))
+          )}
+        </div>
+      )}
 
       {/* 댓글작성 */}
       <div className="flex min-h-[98px] gap-[8px]">
@@ -69,7 +72,7 @@ const Comments = () => {
           className="flex-[1] flex bg-[#000000] bg-opacity-50 hover:bg-opacity-30 justify-center items-center rounded-lg cursor-pointer"
           onClick={() => {
             try {
-              postComment({ meetingId: meetingDetailId!, content: content });
+              postComment({ meetingId: detailId, content: content });
               setContent("");
             } catch (err) {
               console.log(err);

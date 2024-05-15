@@ -10,26 +10,28 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchMeetingDetail } from "@/services/MeetingDetail";
 import { MeetingDetailData, Participant } from "@/types/MeetingDetail";
 import MeetingNavigationBox from "@/components/MeetingDetail/MeetingNavigationBox";
+import SpinnerLoader from "@/components/@common/SpinnerLoader";
+import ErrorMessage from "@/components/@common/ErrorMessage";
 
 const MeetingDetailPage = () => {
   const [showModal, setShowModal] = useState(false);
-  const { id: meetingDetailId } = useParams<string>();
+  const { id: roomId } = useParams<string>();
 
   const {
-    data: meetingDetail,
     isLoading,
     isError,
+    data: meetingDetail,
   } = useQuery<MeetingDetailData>({
-    queryKey: ["meetingDetail", meetingDetailId],
-    queryFn: () => fetchMeetingDetail(meetingDetailId!),
+    queryKey: ["meetingDetail", roomId],
+    queryFn: () => fetchMeetingDetail(roomId!),
   });
 
   if (isLoading) {
-    return <div>로딩 중</div>;
+    return <SpinnerLoader />;
   }
 
   if (isError) {
-    return <div>에러</div>;
+    return <ErrorMessage>회의를 불러올 수 없습니다</ErrorMessage>;
   }
 
   return (
@@ -84,7 +86,7 @@ const MeetingDetailPage = () => {
             <div className="h-full" style={{ width: "calc((100% - 30px) * 5 / 12)" }}>
               <MeetingNavigationBox
                 prev={meetingDetail!.preMeetingId}
-                cur={meetingDetail!.detailId.toString()}
+                cur={roomId!}
                 next={meetingDetail!.nextMeetingId}
                 date={meetingDetail!.date}
                 title={meetingDetail!.title}
@@ -109,7 +111,7 @@ const MeetingDetailPage = () => {
           </div>
           <div className="w-full" style={{ height: "calc((100% - 30px) * 8 / 13)" }}>
             <DetailBox title="댓글">
-              <Comments />
+              <Comments detailId={meetingDetail!.detailId} />
             </DetailBox>
           </div>
         </div>

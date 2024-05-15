@@ -10,7 +10,7 @@ const Login = () => {
 
   useEffect(() => {
     if (token) {
-      alert("이미 로그인 되었습니다.");
+      alert("이미 로그인 되었습니다");
       navigate("/");
     }
   }, []);

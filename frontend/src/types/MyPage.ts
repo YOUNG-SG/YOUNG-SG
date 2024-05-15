@@ -20,6 +20,7 @@ export type FolderProps = {
 };
 
 export type FolderMeetingData = {
+  roomId: number;
   detailId: number;
   title: string;
   participantCnt: number;
@@ -63,6 +64,11 @@ export type TimelineMonthProps = {
 export type TimelineMeetingProps = {
   month: string;
   day: MeetingData;
+};
+
+export type ExpandButtonProps = {
+  btnName: string;
+  handleExpand: () => void;
 };
 
 /*
