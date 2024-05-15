@@ -1,6 +1,5 @@
 import crown from "../../../../assets/chattingIcons/crown.png";
 import { meetingChangeOwner } from "@/services/Chatting";
-import createRoomStore from "@/store/createRoomStore";
 import userStore from "@/store/userStore";
 interface Member {
   id: number;
@@ -11,10 +10,10 @@ interface Member {
 interface ChatTestProps {
   userList?: Member[];
   roomId: number;
+  owner: string | null;
 }
 
-const UserList = ({ userList, roomId }: ChatTestProps) => {
-  const { owner } = createRoomStore();
+const UserList = ({ userList, roomId, owner }: ChatTestProps) => {
   const { name } = userStore();
   const isOwner = owner === name;
 

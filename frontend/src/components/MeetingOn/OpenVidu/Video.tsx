@@ -1,17 +1,19 @@
-import { useRef, useEffect, useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { StreamManager } from "openvidu-browser";
 import * as tf from "@tensorflow/tfjs";
-import "@tensorflow/tfjs-backend-webgl"; // 추가된 부분
+import "@tensorflow/tfjs-backend-webgl";
 import * as handpose from "@tensorflow-models/handpose";
 import { drawHand } from "@/utils/handlePose";
 import * as fp from "fingerpose";
 import victory from "../../../assets/chattingIcons/victory.png";
 import thumbs_up from "../../../assets/chattingIcons/thumbs_up.png";
-import hands_up from "../../../assets/chattingIcons/hands_up.png";
+import hands_up from "../../../assets/chattingIcons/hello.png";
 import { handsUpGesture } from "@/utils/handsUp";
 
 interface Props {
   streamManager: StreamManager;
+  videoSizeClass: string;
+  isPublisher: boolean;
 }
 
 const images: {
@@ -24,12 +26,11 @@ const images: {
   hands_up: hands_up,
 };
 
-function Video({ streamManager }: Props) {
+function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const autoplay = true;
   const [emoji, setEmoji] = useState<keyof typeof images | null>(null);
-  // const [emoji, setEmoji] = useState(null);
 
   const images = { thumbs_up: thumbs_up, victory: victory, hands_up: hands_up };
 
@@ -39,11 +40,14 @@ function Video({ streamManager }: Props) {
       const canvas = canvasRef.current;
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
+      canvas.style.width = `${video.clientWidth}px`;
+      canvas.style.height = `${video.clientHeight}px`;
     }
   };
+
   const runHandpose = async () => {
-    await tf.setBackend("webgl"); // 추가된 부분
-    await tf.ready(); // 추가된 부분
+    await tf.setBackend("webgl");
+    await tf.ready();
     const net = await handpose.load();
     console.log("Handpose model loaded.");
     // Loop and detect hands
@@ -65,7 +69,6 @@ function Video({ streamManager }: Props) {
       canvasRef.current.height = videoHeight;
 
       const hand = await net.estimateHands(video, true);
-      console.log(hand);
 
       if (hand.length > 0) {
         const GE = new fp.GestureEstimator([
@@ -75,24 +78,25 @@ function Video({ streamManager }: Props) {
         ]);
         const gesture = GE.estimate(hand[0].landmarks, 4);
         if (gesture.gestures !== undefined && gesture.gestures.length > 0) {
-          // console.log(gesture.gestures);
-
           const score = gesture.gestures.map((prediction: any) => prediction.score);
           const maxConfidence = score.indexOf(Math.max.apply(null, score));
-          // console.log("maxConfidence: ", maxConfidence, "confidencd: ", confidence);
-          // console.log(gesture.gestures[maxConfidence].name);
 
-          if (gesture.gestures[maxConfidence]) {
-            // console.log(emoji);
+          const threshold = 0.9;
+
+          if (gesture.gestures[maxConfidence].score >= threshold) {
             setEmoji(gesture.gestures[maxConfidence].name);
+          } else {
+            setEmoji(null); // 제스처 인식 못하면 이모지 설정하지 않음
           }
+        } else {
+          setEmoji(null); // 신뢰도가 임계값보다 낮으면 이모지 설정하지 않음
         }
+      } else {
+        setEmoji(null); // 손이 감지되지 않으면 이모지 설정하지 않음
       }
 
       const ctx = canvasRef.current.getContext("2d");
       if (ctx) {
-        // console.log("그리기 성공!");
-        // console.log(canvasRef.current.getContext("2d"));
         drawHand(hand, ctx);
       }
     }
@@ -105,16 +109,18 @@ function Video({ streamManager }: Props) {
   }, [streamManager]);
 
   useEffect(() => {
-    runHandpose();
+    if (isPublisher) {
+      runHandpose();
+    }
   }, []);
 
   return (
     <>
-      <div className="relative w-full h-full">
+      <div className={` ${videoSizeClass} flex items-center justify-center relative`}>
         <video
           autoPlay={autoplay}
           ref={videoRef}
-          className="object-contain w-full h-full z-10"
+          className="aspect-video max-w-full max-h-full h-full w-full"
           onLoadedMetadata={updateCanvasSize}
           onPlay={updateCanvasSize}
         >
@@ -122,14 +128,13 @@ function Video({ streamManager }: Props) {
         </video>
         <canvas
           ref={canvasRef}
-          className="absolute top-0 z-10 left-0 w-full h-full"
-          // style={{ zIndex: 50 }}
+          className="absolute aspect-video top-0 z-10 left-0 w-full h-full "
         ></canvas>
         {emoji !== null && (
           <img
             src={images[emoji]}
             alt="gesture emoji"
-            className="absolute left-1/2 transform -translate-x-1/2 bottom-12 h-24 z-30"
+            className="absolute bottom-4 right-4 h-24 "
           />
         )}
       </div>

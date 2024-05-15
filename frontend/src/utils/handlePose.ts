@@ -1,5 +1,13 @@
-// Points for fingers
-const fingerJoints = {
+// 손가락 관절에 대한 포인트 설정
+interface FingerJoints {
+  thumb: number[];
+  indexFinger: number[];
+  middleFinger: number[];
+  ringFinger: number[];
+  pinky: number[];
+}
+
+const fingerJoints: FingerJoints = {
   thumb: [0, 1, 2, 3, 4],
   indexFinger: [0, 5, 6, 7, 8],
   middleFinger: [0, 9, 10, 11, 12],
@@ -7,8 +15,13 @@ const fingerJoints = {
   pinky: [0, 17, 18, 19, 20],
 };
 
-// Infinity Gauntlet Style
-const style = {
+// Infinity Gauntlet 스타일 설정
+interface LandmarkStyle {
+  color: string;
+  size: number;
+}
+
+const style: Record<number, LandmarkStyle> = {
   0: { color: "yellow", size: 15 },
   1: { color: "gold", size: 6 },
   2: { color: "green", size: 10 },
@@ -32,25 +45,29 @@ const style = {
   20: { color: "gold", size: 6 },
 };
 
-// Drawing function
-export const drawHand = (predictions, ctx) => {
-  // Check if we have predictions
+// 그리기 함수
+interface Prediction {
+  landmarks: [number, number][];
+}
+
+export const drawHand = (predictions: Prediction[], ctx: CanvasRenderingContext2D) => {
+  // 예측이 있는지 확인
   if (predictions.length > 0) {
-    // Loop through each prediction
+    // 각 예측을 반복
     predictions.forEach((prediction) => {
-      // Grab landmarks
+      // 랜드마크 가져오기
       const landmarks = prediction.landmarks;
 
-      // Loop through fingers
+      // 손가락 반복
       for (let j = 0; j < Object.keys(fingerJoints).length; j++) {
-        let finger = Object.keys(fingerJoints)[j];
-        //  Loop through pairs of joints
-        for (let k = 0; k < fingerJoints[finger].length - 1; k++) {
-          // Get pairs of joints
-          const firstJointIndex = fingerJoints[finger][k];
-          const secondJointIndex = fingerJoints[finger][k + 1];
+        const finger = Object.keys(fingerJoints)[j];
+        // 관절 쌍 반복
+        for (let k = 0; k < fingerJoints[finger as keyof FingerJoints].length - 1; k++) {
+          // 관절 쌍 가져오기
+          const firstJointIndex = fingerJoints[finger as keyof FingerJoints][k];
+          const secondJointIndex = fingerJoints[finger as keyof FingerJoints][k + 1];
 
-          // Draw path
+          // 경로 그리기
           ctx.beginPath();
           ctx.moveTo(landmarks[firstJointIndex][0], landmarks[firstJointIndex][1]);
           ctx.lineTo(landmarks[secondJointIndex][0], landmarks[secondJointIndex][1]);
@@ -60,17 +77,17 @@ export const drawHand = (predictions, ctx) => {
         }
       }
 
-      // Loop through landmarks and draw em
+      // 랜드마크 반복 및 그리기
       for (let i = 0; i < landmarks.length; i++) {
-        // Get x point
+        // x 포인트 가져오기
         const x = landmarks[i][0];
-        // Get y point
+        // y 포인트 가져오기
         const y = landmarks[i][1];
-        // Start drawing
+        // 그리기 시작
         ctx.beginPath();
         ctx.arc(x, y, style[i]["size"], 0, 3 * Math.PI);
 
-        // Set line color
+        // 선 색상 설정
         ctx.fillStyle = style[i]["color"];
         ctx.fill();
       }

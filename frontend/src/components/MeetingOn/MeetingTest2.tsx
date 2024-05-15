@@ -13,7 +13,7 @@ import invite from "../../assets/chattingIcons/add-user.png";
 import disconnect from "../../assets/chattingIcons/disconnected.png";
 import screen from "../../assets/chattingIcons/screen.png";
 import bg from "../../assets/chattingIcons/bgImage.jpg";
-import record from "../../assets/chattingIcons/button.png";
+import record from "../../assets/chattingIcons/play-button.png";
 import stop from "../../assets/chattingIcons/stop.png";
 import pause from "../../assets/chattingIcons/pause.png";
 import { OpenVidu, Publisher, Subscriber } from "openvidu-browser";
@@ -23,6 +23,7 @@ import SpeechRecognition from "react-speech-recognition";
 import useDictaphoneStore from "@/store/dictaphoneStore";
 import { meetingRecordStart, meetingRecordEnd, meetingRecordPause } from "@/services/Chatting";
 import { useNavigate } from "react-router-dom";
+import userStore from "@/store/userStore";
 
 interface MeetingTestProps {
   roomId: number;
@@ -30,7 +31,8 @@ interface MeetingTestProps {
 }
 
 const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
-  const { setSessionId, roomStatus, setRoomStatus } = createRoomStore();
+  const { name } = userStore();
+  const { setSessionId, roomStatus, setRoomStatus, owner } = createRoomStore();
   const {
     session,
     setSession,
@@ -346,7 +348,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
           >
             {/* 세션 연결 후 화면 */}
             <div className="col-span-9 grid grid-rows-12">
-              <div className="row-span-10 items-center justify-center grid">
+              <div className="row-span-10 items-center justify-center">
                 {session && (
                   <Session
                     publisher={publisher as Publisher}
@@ -366,23 +368,27 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
                     <img className="h-7 w-7" src={invite} alt="" />
                   </button>
                   {/* 녹음 시작 */}
-                  <button
-                    onClick={toggleRecord}
-                    className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-600 flex justify-center items-center"
-                  >
-                    {!listening ? (
-                      <img className="h-7 w-7" src={record} alt="" />
-                    ) : (
-                      <img className="h-7 w-7" src={pause} alt="" />
-                    )}
-                  </button>
-                  <button
-                    className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-600 flex justify-center items-center"
-                    onClick={endRecord}
-                    disabled={roomStatus === "0" || roomStatus === "2"}
-                  >
-                    <img className="h-7 w-7" src={stop} alt="녹화종료" />
-                  </button>
+                  {name === owner ? (
+                    <>
+                      <button
+                        onClick={toggleRecord}
+                        className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-600 flex justify-center items-center"
+                      >
+                        {!listening ? (
+                          <img className="pl-1 h-7 w-7" src={record} alt="" />
+                        ) : (
+                          <img className="h-7 w-7" src={pause} alt="" />
+                        )}
+                      </button>
+                      <button
+                        className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-600 flex justify-center items-center"
+                        onClick={endRecord}
+                        disabled={roomStatus === "0" || roomStatus === "2"}
+                      >
+                        <img className="h-7 w-7" src={stop} alt="녹화종료" />
+                      </button>
+                    </>
+                  ) : null}
                 </div>
                 {
                   // publisher &&
@@ -441,6 +447,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
                 listenContinuously={listenContinuously}
                 setIsRecording={setIsRecording}
                 listenStop={listenStop}
+                owner={owner}
               />
             </div>
           </div>
