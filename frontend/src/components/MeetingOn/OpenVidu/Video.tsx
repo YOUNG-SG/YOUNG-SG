@@ -16,16 +16,6 @@ interface Props {
   isPublisher: boolean;
 }
 
-const images: {
-  thumbs_up: string;
-  victory: string;
-  hands_up: string;
-} = {
-  thumbs_up: thumbs_up,
-  victory: victory,
-  hands_up: hands_up,
-};
-
 function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -81,10 +71,11 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
           const score = gesture.gestures.map((prediction: any) => prediction.score);
           const maxConfidence = score.indexOf(Math.max.apply(null, score));
 
-          const threshold = 0.9;
+          const threshold = 0.95;
 
           if (gesture.gestures[maxConfidence].score >= threshold) {
-            setEmoji(gesture.gestures[maxConfidence].name);
+            const gestureName = gesture.gestures[maxConfidence].name as keyof typeof images;
+            setEmoji(gestureName);
           } else {
             setEmoji(null); // 제스처 인식 못하면 이모지 설정하지 않음
           }
