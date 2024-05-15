@@ -44,8 +44,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(config -> {
-            config.requestMatchers("/ws/**").permitAll()  // WebSocket 경로 모두 허용
-                    .anyRequest().authenticated();      // 나머지 요청은 인증 필요
+            config.requestMatchers("/**").permitAll();
         });
 
         http.formLogin(AbstractHttpConfigurer::disable)
