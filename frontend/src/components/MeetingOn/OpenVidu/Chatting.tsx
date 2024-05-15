@@ -24,6 +24,7 @@ interface ChattingProps {
   listenContinuously: () => void;
   listenStop: () => void;
   setIsRecording: (isRecording: boolean) => void;
+  owner: string | null;
 }
 
 interface Message {
@@ -56,6 +57,7 @@ const Chatting = ({
   listenContinuously,
   listenStop,
   setIsRecording,
+  owner,
 }: ChattingProps) => {
   // isChat이면 채팅창, false이면 사용자 목록
   const [isChatting, setIsChatting] = useState<boolean>(false);
@@ -326,7 +328,7 @@ const Chatting = ({
         {!isChatting && (
           <>
             <div className="row-span-10 w-full flex flex-col border rounded-xl bg-black bg-opacity-70">
-              <UserList userList={userList} roomId={roomId} />
+              <UserList userList={userList} roomId={roomId} owner={owner} />
             </div>
           </>
         )}
