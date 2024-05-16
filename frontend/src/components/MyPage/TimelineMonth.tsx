@@ -62,7 +62,7 @@ const TimelineMonth: React.FC<TimelineMonthProps> = ({ month, days }) => {
           />
         </div>
         <span className="w-[16px] h-[16px] mr-[20px] bg-[white] rounded-full"></span>
-        <div className="text-[22px] font-b">{month}월</div>
+        <div className="text-[22px] font-b cursor-default">{month}월</div>
       </div>
       {/* Day map 함수 */}
       <div
