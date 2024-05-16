@@ -68,7 +68,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     setSessionId("");
     setSubscriber(null);
     setPublisher(null);
-    setIsAudioEnabled(true); // 세션 종료 시 오디오 상태 초기화
+    setIsAudioEnabled(true);
     setIsVideoEnabled(true);
 
     if (screenSession) screenSession.disconnect();
@@ -294,7 +294,6 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     try {
       const msg = await meetingRecordEnd(roomId);
       if (msg === "미팅종료...") {
-        await sendText(roomId);
         setRoomStatus("2");
         listenStop();
         setIsRecording(false);
@@ -302,6 +301,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     } catch (err) {
       console.log(err);
     }
+    await sendText(roomId);
   };
 
   const listenContinuously = () => {
