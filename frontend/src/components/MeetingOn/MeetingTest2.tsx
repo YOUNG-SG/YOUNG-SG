@@ -294,6 +294,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     try {
       const msg = await meetingRecordEnd(roomId);
       if (msg === "미팅종료...") {
+        await sendText(roomId);
         setRoomStatus("2");
         listenStop();
         setIsRecording(false);
@@ -319,9 +320,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
   const leaveMeetingRoom = async () => {
     try {
       leaveSession();
-
       // 상태 확인 필요
-      await sendText(roomId);
       await leaveRoom(roomId);
     } catch (err) {
       console.log(err);
