@@ -10,8 +10,8 @@ thumbsDownGesture.addDirection(Finger.Thumb, FingerDirection.DiagonalDownRight, 
 
 // Index, Middle, Ring, Pinky
 for (const finger of [Finger.Index, Finger.Middle, Finger.Ring, Finger.Pinky]) {
-  thumbsDownGesture.addCurl(finger, FingerCurl.NoCurl, 1.0);
-  thumbsDownGesture.addDirection(finger, FingerDirection.VerticalUp, 0.75);
+  thumbsDownGesture.addCurl(finger, FingerCurl.FullCurl, 1.0);
+  thumbsDownGesture.addDirection(finger, FingerDirection.HorizontalLeft, 0.75);
   thumbsDownGesture.addDirection(finger, FingerDirection.DiagonalUpLeft, 0.25);
   thumbsDownGesture.addDirection(finger, FingerDirection.DiagonalUpRight, 0.25);
 }

@@ -8,7 +8,9 @@ import * as fp from "fingerpose";
 import victory from "../../../assets/chattingIcons/victory.png";
 import thumbs_up from "../../../assets/chattingIcons/thumbs_up.png";
 import hands_up from "../../../assets/chattingIcons/hello.png";
+import thumbs_dowm from "../../../assets/chattingIcons/thumbs-down.png";
 import { handsUpGesture } from "@/utils/handsUp";
+import { thumbsDownGesture } from "@/utils/thumbsDown";
 
 interface Props {
   streamManager: StreamManager;
@@ -24,7 +26,12 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
   // const [gestureStartTime, setGestureStartTime] = useState<number | null>(null);
   // const [isGestureDetected, setIsGestureDetected] = useState(false);
 
-  const images = { thumbs_up: thumbs_up, victory: victory, hands_up: hands_up };
+  const images = {
+    thumbs_up: thumbs_up,
+    victory: victory,
+    hands_up: hands_up,
+    thumbs_dowm: thumbs_dowm,
+  };
 
   const updateCanvasSize = () => {
     if (videoRef.current && canvasRef.current) {
@@ -67,12 +74,13 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
           fp.Gestures.VictoryGesture,
           fp.Gestures.ThumbsUpGesture,
           handsUpGesture,
+          thumbsDownGesture,
         ]);
         const gesture = GE.estimate(hand[0].landmarks, 4);
         if (gesture.gestures !== undefined && gesture.gestures.length > 0) {
           const score = gesture.gestures.map((prediction: any) => prediction.score);
           const maxConfidence = score.indexOf(Math.max.apply(null, score));
-
+          console.log(gesture.gestures);
           const threshold = 0.95;
 
           if (gesture.gestures[maxConfidence].score >= threshold) {

@@ -300,8 +300,8 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
       }
     } catch (err) {
       console.log(err);
+      await sendText(roomId);
     }
-    await sendText(roomId);
   };
 
   const listenContinuously = () => {
