@@ -107,7 +107,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         // 파일 업로드
         String bucketName = "youngseogi";
-        String key = "test_test.docx";
+        String key = "testword.docx";
         InputStream inputStream = wordDocumentUpdater.getFileFromS3(bucketName, key);
         String newKey = "SummaryFolder/" + UUID.randomUUID() + ".docx";
 
