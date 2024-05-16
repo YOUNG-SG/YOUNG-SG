@@ -11,6 +11,6 @@ FROM node:alpine
 WORKDIR /app
 COPY --from=builder /frontend/dist /app
 COPY --from=builder /frontend/package*.json /app/
-COPY --from=builder /frontend/node_modules /app/node_modules
+RUN npm install --production
 EXPOSE 5173
 CMD ["npm", "run", "dev"]
