@@ -3,6 +3,7 @@ package com.d208.AIclerk.meeting.service;
 
 import com.d208.AIclerk.chatting.repository.RoomRepository;
 import com.d208.AIclerk.chatting.repository.SummaryRepository;
+import java.util.concurrent.locks.ReentrantLock;
 import com.d208.AIclerk.entity.*;
 import com.d208.AIclerk.entity.File;
 import com.d208.AIclerk.exception.meeting.CommentException;
@@ -52,6 +53,7 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Autowired
     private WordDocumentUpdater wordDocumentUpdater;
+    private final ReentrantLock lock = new ReentrantLock();
     @Override
     @Transactional
     public ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception {
@@ -65,23 +67,22 @@ public class MeetingServiceImpl implements MeetingService {
         String inputText = summary.getContent();
         StringBuilder fullSummary = new StringBuilder();
 
-        // 글자수 제한 확인
-        final int MAX_LENGTH = 4000;
-        while (!inputText.isEmpty()) {
-            String partOfText;
-            if (inputText.length() > MAX_LENGTH) {
-                partOfText = inputText.substring(0, MAX_LENGTH);
-                inputText = inputText.substring(MAX_LENGTH);
-            } else {
-                partOfText = inputText;
-                inputText = "";
+            final int MAX_LENGTH = 4000;
+            while (!inputText.isEmpty()) {
+                String partOfText;
+                if (inputText.length() > MAX_LENGTH) {
+                    partOfText = inputText.substring(0, MAX_LENGTH);
+                    inputText = inputText.substring(MAX_LENGTH);
+                } else {
+                    partOfText = inputText;
+                    inputText = "";
+                }
+
+                String result = openAiUtil.summarizeText(partOfText);
+                fullSummary.append(result);
+                fullSummary.append(" ");
             }
 
-            // 텍스트 요약
-            String result = openAiUtil.summarizeText(partOfText);
-            fullSummary.append(result);
-            fullSummary.append(" ");
-        }
 
         MeetingRoom meetingRoom = roomRepository.findById(dto.getRoomId())
                 .orElseThrow(() -> new NoSuchElementException("Meeting room not found with id: " + dto.getRoomId()));
@@ -124,6 +125,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         return ResponseEntity.ok("회의 상세(meeting_detail) 저장 성공 및 파일 업로드 완료");
     }
+
 
     // 댓글 기능 구현
     @Override
