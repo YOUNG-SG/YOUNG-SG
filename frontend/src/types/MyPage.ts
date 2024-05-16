@@ -1,8 +1,3 @@
-/* 프로필 */
-export type EditButtonProps = {
-  handleEditProfile?: () => void;
-};
-
 /* 탭 */
 export type TabProps = {
   tab: string;
