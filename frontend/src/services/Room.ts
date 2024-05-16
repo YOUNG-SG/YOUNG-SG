@@ -28,5 +28,8 @@ export const leaveRoom = async (roomId: number) => {
 // 텍스트 요약 (방 나가면서 호출)
 export const sendText = async (roomId: number) => {
   const res = await axiosAuthRequest.post("/api/meeting/send-text", { roomId: roomId });
+  console.log("잘되나오바 ㅋㅋ")
+  console.log(res.data);
+  
   return res.data;
 };
