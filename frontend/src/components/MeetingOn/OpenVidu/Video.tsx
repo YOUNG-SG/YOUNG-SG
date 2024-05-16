@@ -21,8 +21,8 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const autoplay = true;
   const [emoji, setEmoji] = useState<keyof typeof images | null>(null);
-  const [gestureStartTime, setGestureStartTime] = useState<number | null>(null);
-  const [isGestureDetected, setIsGestureDetected] = useState(false);
+  // const [gestureStartTime, setGestureStartTime] = useState<number | null>(null);
+  // const [isGestureDetected, setIsGestureDetected] = useState(false);
 
   const images = { thumbs_up: thumbs_up, victory: victory, hands_up: hands_up };
 
@@ -78,28 +78,28 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
           if (gesture.gestures[maxConfidence].score >= threshold) {
             const gestureName = gesture.gestures[maxConfidence].name as keyof typeof images;
 
-            if (gestureStartTime === null) {
-              setGestureStartTime(Date.now());
-            } else {
-              const elapsedTime = Date.now() - gestureStartTime;
-              if (elapsedTime >= 3000) {
-                setIsGestureDetected(true);
-                setEmoji(gestureName);
-              }
-            }
+            // if (gestureStartTime === null) {
+            //   setGestureStartTime(Date.now());
+            // } else {
+            //   const elapsedTime = Date.now() - gestureStartTime;
+            //   if (elapsedTime >= 3000) {
+            //     setIsGestureDetected(true);
+            setEmoji(gestureName);
+            //   }
+            // }
           } else {
-            setGestureStartTime(null);
-            setIsGestureDetected(false);
+            // setGestureStartTime(null);
+            // setIsGestureDetected(false);
             setEmoji(null); // 제스처 인식 못하면 이모지 설정하지 않음
           }
         } else {
-          setGestureStartTime(null);
-          setIsGestureDetected(false);
+          // setGestureStartTime(null);
+          // setIsGestureDetected(false);
           setEmoji(null); // 신뢰도가 임계값보다 낮으면 이모지 설정하지 않음
         }
       } else {
-        setGestureStartTime(null);
-        setIsGestureDetected(false);
+        // setGestureStartTime(null);
+        // setIsGestureDetected(false);
         setEmoji(null); // 손이 감지되지 않으면 이모지 설정하지 않음
       }
 
