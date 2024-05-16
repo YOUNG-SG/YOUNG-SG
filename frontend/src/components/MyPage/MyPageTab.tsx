@@ -1,10 +1,22 @@
 import { tabStore } from "@/store/myPageStore";
 import { TabProps } from "@/types/MyPage";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const MyPageTab = () => {
   const navigate = useNavigate();
   const { selectTab, setSelectTab } = tabStore();
+
+  const [searchParams] = useSearchParams();
+  const tab = searchParams.get("meeting");
+
+  useEffect(() => {
+    if (tab === "folder" || tab === null) {
+      setSelectTab("folder");
+    } else {
+      setSelectTab("timeline");
+    }
+  }, []);
 
   const handleTabClick = (tab: string) => {
     setSelectTab(tab);
