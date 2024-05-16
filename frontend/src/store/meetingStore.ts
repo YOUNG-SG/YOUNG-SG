@@ -5,8 +5,8 @@ interface MeetingState {
   session: OVSession | null;
   screenSession: OVSession | null;
   // sessionId: string;
-  subscriber: Subscriber | null;
-  screenSubscriber: Subscriber | null;
+  subscribers: Subscriber[];
+  screenSubscribers: Subscriber[];
   publisher: Publisher | null;
   screenPublisher: Publisher | null;
   isAudioEnabled: boolean;
@@ -17,8 +17,8 @@ interface MeetingState {
   setSession: (session: OVSession | null) => void;
   setScreenSession: (session: OVSession | null) => void;
   // setSessionId: (sessionId: string) => void;
-  setSubscriber: (subscriber: Subscriber | null) => void;
-  setScreenSubscriber: (screenSubscriber: Subscriber | null) => void;
+  setSubscribers: (subscriber: Subscriber[]) => void;
+  setScreenSubscribers: (screenSubscriber: Subscriber[]) => void;
   setPublisher: (publisher: Publisher | null) => void;
   setScreenPublisher: (screenPublisher: Publisher | null) => void;
   setIsAudioEnabled: (isAudioEnabled: boolean) => void;
@@ -31,8 +31,8 @@ const useMeetingStore = create<MeetingState>((set) => ({
   session: null,
   screenSession: null,
   // sessionId: "",
-  subscriber: null,
-  screenSubscriber: null,
+  subscribers: [],
+  screenSubscribers: [],
   publisher: null,
   screenPublisher: null,
   isAudioEnabled: true,
@@ -43,8 +43,8 @@ const useMeetingStore = create<MeetingState>((set) => ({
   setSession: (session) => set({ session }),
   setScreenSession: (screenSession) => set({ screenSession }),
   // setSessionId: (sessionId) => set({ sessionId }),
-  setSubscriber: (subscriber) => set({ subscriber }),
-  setScreenSubscriber: (screenSubscriber) => set({ screenSubscriber }),
+  setSubscribers: (subscribers) => set({ subscribers }),
+  setScreenSubscribers: (screenSubscribers) => set({ screenSubscribers }),
   setPublisher: (publisher) => set({ publisher }),
   setScreenPublisher: (screenPublisher) => set({ screenPublisher }),
   setIsAudioEnabled: (isAudioEnabled) => set({ isAudioEnabled }),

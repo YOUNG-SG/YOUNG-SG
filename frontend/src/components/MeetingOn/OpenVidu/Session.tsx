@@ -1,29 +1,14 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import Video from "./Video";
 import { Publisher, Subscriber } from "openvidu-browser";
 
 interface SessionProps {
-  subscriber: Subscriber;
+  subscribers: Subscriber[];
   publisher: Publisher;
 }
 
-function Session({ subscriber, publisher }: SessionProps) {
-  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
-
-  useEffect(() => {
-    if (subscriber) {
-      setSubscribers((prevSubscribers) => {
-        // 새로운 subscriber가 이미 배열에 있는지 확인
-        const isAlreadyAdded = prevSubscribers.some(
-          (sub) => sub.stream.streamId === subscriber.stream.streamId,
-        );
-        if (!isAlreadyAdded) {
-          return [...prevSubscribers, subscriber];
-        }
-        return prevSubscribers;
-      });
-    }
-  }, [subscriber]);
+function Session({ subscribers, publisher }: SessionProps) {
+  // const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
 
   // 참가자 수에 따라 그리드 레이아웃을 계산
   const calculateGridClasses = (count: number) => {

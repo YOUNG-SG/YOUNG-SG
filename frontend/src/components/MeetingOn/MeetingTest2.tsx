@@ -38,9 +38,9 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     setSession,
     screenSession,
     setScreenSession,
-    subscriber,
-    setSubscriber,
-    setScreenSubscriber,
+    subscribers,
+    setSubscribers,
+    setScreenSubscribers,
     publisher,
     setPublisher,
     setScreenPublisher,
@@ -66,7 +66,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     setOV(null);
     setSession(null);
     setSessionId("");
-    setSubscriber(null);
+    setSubscribers([]);
     setPublisher(null);
     setIsAudioEnabled(true);
     setIsVideoEnabled(true);
@@ -76,20 +76,51 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     setScreenOV(null);
     setScreenSession(null);
     setScreenPublisher(null);
-    setScreenSubscriber(null);
+    setScreenSubscribers([]);
   }, [session]);
 
-  const joinSession = () => {
+  const joinSession = useCallback(() => {
     const OVs = new OpenVidu();
     setOV(OVs);
-    setSession(OVs.initSession());
-  };
+    const newSession = OVs.initSession();
 
-  const joinScreenSession = () => {
+    newSession.on("streamCreated", (event) => {
+      const newSubscriber = newSession.subscribe(event.stream, undefined);
+      setSubscribers((prevSubscribers) => [...prevSubscribers, newSubscriber]);
+    });
+
+    newSession.on("streamDestroyed", (event) => {
+      setSubscribers((prevSubscribers) =>
+        prevSubscribers.filter((subscriber) => subscriber.stream !== event.stream),
+      );
+    });
+
+    setSession(newSession);
+  }, [setOV, setSession, setSubscribers]);
+
+  const joinScreenSession = useCallback(() => {
     const screenOVs = new OpenVidu();
     setScreenOV(screenOVs);
-    setScreenSession(screenOVs.initSession());
-  };
+    const newScreenSession = screenOVs.initSession();
+
+    newScreenSession.on("streamCreated", (event) => {
+      const newScreenSubscriber = newScreenSession.subscribe(event.stream, undefined);
+      setScreenSubscribers((prevScreenSubscribers) => [
+        ...prevScreenSubscribers,
+        newScreenSubscriber,
+      ]);
+    });
+
+    newScreenSession.on("streamDestroyed", (event) => {
+      setScreenSubscribers((prevScreenSubscribers) =>
+        prevScreenSubscribers.filter(
+          (screenSubscriber) => screenSubscriber.stream !== event.stream,
+        ),
+      );
+    });
+
+    setScreenSession(newScreenSession);
+  }, [setScreenOV, setScreenSession, setScreenSubscribers]);
 
   useEffect(() => {
     window.addEventListener("beforeunload", leaveSession);
@@ -152,34 +183,34 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     joinSession();
   }, []);
 
-  useEffect(() => {
-    if (session === null) return;
+  // useEffect(() => {
+  //   if (session === null) return;
 
-    session.on("streamDestroyed", (event) => {
-      if (subscriber && event.stream.streamId === subscriber.stream.streamId) {
-        setSubscriber(null);
-      }
-    });
-  }, [session]);
+  //   session.on("streamDestroyed", (event) => {
+  //     if (subscriber && event.stream.streamId === subscriber.stream.streamId) {
+  //       setSubscriber(null);
+  //     }
+  //   });
+  // }, [session]);
 
-  useEffect(() => {
-    if (screenSession === null) return;
+  // useEffect(() => {
+  //   if (screenSession === null) return;
 
-    screenSession.on("streamDestroyed", (event) => {
-      if (subscriber && event.stream.streamId === subscriber.stream.streamId) {
-        setSubscriber(null);
-      }
-    });
-  }, [screenSession]);
+  //   screenSession.on("streamDestroyed", (event) => {
+  //     if (subscriber && event.stream.streamId === subscriber.stream.streamId) {
+  //       setSubscriber(null);
+  //     }
+  //   });
+  // }, [screenSession]);
 
   // 유저 화면 세션
   useEffect(() => {
     if (session === null) return;
 
-    session.on("streamCreated", (event) => {
-      const subscribers = session.subscribe(event.stream, "");
-      setSubscriber(subscribers);
-    });
+    // session.on("streamCreated", (event) => {
+    //   const subscribers = session.subscribe(event.stream, "");
+    //   setSubscriber(subscribers);
+    // });
 
     getToken()
       .then((token) => {
@@ -193,6 +224,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
                 publishAudio: false,
                 publishVideo: true,
                 mirror: true,
+                insertMode: "APPEND",
               });
 
               setPublisher(publishers);
@@ -211,10 +243,10 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
   useEffect(() => {
     if (screenSession === null) return;
 
-    screenSession.on("streamCreated", (event) => {
-      const screenSubscribers = screenSession.subscribe(event.stream, "");
-      setScreenSubscriber(screenSubscribers);
-    });
+    // screenSession.on("streamCreated", (event) => {
+    //   const screenSubscribers = screenSession.subscribe(event.stream, "");
+    //   setScreenSubscriber(screenSubscribers);
+    // });
 
     getToken()
       .then((token) => {
@@ -351,7 +383,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
                 {session && (
                   <Session
                     publisher={publisher as Publisher}
-                    subscriber={subscriber as Subscriber}
+                    subscribers={subscribers as Subscriber[]}
                   />
                 )}
               </div>
@@ -371,7 +403,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
                     <>
                       <button
                         onClick={toggleRecord}
-                        className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-600 flex justify-center items-center"
+                        className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center"
                       >
                         {!listening ? (
                           <img className="pl-1 h-7 w-7" src={record} alt="" />
@@ -380,7 +412,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
                         )}
                       </button>
                       <button
-                        className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-600 flex justify-center items-center"
+                        className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center"
                         onClick={endRecord}
                         disabled={roomStatus === "0" || roomStatus === "2"}
                       >
@@ -440,14 +472,16 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
               ) : null}
             </div>
             <div className="col-span-3">
-              <Chatting
-                roomId={roomId}
-                roomStatus={roomStatus}
-                listenContinuously={listenContinuously}
-                setIsRecording={setIsRecording}
-                listenStop={listenStop}
-                owner={owner}
-              />
+              {roomId && (
+                <Chatting
+                  roomId={roomId}
+                  roomStatus={roomStatus}
+                  listenContinuously={listenContinuously}
+                  setIsRecording={setIsRecording}
+                  listenStop={listenStop}
+                  owner={owner}
+                />
+              )}
             </div>
           </div>
         </>

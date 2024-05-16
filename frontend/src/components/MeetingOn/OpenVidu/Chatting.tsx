@@ -141,6 +141,12 @@ const Chatting = ({
           }
         }
       });
+
+      stompClientRef.current.subscribe(`/sub/vote/${roomId}`, function (res) {
+        const data = JSON.parse(res.body);
+        console.log(data);
+      });
+
       setPrevStatus(roomStatus);
     } else if (roomStatus === "2") {
       console.log("Unsubscribing from meeting chat for roomId:", roomId);
@@ -204,6 +210,7 @@ const Chatting = ({
       console.log("Connected: " + frame);
       setConnected(true);
 
+      // 채팅 메시지 구독
       client.subscribe(`/sub/chat/${roomId}`, function (message) {
         console.log("Message received:", message.body);
         const contentType = message.headers["content-type"];
@@ -217,6 +224,7 @@ const Chatting = ({
         }
       });
 
+      // 상태 갱신 소켓 구독
       client.subscribe(`/sub/room/update/${roomId}`, function (res) {
         const data = JSON.parse(res.body);
         console.log(data);
@@ -336,13 +344,13 @@ const Chatting = ({
         <div className="row-span-2 flex gap-2 justify-end items-center">
           <button
             onClick={handleIsSubscribers}
-            className="w-10 h-10 rounded-full bg-gray-400 flex justify-center items-center"
+            className="w-10 h-10 rounded-full bg-gray-400 hover:bg-gray-300 flex justify-center items-center"
           >
             <img className="w-6 h-6" src={people} alt="" />
           </button>
           <button
             onClick={handleIsChatting}
-            className="w-10 h-10 rounded-full bg-gray-400 flex justify-center items-center"
+            className="w-10 h-10 rounded-full bg-gray-400 hover:bg-gray-300 flex justify-center items-center"
           >
             <img className="w-6 h-6" src={chat} alt="" />
           </button>
