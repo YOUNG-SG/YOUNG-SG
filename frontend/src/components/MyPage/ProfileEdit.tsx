@@ -64,6 +64,10 @@ const ProfileEdit = () => {
         <u
           className="cursor-pointer"
           onClick={() => {
+            if (nickname.length > 5) {
+              alert("닉네임은 5글자 이하로 설정해주세요");
+              return;
+            }
             handleEditProfile();
             setEditMode(false);
           }}

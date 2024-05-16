@@ -57,7 +57,11 @@ const Profile = () => {
       />
 
       <div>
-        <span className="text-[24px] font-bold">{myProfile.nickName}</span>
+        <span className="text-[24px] font-bold">
+          {myProfile.nickName.length > 5
+            ? myProfile.nickName.slice(0, 5) + "···"
+            : myProfile.nickName}
+        </span>
         <span className="text-[20px] font-[#CCCCCC]">님</span>
       </div>
       <u
