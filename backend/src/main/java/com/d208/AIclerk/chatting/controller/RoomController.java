@@ -180,6 +180,14 @@ public class RoomController {
         }
     }
 
+    @MessageMapping("/{roomId}/sendVote")
+    public void sendVote(@DestinationVariable Long roomId, VoteMessageDto message) {
+        log.info("투표관련내용: {} ({}): {}", message.getSender(), message.getSenderId(), message.getVoteType());
+        messagingTemplate.convertAndSend("/sub/vote/" + roomId, message);
+
+    }
+
+
 
 
 }
