@@ -269,7 +269,7 @@ public class MemberServiceImpl implements MemberService{
         TreeMap<Integer, TreeMap<Integer, List<TimeLineDayDto>>> response =  new TreeMap<>(Comparator.reverseOrder());
         for (meetingListDto meeting:meetingList) {
             // meetingroom의 id 가 detail에 존재하지 않는다면 그냥 넘기기
-            MeetingDetail meetingDetail = meetingDetailRepository.findByMeetingRoom_Id(meeting.getRoomId());
+            List<MeetingDetail> meetingDetail = meetingDetailRepository.findAllByMeetingRoom_Id(meeting.getRoomId());
             if (meetingDetail == null) {
                 continue;  // MeetingDetail이 존재하지 않으면 다음 반복으로 넘어감
             }

@@ -83,46 +83,47 @@ public class MeetingServiceImpl implements MeetingService {
                 fullSummary.append(" ");
             }
 
-            MeetingRoom meetingRoom = roomRepository.findById(dto.getRoomId())
-                    .orElseThrow(() -> new NoSuchElementException("Meeting room not found with id: " + dto.getRoomId()));
 
-            if (meetingDetailRepository.findByMeetingRoom_Id(meetingRoom.getId()) != null) {
-                throw MeetingDetailException.existDetailException();
-            }
+        MeetingRoom meetingRoom = roomRepository.findById(dto.getRoomId())
+                .orElseThrow(() -> new NoSuchElementException("Meeting room not found with id: " + dto.getRoomId()));
 
-            LocalDateTime startTime = Optional.ofNullable(meetingRoom.getStartTime()).orElse(LocalDateTime.now());
-            LocalDateTime endTime = Optional.ofNullable(meetingRoom.getEndTime()).orElse(LocalDateTime.now());
-
-            MeetingDetail meetingDetail = MeetingDetail.builder()
-                    .summary(fullSummary.toString())
-                    .title(meetingRoom.getTitle())
-                    .meetingRoom(meetingRoom)
-                    .createAt(startTime)
-                    .totalTime(Duration.between(startTime, endTime).toMinutes())
-                    .build();
-
-            meetingDetailRepository.save(meetingDetail);
-
-            String bucketName = "youngseogi";
-            String key = "test_test.docx";
-            InputStream inputStream = wordDocumentUpdater.getFileFromS3(bucketName, key);
-            String newKey = "SummaryFolder/" + UUID.randomUUID() + ".docx";
-
-            List<String> participantNames = getParticipantNamesByMeetingRoomId(meetingRoom.getId());
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-            String formattedDate = meetingDetail.getCreateAt().format(formatter);
-
-            try {
-                wordDocumentUpdater.updateDocument(inputStream, bucketName, newKey, meetingRoom.getTitle(), fullSummary.toString(), participantNames, meetingDetail.getId(), formattedDate);
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update document: " + e.getMessage());
-            }
-
-            return ResponseEntity.ok("회의 상세(meeting_detail) 저장 성공 및 파일 업로드 완료");
-        } finally {
-            lock.unlock();
+        // 이미 저장된 상세페이지가 있는지 예외처리
+        if (meetingDetailRepository.findAllByMeetingRoom_Id(meetingRoom.getId()).get(0) != null) {
+            throw MeetingDetailException.existDetailException();
         }
+
+        LocalDateTime startTime = Optional.ofNullable(meetingRoom.getStartTime()).orElse(LocalDateTime.now());
+        LocalDateTime endTime = Optional.ofNullable(meetingRoom.getEndTime()).orElse(LocalDateTime.now());
+
+        MeetingDetail meetingDetail = MeetingDetail.builder()
+                .summary(fullSummary.toString())
+                .title(meetingRoom.getTitle())
+                .meetingRoom(meetingRoom)
+                .createAt(startTime)
+                .totalTime(Duration.between(startTime, endTime).toMinutes())
+                .build();
+
+        // 먼저 MeetingDetail 저장
+        meetingDetailRepository.save(meetingDetail);
+
+        // 파일 업로드
+        String bucketName = "youngseogi";
+        String key = "test_test.docx";
+        InputStream inputStream = wordDocumentUpdater.getFileFromS3(bucketName, key);
+        String newKey = "SummaryFolder/" + UUID.randomUUID() + ".docx";
+
+        List<String> participantNames = getParticipantNamesByMeetingRoomId(meetingRoom.getId());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        String formattedDate = meetingDetail.getCreateAt().format(formatter);
+
+        try {
+            wordDocumentUpdater.updateDocument(inputStream, bucketName, newKey, meetingRoom.getTitle(), fullSummary.toString(), participantNames, meetingDetail.getId(), formattedDate);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update document: " + e.getMessage());
+        }
+
+        return ResponseEntity.ok("회의 상세(meeting_detail) 저장 성공 및 파일 업로드 완료");
     }
 
 
@@ -184,7 +185,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         MeetingDetailResponseDto dto = new MeetingDetailResponseDto();
 
-        MeetingDetail meetingDetail = meetingDetailRepository.findByMeetingRoom_Id(roomId);
+        MeetingDetail meetingDetail = meetingDetailRepository.findAllByMeetingRoom_Id(roomId).get(0);
 
         dto.setTitle(meetingDetail.getTitle());
         dto.setDetailId(meetingDetail.getId());
@@ -235,7 +236,7 @@ public class MeetingServiceImpl implements MeetingService {
         List<MemberMeeting> memberMeetingList = memberMeetingRepository.findAllByFolder_Id(folderId);
 
         List<DetailListResponseDto> detailListResponseDtos = memberMeetingList.stream()
-                .map(memberMeeting -> meetingDetailRepository.findByMeetingRoom_Id(memberMeeting.getRoomId()))
+                .map(memberMeeting -> meetingDetailRepository.findAllByMeetingRoom_Id(memberMeeting.getRoomId()).get(0))
                 .filter(Objects::nonNull)
                 .map(detail -> {
                     DetailListResponseDto detailListResponseDto = new DetailListResponseDto();

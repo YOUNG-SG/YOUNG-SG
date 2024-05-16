@@ -7,10 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MeetingDetailRepository extends JpaRepository<MeetingDetail, Long> {
 
     MeetingDetail findByMeetingRoom_Id(Long roomId);
+    List<MeetingDetail> findAllByMeetingRoom_Id(Long roomId);
 
 }
