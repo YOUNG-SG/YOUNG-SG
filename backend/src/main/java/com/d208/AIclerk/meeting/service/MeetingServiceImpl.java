@@ -87,7 +87,7 @@ public class MeetingServiceImpl implements MeetingService {
                 .orElseThrow(() -> new NoSuchElementException("Meeting room not found with id: " + dto.getRoomId()));
 
         // 이미 저장된 상세페이지가 있는지 예외처리
-        if (meetingDetailRepository.findByMeetingRoom_Id(meetingRoom.getId()) != null) {
+        if (meetingDetailRepository.findAllByMeetingRoom_Id(meetingRoom.getId()).get(0) != null) {
             throw MeetingDetailException.existDetailException();
         }
 
@@ -183,7 +183,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         MeetingDetailResponseDto dto = new MeetingDetailResponseDto();
 
-        MeetingDetail meetingDetail = meetingDetailRepository.findByMeetingRoom_Id(roomId);
+        MeetingDetail meetingDetail = meetingDetailRepository.findAllByMeetingRoom_Id(roomId).get(0);
 
         dto.setTitle(meetingDetail.getTitle());
         dto.setDetailId(meetingDetail.getId());
@@ -234,7 +234,7 @@ public class MeetingServiceImpl implements MeetingService {
         List<MemberMeeting> memberMeetingList = memberMeetingRepository.findAllByFolder_Id(folderId);
 
         List<DetailListResponseDto> detailListResponseDtos = memberMeetingList.stream()
-                .map(memberMeeting -> meetingDetailRepository.findByMeetingRoom_Id(memberMeeting.getRoomId()))
+                .map(memberMeeting -> meetingDetailRepository.findAllByMeetingRoom_Id(memberMeeting.getRoomId()).get(0))
                 .filter(Objects::nonNull)
                 .map(detail -> {
                     DetailListResponseDto detailListResponseDto = new DetailListResponseDto();
