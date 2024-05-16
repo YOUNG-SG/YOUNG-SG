@@ -29,7 +29,6 @@ public class SecurityConfig {
     @Autowired
     private JWTUtil jwtUtil;
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // Cors 설정
@@ -66,15 +65,22 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration config = new CorsConfiguration();
+
+
         config.setAllowCredentials(true);
         config.addAllowedOriginPattern("*");
         config.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
         source.registerCorsConfiguration("/**", config);
+        source.registerCorsConfiguration("/ws/**", config);  // WebSocket 경로에도 CORS 설정 적용
 
         return source;
     }
+
+    // config 뭐가 문제지?
 }

@@ -1,10 +1,12 @@
 package com.d208.AIclerk.member.service;
 
 import com.d208.AIclerk.common.S3Uploader;
+import com.d208.AIclerk.entity.MeetingDetail;
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.entity.MemberMeeting;
 import com.d208.AIclerk.exception.member.MemberException;
 import com.d208.AIclerk.meeting.dto.meetingListDto;
+import com.d208.AIclerk.meeting.repository.MeetingDetailRepository;
 import com.d208.AIclerk.meeting.repository.MeetingRoomRepository;
 import com.d208.AIclerk.meeting.repository.MemberMeetingRepository;
 import com.d208.AIclerk.member.dto.responseDto.*;
@@ -42,6 +44,7 @@ public class MemberServiceImpl implements MemberService{
     private final S3Uploader s3Uploader;
     private final MemberMeetingRepository memberMeetingRepository;
     private final MeetingRoomRepository meetingRoomRepository;
+    private final MeetingDetailRepository meetingDetailRepository;
 
 
     @Value("${KAKAO_CLIENT_ID}")
@@ -265,6 +268,12 @@ public class MemberServiceImpl implements MemberService{
         // treemap response 생성
         TreeMap<Integer, TreeMap<Integer, List<TimeLineDayDto>>> response =  new TreeMap<>(Comparator.reverseOrder());
         for (meetingListDto meeting:meetingList) {
+            // meetingroom의 id 가 detail에 존재하지 않는다면 그냥 넘기기
+            List<MeetingDetail> meetingDetail = meetingDetailRepository.findAllByMeetingRoom_Id(meeting.getRoomId());
+            if (meetingDetail == null) {
+                continue;  // MeetingDetail이 존재하지 않으면 다음 반복으로 넘어감
+            }
+
             // 연도와 월 체크 => 다르면 싹 갱신 연도 리스트에 월 리스트로 체크
             if (meeting.getStartTime().getYear() != year || meeting.getStartTime().getMonthValue() != month) {
                 year = meeting.getStartTime().getYear();

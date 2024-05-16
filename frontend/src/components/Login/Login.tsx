@@ -1,5 +1,5 @@
-import TestIcon from "@/assets/@test/Pencil.svg?react";
-import KakaoLogin from "@/assets/Login/KakaoLogin.svg?react";
+import Logo from "@/assets/@common/LoginLogo.svg?react";
+import KakaoLogo from "@/assets/Login/KakaoLogo.svg?react";
 import { tokenStore } from "@/store/tokenStore";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +10,7 @@ const Login = () => {
 
   useEffect(() => {
     if (token) {
-      alert("이미 로그인 되었습니다.");
+      alert("이미 로그인 되었습니다");
       navigate("/");
     }
   }, []);
@@ -24,10 +24,15 @@ const Login = () => {
   };
 
   return (
-    <div className="w-[400px] h-[550px] bg-e-20 rounded-lg backdrop-blur-10 flex flex-col justify-center items-center">
-      <div className="text-[28px] font-bold">YOUNG 서기</div>
-      <TestIcon className="w-[200px]" />
-      <KakaoLogin className="w-[230px] cursor-pointer" onClick={loginHandler} />
+    <div className="w-[400px] h-[500px] bg-e-20 rounded-lg backdrop-blur-10 flex flex-col gap-[20px] justify-center items-center">
+      <Logo className="w-[200px] opacity-80" />
+      <div
+        className="w-[200px] h-[40px] bg-white bg-opacity-10 hover:scale-[1.1] hover:bg-opacity-30 shadow-md rounded-md flex gap-[16px] justify-center items-center cursor-pointer"
+        onClick={loginHandler}
+      >
+        <KakaoLogo />
+        <div className="text-[14px]">카카오 로그인</div>
+      </div>
     </div>
   );
 };

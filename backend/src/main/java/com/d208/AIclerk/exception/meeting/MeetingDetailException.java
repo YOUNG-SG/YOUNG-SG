@@ -25,5 +25,9 @@ public class MeetingDetailException extends RuntimeException{
         return new MeetingDetailException("이전, 이후 회의 목록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
     }
 
+    public static MeetingDetailException summaryNotFoundException() {
+        return new MeetingDetailException("요약된 회의 내용을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+    }
+
 
 }

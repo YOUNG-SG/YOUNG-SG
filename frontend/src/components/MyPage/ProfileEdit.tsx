@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import ChangeImage from "@/assets/MyPage/PencilSimpleLine.svg?react";
 import { updateMyProfile } from "@/services/MyPage";
 import { editModeStore } from "@/store/myPageStore";
+import SkeletonLoader from "@/components/@common/SkeletonLoader";
+import DefaultProfile from "@/assets/@common/Profile.svg?react";
 
 const ProfileEdit = () => {
   /* store */
@@ -11,16 +13,16 @@ const ProfileEdit = () => {
 
   /* tanstack query */
   const {
+    isLoading: getLoading,
+    isError: getError,
     data: myProfile,
-    isLoading,
-    error,
   } = useQuery({
     queryKey: ["myProfile"],
     queryFn: () => fetchMyProfile(),
   });
 
   const queryClient = useQueryClient();
-  const { mutate: editProfile } = useMutation({
+  const { isError: editError, mutate: editProfile } = useMutation({
     mutationFn: updateMyProfile,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myProfile"] });
@@ -31,17 +33,6 @@ const ProfileEdit = () => {
   const [nickname, setNickname] = useState(myProfile.nickName);
   const [preview, setPreview] = useState(myProfile.profileImg);
   const [file, setFile] = useState<File | null>(null);
-
-  if (isLoading) {
-    // 로딩 컴포넌트 x
-    return (
-      <div className="min-w-[240px] h-full py-[40px] flex flex-col items-center bg-[#777777] bg-opacity-30"></div>
-    );
-  }
-
-  if (error) {
-    return <div>{error.message}</div>;
-  }
 
   function handleEditProfile() {
     const profile = new FormData();
@@ -73,6 +64,10 @@ const ProfileEdit = () => {
         <u
           className="cursor-pointer"
           onClick={() => {
+            if (nickname.length > 5) {
+              alert("닉네임은 5글자 이하로 설정해주세요");
+              return;
+            }
             handleEditProfile();
             setEditMode(false);
           }}
@@ -90,6 +85,31 @@ const ProfileEdit = () => {
       setPreview(URL.createObjectURL(newFile));
     }
   };
+
+  if (getError) {
+    alert("오류가 발생했습니다");
+    setEditMode(false);
+  }
+
+  if (editError) {
+    alert("프로필 수정에 실패했습니다");
+  }
+
+  if (getLoading || getError) {
+    return (
+      <div className="min-w-[240px] h-full py-[40px] flex flex-col items-center bg-[#777777] bg-opacity-30">
+        <div className="h-[20px]"></div>
+        {getLoading ? (
+          <div className="mt-[15px] mb-[25px]">
+            <SkeletonLoader round="full" w={140} h={140} />
+          </div>
+        ) : (
+          <DefaultProfile className="w-[140px] h-[140px] rounded-full object-cover mt-[15px] mb-[25px]" />
+        )}
+        {getLoading ? <SkeletonLoader round="lg" w={140} h={40} /> : <></>}
+      </div>
+    );
+  }
 
   return (
     <div className="min-w-[240px] h-full py-[40px] flex flex-col items-center bg-[#777777] bg-opacity-30">

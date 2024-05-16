@@ -57,11 +57,15 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     @Transactional
     public ResponseEntity<String> summaryText(OpenAiRequestDto dto) throws Exception {
-        lock.lock();
-        try {
-            Summary summary = summaryRepository.findContentByMeetingRoomId(dto.getRoomId());
-            String inputText = summary.getContent();
-            StringBuilder fullSummary = new StringBuilder();
+
+        Summary summary = summaryRepository.findContentByMeetingRoomId(dto.getRoomId());
+
+        if (summary == null) {
+            throw MeetingDetailException.summaryNotFoundException();
+        }
+
+        String inputText = summary.getContent();
+        StringBuilder fullSummary = new StringBuilder();
 
             final int MAX_LENGTH = 4000;
             while (!inputText.isEmpty()) {
@@ -79,46 +83,47 @@ public class MeetingServiceImpl implements MeetingService {
                 fullSummary.append(" ");
             }
 
-            MeetingRoom meetingRoom = roomRepository.findById(dto.getRoomId())
-                    .orElseThrow(() -> new NoSuchElementException("Meeting room not found with id: " + dto.getRoomId()));
 
-            if (meetingDetailRepository.findByMeetingRoom_Id(meetingRoom.getId()) != null) {
-                throw MeetingDetailException.existDetailException();
-            }
+        MeetingRoom meetingRoom = roomRepository.findById(dto.getRoomId())
+                .orElseThrow(() -> new NoSuchElementException("Meeting room not found with id: " + dto.getRoomId()));
 
-            LocalDateTime startTime = Optional.ofNullable(meetingRoom.getStartTime()).orElse(LocalDateTime.now());
-            LocalDateTime endTime = Optional.ofNullable(meetingRoom.getEndTime()).orElse(LocalDateTime.now());
-
-            MeetingDetail meetingDetail = MeetingDetail.builder()
-                    .summary(fullSummary.toString())
-                    .title(meetingRoom.getTitle())
-                    .meetingRoom(meetingRoom)
-                    .createAt(startTime)
-                    .totalTime(Duration.between(startTime, endTime).toMinutes())
-                    .build();
-
-            meetingDetailRepository.save(meetingDetail);
-
-            String bucketName = "youngseogi";
-            String key = "test_test.docx";
-            InputStream inputStream = wordDocumentUpdater.getFileFromS3(bucketName, key);
-            String newKey = "SummaryFolder/" + UUID.randomUUID() + ".docx";
-
-            List<String> participantNames = getParticipantNamesByMeetingRoomId(meetingRoom.getId());
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-            String formattedDate = meetingDetail.getCreateAt().format(formatter);
-
-            try {
-                wordDocumentUpdater.updateDocument(inputStream, bucketName, newKey, meetingRoom.getTitle(), fullSummary.toString(), participantNames, meetingDetail.getId(), formattedDate);
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update document: " + e.getMessage());
-            }
-
-            return ResponseEntity.ok("회의 상세(meeting_detail) 저장 성공 및 파일 업로드 완료");
-        } finally {
-            lock.unlock();
+        // 이미 저장된 상세페이지가 있는지 예외처리
+        if (!meetingDetailRepository.findAllByMeetingRoom_Id(meetingRoom.getId()).isEmpty()) {
+            throw MeetingDetailException.existDetailException();
         }
+
+        LocalDateTime startTime = Optional.ofNullable(meetingRoom.getStartTime()).orElse(LocalDateTime.now());
+        LocalDateTime endTime = Optional.ofNullable(meetingRoom.getEndTime()).orElse(LocalDateTime.now());
+
+        MeetingDetail meetingDetail = MeetingDetail.builder()
+                .summary(fullSummary.toString())
+                .title(meetingRoom.getTitle())
+                .meetingRoom(meetingRoom)
+                .createAt(startTime)
+                .totalTime(Duration.between(startTime, endTime).toMinutes())
+                .build();
+
+        // 먼저 MeetingDetail 저장
+        meetingDetailRepository.save(meetingDetail);
+
+        // 파일 업로드
+        String bucketName = "youngseogi";
+        String key = "testword.docx";
+        InputStream inputStream = wordDocumentUpdater.getFileFromS3(bucketName, key);
+        String newKey = "SummaryFolder/" + UUID.randomUUID() + ".docx";
+
+        List<String> participantNames = getParticipantNamesByMeetingRoomId(meetingRoom.getId());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        String formattedDate = meetingDetail.getCreateAt().format(formatter);
+
+        try {
+            wordDocumentUpdater.updateDocument(inputStream, bucketName, newKey, meetingRoom.getTitle(), fullSummary.toString(), participantNames, meetingDetail.getId(), formattedDate);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update document: " + e.getMessage());
+        }
+
+        return ResponseEntity.ok("회의 상세(meeting_detail) 저장 성공 및 파일 업로드 완료");
     }
 
 
@@ -176,16 +181,16 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public ResponseEntity<MeetingDetailResponse> readMeetingDetail(Long roomId) {
-
         Member currentMember = commonUtil.getMember();
 
         MeetingDetailResponseDto dto = new MeetingDetailResponseDto();
 
-        MeetingDetail meetingDetail = meetingDetailRepository.findByMeetingRoom_Id(roomId);
+        MeetingDetail meetingDetail = meetingDetailRepository.findAllByMeetingRoom_Id(roomId).get(0);
 
         dto.setTitle(meetingDetail.getTitle());
         dto.setDetailId(meetingDetail.getId());
         dto.setSummary(meetingDetail.getSummary());
+
 
         // 시간
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
@@ -197,29 +202,14 @@ public class MeetingServiceImpl implements MeetingService {
             dto.setDate("생성 시간이 없습니다.");
         }
 
+        Long folderId = memberMeetingRepository.findFolderIdByMemberIdAndRoomId(currentMember.getId(), roomId);
 
-        Object[] detailIds = memberMeetingRepository.findPreviousAndNextDetailIds(currentMember.getId(), roomId)
-                .orElseThrow(MeetingDetailException::preAndNextDetailNotFoundException);
+        Long preRoomId = memberMeetingRepository.findPreRoomId(folderId, roomId).orElse(null);
+        Long nxtRoomId = memberMeetingRepository.findNextRoomId(folderId, roomId).orElse(null);
 
-        Long preMeetingId = null;
-        Long nextMeetingId = null;
+        dto.setPreMeetingId(preRoomId);
+        dto.setNextMeetingId(nxtRoomId);
 
-        if (detailIds == null || detailIds.length == 0) {
-            dto.setPreMeetingId(preMeetingId);
-            dto.setNextMeetingId(nextMeetingId);
-        } else {
-            Object[] detailIdList = (Object[]) detailIds[0];
-            if (detailIdList[0] != null && !detailIdList[0].equals(0L)) {
-                preMeetingId = (Long) detailIdList[0];
-            }
-
-            if (detailIdList[1] != null && !detailIdList[1].equals(0L)) {
-                nextMeetingId = (Long) detailIdList[1];
-            }
-
-            dto.setPreMeetingId(preMeetingId);
-            dto.setNextMeetingId(nextMeetingId);
-        }
 
         File file = fileRepository.findByMeetingDetail(meetingDetail);
         dto.setFileUrl(file.getUrl());
@@ -244,10 +234,13 @@ public class MeetingServiceImpl implements MeetingService {
     public ResponseEntity<DetailListResponse> readDetailList(Long folderId) {
 
         List<MemberMeeting> memberMeetingList = memberMeetingRepository.findAllByFolder_Id(folderId);
+
         List<DetailListResponseDto> detailListResponseDtos = memberMeetingList.stream()
-                .map(memberMeeting -> {
+                .map(memberMeeting -> meetingDetailRepository.findAllByMeetingRoom_Id(memberMeeting.getRoomId()))
+                .map(details -> details.isEmpty() ? null:details.get(0))
+                .filter(Objects::nonNull)
+                .map(detail -> {
                     DetailListResponseDto detailListResponseDto = new DetailListResponseDto();
-                    MeetingDetail detail = meetingDetailRepository.findByMeetingRoom_Id(memberMeeting.getRoomId());
                     Long commentCnt = commentRepository.countAllByMeetingDetail_Id(detail.getId());
 
                     Long meetingRoomId = Optional.ofNullable(detail.getMeetingRoom())
@@ -266,6 +259,7 @@ public class MeetingServiceImpl implements MeetingService {
                         detailListResponseDto.setDate(formattedDate);
                     }
 
+                    detailListResponseDto.setRoomId(detail.getMeetingRoom().getId());
                     detailListResponseDto.setDetailId(detail.getId());
                     detailListResponseDto.setTitle(detail.getTitle());
                     detailListResponseDto.setTotalTime(detail.getTotalTime());
@@ -330,10 +324,6 @@ public class MeetingServiceImpl implements MeetingService {
     public ResponseEntity<ReadCommentResponse> readComment(Long detailId) {
 
         List<Comment> comments = commentRepository.findAllByMeetingDetail_Id(detailId);
-
-        if (comments.isEmpty()){
-            throw CommentException.commentNotFoundException();
-        }
 
         List<CommentResponseDto> commentResponseDtoList = comments.stream()
                 .map(comment -> new CommentResponseDto(

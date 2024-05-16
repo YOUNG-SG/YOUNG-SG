@@ -1,23 +1,22 @@
 import UserInfo from "./UserInfo";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteComment } from "@/services/MeetingDetail";
-import { CommentType } from "@/types/MeetingDetail";
+import { CommentProps } from "@/types/MeetingDetail";
 
-const Comment: React.FC<{
-  comment: CommentType;
-  meetingDetailId: string | undefined;
-  myMemberId: number;
-}> = ({ comment, meetingDetailId, myMemberId }) => {
+const Comment: React.FC<CommentProps> = ({ comment, detailId, myMemberId }) => {
   const queryClient = useQueryClient();
-  // const comment = props.comment;
   const isWriter = myMemberId === comment.memberId;
 
-  const { mutate: delComment } = useMutation({
+  const { isError, mutate: delComment } = useMutation({
     mutationFn: deleteComment,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comments", meetingDetailId] });
+      queryClient.invalidateQueries({ queryKey: ["comments", detailId] });
     },
   });
+
+  if (isError) {
+    alert("댓글 삭제에 실패했습니다");
+  }
 
   return (
     <div className="flex w-full justify-between">

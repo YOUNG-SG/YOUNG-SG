@@ -1,9 +1,21 @@
 import { axiosAuthRequest } from "./axios";
+import { tokenStore } from "@/store/tokenStore";
+import axios from "axios";
 
 // 내 정보
 export const fetchMyProfile = async () => {
-  const res = await axiosAuthRequest.get("/api/oauth/mypage/profile");
-  return res.data.data;
+  try {
+    const res = await axiosAuthRequest.get("/api/oauth/mypage/profile");
+    return res.data.data;
+  } catch (error) {
+    alert("로그인 정보가 유효하지 않습니다");
+    tokenStore.setState({ token: null });
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      throw error;
+    } else {
+      throw error;
+    }
+  }
 };
 
 // 내 정보 수정

@@ -2,46 +2,58 @@ import { clickButtonStore } from "@/store/myPageStore";
 import TimelineYear from "@/components/MyPage/TimelineYear";
 import { useQuery } from "@tanstack/react-query";
 import { fetchTimeline } from "@/services/MyPage";
-import { YearData } from "@/types/MyPage";
+import { ExpandButtonProps, YearData } from "@/types/MyPage";
+import SpinnerLoader from "@/components/@common/SpinnerLoader";
+import ErrorMessage from "@/components/@common/ErrorMessage";
 
 const Timeline = () => {
   const { setIsClick, setIsAllExpanded } = clickButtonStore();
 
-  const { data: timeline, isLoading } = useQuery<YearData>({
+  const {
+    isLoading,
+    isError,
+    data: timeline,
+  } = useQuery<YearData>({
     queryKey: ["timeline"],
     queryFn: () => fetchTimeline(),
   });
 
-  const ExpandBtn: React.FC<{ btnName: string; handleExpand: () => void }> = (props) => {
+  const ExpandButton: React.FC<ExpandButtonProps> = ({ btnName, handleExpand }) => {
     return (
       <div
         className="w-[160px] h-[48px] bg-[#EEEEEE] bg-opacity-30 hover:bg-opacity-50 rounded-lg flex justify-center items-center text-[18px] mb-[16px] cursor-pointer"
-        onClick={props.handleExpand}
+        onClick={handleExpand}
       >
-        {props.btnName}
+        {btnName}
       </div>
     );
   };
 
   if (isLoading) {
-    return <div>로딩중</div>;
+    return (
+      <div className="w-full h-full">
+        <SpinnerLoader />
+      </div>
+    );
   }
 
   return (
     <div className="w-full h-full relative">
-      {timeline && Object.entries(timeline).length ? (
+      {isError ? (
+        <ErrorMessage>타임라인을 불러올 수 없습니다</ErrorMessage>
+      ) : timeline && Object.entries(timeline).length ? (
         <>
           <div className="h-full border-l-[4px] border-[white] ml-[40px] absolute" />
           <div className="w-full h-full">
             <div className="flex justify-end gap-[16px]">
-              <ExpandBtn
+              <ExpandButton
                 btnName="모두 펼치기"
                 handleExpand={() => {
                   setIsAllExpanded(false);
                   setIsClick(true);
                 }}
               />
-              <ExpandBtn
+              <ExpandButton
                 btnName="모두 접기"
                 handleExpand={() => {
                   setIsAllExpanded(true);
@@ -60,9 +72,7 @@ const Timeline = () => {
           </div>
         </>
       ) : (
-        <div className="w-full h-full flex justify-center items-center text-[#CCCCCC]">
-          <div>아직 진행된 회의가 없어요 {": ("}</div>
-        </div>
+        <ErrorMessage>아직 진행된 회의가 없어요 {": ("}</ErrorMessage>
       )}
     </div>
   );
