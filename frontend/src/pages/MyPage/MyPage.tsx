@@ -3,9 +3,14 @@ import Profile from "@/components/MyPage/Profile";
 import ProfileEdit from "@/components/MyPage/ProfileEdit";
 import MyPageTabLayout from "./MyPageTabLayout";
 import MyPageTab from "@/components/MyPage/MyPageTab";
+import { useEffect } from "react";
 
 const MyPage = () => {
-  const { editMode } = editModeStore();
+  const { editMode, setEditMode } = editModeStore();
+
+  useEffect(() => {
+    setEditMode(false);
+  }, []);
 
   return (
     <div className="flex h-screen">

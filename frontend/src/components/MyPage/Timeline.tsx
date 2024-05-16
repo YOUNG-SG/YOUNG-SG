@@ -2,12 +2,12 @@ import { clickButtonStore } from "@/store/myPageStore";
 import TimelineYear from "@/components/MyPage/TimelineYear";
 import { useQuery } from "@tanstack/react-query";
 import { fetchTimeline } from "@/services/MyPage";
-import { ExpandButtonProps, YearData } from "@/types/MyPage";
+import { AllToggleButtonProps, YearData } from "@/types/MyPage";
 import SpinnerLoader from "@/components/@common/SpinnerLoader";
 import ErrorMessage from "@/components/@common/ErrorMessage";
 
 const Timeline = () => {
-  const { setIsClick, setIsAllExpanded } = clickButtonStore();
+  const { setAllToggleActive, setClickAllOpen } = clickButtonStore();
 
   const {
     isLoading,
@@ -18,13 +18,13 @@ const Timeline = () => {
     queryFn: () => fetchTimeline(),
   });
 
-  const ExpandButton: React.FC<ExpandButtonProps> = ({ btnName, handleExpand }) => {
+  const AllToggleButton: React.FC<AllToggleButtonProps> = ({ name, handleToggle }) => {
     return (
       <div
         className="w-[160px] h-[48px] bg-[#EEEEEE] bg-opacity-30 hover:bg-opacity-50 rounded-lg flex justify-center items-center text-[18px] mb-[16px] cursor-pointer"
-        onClick={handleExpand}
+        onClick={handleToggle}
       >
-        {btnName}
+        {name}
       </div>
     );
   };
@@ -46,18 +46,18 @@ const Timeline = () => {
           <div className="h-full border-l-[4px] border-[white] ml-[40px] absolute" />
           <div className="w-full h-full">
             <div className="flex justify-end gap-[16px]">
-              <ExpandButton
-                btnName="모두 펼치기"
-                handleExpand={() => {
-                  setIsAllExpanded(false);
-                  setIsClick(true);
+              <AllToggleButton
+                name="모두 펼치기"
+                handleToggle={() => {
+                  setClickAllOpen(true);
+                  setAllToggleActive(true);
                 }}
               />
-              <ExpandButton
-                btnName="모두 접기"
-                handleExpand={() => {
-                  setIsAllExpanded(true);
-                  setIsClick(true);
+              <AllToggleButton
+                name="모두 접기"
+                handleToggle={() => {
+                  setClickAllOpen(false);
+                  setAllToggleActive(true);
                 }}
               />
             </div>
