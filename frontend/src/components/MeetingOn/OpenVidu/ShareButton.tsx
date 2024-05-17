@@ -1,6 +1,6 @@
 import { shareKakao } from "@/utils/shareKakaoLink";
 import { useEffect } from "react";
-import kakao from "../../../assets/chattingIcons/kakao.png";
+import KakaoLogo from "@/assets/Login/KakaoLogo.svg?react";
 
 interface shareProps {
   sessionId: string;
@@ -22,15 +22,13 @@ const ShareButton = ({ sessionId, title }: shareProps) => {
   }, []);
 
   return (
-    <>
-      <button
-        className="w-16 p-2 mt-4 flex justify-center text-center text-white rounded"
-        style={{ backgroundColor: "rgb(43, 46, 51)" }}
-        onClick={() => shareKakao(route, title)}
-      >
-        <img className="w-7 h-7" src={kakao} alt="" />
-      </button>
-    </>
+    <div
+      className="rounded text-[16px] bg-[#EEEEEE] bg-opacity-30 hover:bg-opacity-40 w-[90px] h-[36px] flex justify-center items-center gap-[6px]"
+      onClick={() => shareKakao(route, title)}
+    >
+      <KakaoLogo className="w-[16px]" />
+      <div>공유</div>
+    </div>
   );
 };
 
