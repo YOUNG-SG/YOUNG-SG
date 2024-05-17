@@ -260,14 +260,18 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public ResponseEntity<TimeLineResponseDto> timeline() {
         Member member = commonUtil.getMember();
-        // List 비었는지 체크해야함
         List<meetingListDto> meetingList = memberMeetingRepository.findAllByMemberOrderByStartTime(member);
         int month = LocalDateTime.now().getMonthValue();
         int year = LocalDateTime.now().getYear();
 
         // treemap response 생성
-        TreeMap<Integer, TreeMap<Integer, List<TimeLineDayDto>>> response =  new TreeMap<>(Comparator.reverseOrder());
-        for (meetingListDto meeting:meetingList) {
+        TreeMap<Integer, TreeMap<Integer, List<TimeLineDayDto>>> response = new TreeMap<>(Comparator.reverseOrder());
+        for (meetingListDto meeting : meetingList) {
+
+            if (meeting.getStartTime() == null) {
+                continue;  // 녹음 안하면 등록이안되요 그건 타임에 포함 ㄴㄴ;
+            }
+
             // meetingroom의 id 가 detail에 존재하지 않는다면 그냥 넘기기
             List<MeetingDetail> meetingDetail = meetingDetailRepository.findAllByMeetingRoom_Id(meeting.getRoomId());
             if (meetingDetail == null) {
@@ -279,16 +283,19 @@ public class MemberServiceImpl implements MemberService{
                 year = meeting.getStartTime().getYear();
                 month = meeting.getStartTime().getMonthValue();
             }
+
             // year 값이 존재하는지 체크 => 없으면 추가
-            if (response.getOrDefault(year, null) == null){
+            if (response.getOrDefault(year, null) == null) {
                 // 키를 추가
                 response.put(year, new TreeMap<>(Comparator.reverseOrder()));
             }
+
             // year의 리스트에 month 있는지 체크
-            if (response.get(year).getOrDefault(month, null) == null){
+            if (response.get(year).getOrDefault(month, null) == null) {
                 // 키를 추가
                 response.get(year).put(month, new ArrayList<>());
             }
+
             response.get(year).get(month)
                     .add(TimeLineDayDto.of(meeting.getRoomId(), meeting.getStartTime().getDayOfMonth(),
                             meeting.getFolderTitle(), meeting.getRoomTitle()));
@@ -298,6 +305,7 @@ public class MemberServiceImpl implements MemberService{
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
 
     @Override
     public ResponseEntity<String> deleteMeeting(Long usermeetingId) {

@@ -12,6 +12,9 @@ import * as fp from "fingerpose";
 import { handsUpGesture } from "@/utils/handsUp";
 import { thumbsDownGesture } from "@/utils/thumbsDown";
 import userStore from "@/store/userStore";
+import { thumbsDownGesture } from "@/utils/handsUp";
+import { thumbsUpGesture } from "@/utils/handsUp";
+import userStore from "@/store/userStore";
 
 interface Props {
   streamManager: StreamManager;
@@ -24,6 +27,14 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const autoplay = true;
   const { emotion, setEmotion } = userStore();
+  const [emoji, setEmoji] = useState<keyof typeof images | null>(null);
+
+  const images = {
+    thumbs_up: thumbs_up,
+    victory: victory,
+    hands_up: hands_up,
+    thumbs_dowm: thumbs_dowm,
+  };
 
   const updateCanvasSize = () => {
     if (videoRef.current && canvasRef.current) {
@@ -76,7 +87,7 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
 
           if (gesture.gestures[maxConfidence].score >= threshold) {
             const gestureName = gesture.gestures[maxConfidence].name;
-            console.log(gestureName, "이모셔");
+
             if (gestureName === "thumbs_up") {
               setEmotion(1);
             } else if (gestureName === "thumbs_dowm") {
@@ -116,7 +127,7 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
   }, []);
 
   useEffect(() => {
-    console.log(emotion, "이모셔");
+    console.log(emotion, "");
   }, [emotion]);
 
   return (
