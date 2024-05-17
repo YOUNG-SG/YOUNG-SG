@@ -52,7 +52,7 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
     // Loop and detect hands
     setInterval(() => {
       detect(net);
-    }, 10);
+    }, 10000000);
   };
 
   const detect = async (net: any) => {

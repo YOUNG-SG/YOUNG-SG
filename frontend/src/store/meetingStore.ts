@@ -7,8 +7,8 @@ interface MeetingState {
   // sessionId: string;
   subscribers: Subscriber[];
   screenSubscribers: Subscriber[];
-  publisher: Publisher | null;
-  screenPublisher: Publisher | null;
+  publisher: Publisher | undefined;
+  screenPublisher: Publisher | undefined;
   isAudioEnabled: boolean;
   isVideoEnabled: boolean;
   OV: OpenVidu | null;
@@ -17,10 +17,10 @@ interface MeetingState {
   setSession: (session: OVSession | null) => void;
   setScreenSession: (session: OVSession | null) => void;
   // setSessionId: (sessionId: string) => void;
-  setSubscribers: (subscriber: Subscriber[]) => void;
-  setScreenSubscribers: (screenSubscriber: Subscriber[]) => void;
-  setPublisher: (publisher: Publisher | null) => void;
-  setScreenPublisher: (screenPublisher: Publisher | null) => void;
+  setSubscribers: (subscriber: Subscriber[] | undefined) => void;
+  setScreenSubscribers: (screenSubscriber: Subscriber[] | undefined) => void;
+  setPublisher: (publisher: Publisher | undefined) => void;
+  setScreenPublisher: (screenPublisher: Publisher | undefined) => void;
   setIsAudioEnabled: (isAudioEnabled: boolean) => void;
   setIsVideoEnabled: (isVideoEnabled: boolean) => void;
   setOV: (OV: OpenVidu | null) => void;
@@ -33,8 +33,8 @@ const useMeetingStore = create<MeetingState>((set) => ({
   // sessionId: "",
   subscribers: [],
   screenSubscribers: [],
-  publisher: null,
-  screenPublisher: null,
+  publisher: undefined,
+  screenPublisher: undefined,
   isAudioEnabled: true,
   isVideoEnabled: true,
   OV: null,

@@ -1,15 +1,14 @@
-// import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Video from "./Video";
-import { Publisher, Subscriber } from "openvidu-browser";
+import { Subscriber, Publisher } from "openvidu-browser";
 
 interface SessionProps {
   subscribers: Subscriber[];
-  publisher: Publisher;
+  publisher: Publisher | undefined;
+  setSubscribers: (subscribers: Subscriber[] | undefined) => void;
 }
 
 function Session({ subscribers, publisher }: SessionProps) {
-  // const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
-
   // 참가자 수에 따라 그리드 레이아웃을 계산
   const calculateGridClasses = (count: number) => {
     switch (count) {
@@ -30,6 +29,10 @@ function Session({ subscribers, publisher }: SessionProps) {
     }
   };
 
+  useEffect(() => {
+    console.log("복", subscribers);
+  }, [subscribers]);
+
   const participantCount = subscribers.length + 1; // 퍼블리셔 + 구독자 수
   const gridClasses = calculateGridClasses(participantCount);
 
@@ -42,14 +45,15 @@ function Session({ subscribers, publisher }: SessionProps) {
         }
         isPublisher={true} // 퍼블리셔임을 표시
       />
-      {subscribers.map((subscriber, index) => (
-        <Video
-          key={index}
-          streamManager={subscriber}
-          videoSizeClass="w-full h-full p-2"
-          isPublisher={false} // 구독자임을 표시
-        />
-      ))}
+      {subscribers &&
+        subscribers.map((subscriber, index) => (
+          <Video
+            key={index}
+            streamManager={subscriber}
+            videoSizeClass="w-full h-full p-2"
+            isPublisher={false} // 구독자임을 표시
+          />
+        ))}
     </div>
   );
 }
