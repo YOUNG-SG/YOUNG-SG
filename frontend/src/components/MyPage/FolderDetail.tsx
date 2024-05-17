@@ -35,7 +35,7 @@ const FolderDetail = () => {
     queryFn: () => fetchFolderMeetingList(selectFolder),
   });
 
-  if (selectFolder === -1) {
+  if (selectFolder === -1 || isLoading || isError) {
     return (
       <div className="flex-[1.05] min-h-full bg-e-20 rounded-2xl text-[#CCCCCC] flex justify-center items-center">
         폴더를 선택해주세요
