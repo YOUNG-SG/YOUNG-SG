@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import bg from "../../../assets/chattingIcons/bgImage.jpg";
 import AddFolderModal from "./AddFolder";
 import { saveMeeting, folderList } from "@/services/Folder";
 import { useNavigate } from "react-router-dom";
 import createRoomStore from "@/store/createRoomStore";
+import Folder from "./Folder";
+import { addFolderStore, selectFolderStore } from "@/store/meetingOffStore";
 
-interface Folder {
+interface FolderType {
   folderId: number | null;
   title: string;
   date: string;
@@ -13,21 +14,17 @@ interface Folder {
 
 const SelectFolder = () => {
   const navigate = useNavigate();
-  const [selectedFolder, setSelectedFolder] = useState<number | null>(null);
-  const [isAddFolder, setIsAddFolder] = useState<boolean>(false);
-  const [folders, setFolders] = useState<Folder[]>([]);
+  const { selectFolder } = selectFolderStore();
+  const { isAddFolder, setIsAddFolder } = addFolderStore();
+  const [folders, setFolders] = useState<FolderType[]>([]);
   const { roomId } = createRoomStore();
-
-  const handleFolderClick = (folderId: number | null) => {
-    setSelectedFolder(folderId);
-  };
 
   const toggleAddFolderModal = () => {
     setIsAddFolder(!isAddFolder);
   };
 
   const handleFolderList = async () => {
-    const data: Folder[] = await folderList();
+    const data: FolderType[] = await folderList();
     console.log(data);
     setFolders(data);
   };
@@ -45,57 +42,48 @@ const SelectFolder = () => {
     }
   };
 
+  const AddFolderButton = () => {
+    return (
+      <div
+        onClick={toggleAddFolderModal}
+        className="text-[20px] border-2 border-dashed border-white border-opacity-50 rounded-lg flex justify-center items-center cursor-pointer hover:text-[22px] hover:font-bold"
+      >
+        폴더 추가
+      </div>
+    );
+  };
+
+  const SaveButton = () => {
+    return (
+      <div
+        onClick={() => handleSaveMeeting(selectFolder, roomId)}
+        className="flex-[12] w-1/3 text-[20px] flex justify-center items-center rounded-lg bg-[#EEEEEE] bg-opacity-30 h-12 cursor-pointer hover:bg-opacity-40"
+      >
+        저장
+      </div>
+    );
+  };
+
   useEffect(() => {
     handleFolderList();
   }, []);
 
   return (
     <>
-      <AddFolderModal
-        isOpen={isAddFolder}
-        onClose={toggleAddFolderModal}
-        onFolderCreated={handleFolderList}
-      />
-      <div
-        className="h-screen w-screen items-center justify-center flex"
-        style={{
-          backgroundImage: `url(${bg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        <div className="bg-black bg-opacity-30 rounded-lg justify-center items-center w-4/5 h-3/5">
-          <div className="grid grid-rows-12 w-full h-full p-4">
-            <div className="flex flex-wrap gap-4 overflow-auto p-4 row-span-10">
-              {/* 추가 */}
-              <div
-                onClick={toggleAddFolderModal}
-                className="border-2 border-dashed border-white rounded-lg w-full h-12 flex justify-center items-center text-white cursor-pointer hover:bg-white hover:bg-opacity-10"
-              >
-                + 추가
-              </div>
-              {/* 폴더 리스트 */}
-              <div className="grid grid-cols-2 gap-4 w-full">
-                {folders.map((folder, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleFolderClick(folder.folderId)}
-                    className={`rounded-lg text-white flex justify-center items-center p-4 cursor-pointer ${
-                      selectedFolder === folder.folderId ? "bg-gray-600" : "bg-opacity-50 bg-white"
-                    } hover:bg-opacity-70`}
-                  >
-                    {folder.title}
-                  </div>
-                ))}
-              </div>
+      {isAddFolder && <AddFolderModal onFolderCreated={handleFolderList} />}
+      <div className="h-screen w-screen items-center justify-center flex">
+        <div
+          className="bg-e-20 rounded-xl justify-center items-center"
+          style={{ width: "calc(100% - 380px)", height: "calc(100% - 200px)" }}
+        >
+          <div className="flex flex-col gap-[36px] h-full px-[70px] py-[50px] items-center">
+            <div className="flex-[88] overflow-scroll grid grid-cols-2 auto-rows-[80px] gap-[16px] w-full py-[6px]">
+              <AddFolderButton />
+              {folders.map((folder) => (
+                <Folder key={folder.folderId} folder={folder} />
+              ))}
             </div>
-            <div
-              onClick={() => handleSaveMeeting(selectedFolder, roomId)}
-              className="flex justify-center items-center rounded-lg text-white bg-opacity-80 bg-gray-500 h-12 cursor-pointer hover:bg-gray-600"
-            >
-              저장
-            </div>
+            <SaveButton />
           </div>
         </div>
       </div>
