@@ -32,7 +32,7 @@ public class OpenAiUtil {
         String payload = String.format("{\"model\": \"gpt-3.5-turbo\", " +
                 "\"messages\": [{ " +
                 "\"role\": \"user\", " +
-                "\"content\": \"내용요약 해줘 : %s\" " +
+                "\"content\": \"회의 내용을 자세하게 설명해줘 : %s\" " +
                 "}], " +
                 "\"max_tokens\": 4000}", inputText);
 
