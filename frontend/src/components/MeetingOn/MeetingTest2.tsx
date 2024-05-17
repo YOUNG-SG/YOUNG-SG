@@ -230,18 +230,23 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
         screenSession
           .connect(token, { clientData: `${name} screen` })
           .then(() => {
-            if (OV) {
-              const publishers = OV.initPublisher(undefined, {
-                audioSource: undefined,
-                videoSource: undefined,
-                publishAudio: false,
-                publishVideo: true,
-                mirror: true,
+            if (screenOV) {
+              const screenPublishers = screenOV.initPublisher(undefined, {
+                videoSource: "screen",
+              });
+              screenPublishers.once("accessAllowed", () => {
+                screenPublishers.stream
+                  .getMediaStream()
+                  .getVideoTracks()[0]
+                  .addEventListener("ended", () => {
+                    console.log("stop sharing button");
+                    screenSession.unpublish(screenPublishers);
+                  });
               });
 
-              setPublisher(publishers);
-              session
-                .publish(publishers)
+              setScreenPublisher(screenPublishers);
+              screenSession
+                .publish(screenPublishers)
                 .then(() => {})
                 .catch(() => {});
             }
@@ -249,7 +254,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
           .catch(() => {});
       })
       .catch(() => {});
-  }, [session, OV, sessionId, OPENVIDU_SERVER_URL]);
+  }, [screenSession, screenOV, sessionId, OPENVIDU_SERVER_URL]);
 
   const toggleAudio = () => {
     if (publisher) {

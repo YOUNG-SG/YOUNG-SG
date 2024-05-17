@@ -5,15 +5,10 @@ import "@tensorflow/tfjs-backend-webgl";
 import * as handpose from "@tensorflow-models/handpose";
 import { drawHand } from "@/utils/handlePose";
 import * as fp from "fingerpose";
-// import victory from "../../../assets/chattingIcons/victory.png";
 // import thumbs_up from "../../../assets/chattingIcons/thumbs_up.png";
 // import hands_up from "../../../assets/chattingIcons/hello.png";
 // import thumbs_dowm from "../../../assets/chattingIcons/thumbs-down.png";
-import { handsUpGesture } from "@/utils/handsUp";
-import { thumbsDownGesture } from "@/utils/thumbsDown";
-import userStore from "@/store/userStore";
-import { thumbsDownGesture } from "@/utils/handsUp";
-import { thumbsUpGesture } from "@/utils/handsUp";
+import { handsUpGesture, thumbsDownGesture, thumbsUpGesture } from "@/utils/handsUp";
 import userStore from "@/store/userStore";
 
 interface Props {
@@ -27,14 +22,7 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const autoplay = true;
   const { emotion, setEmotion } = userStore();
-  const [emoji, setEmoji] = useState<keyof typeof images | null>(null);
-
-  const images = {
-    thumbs_up: thumbs_up,
-    victory: victory,
-    hands_up: hands_up,
-    thumbs_dowm: thumbs_dowm,
-  };
+  // const [emoji, setEmoji] = useState<keyof typeof images | null>(null);
 
   const updateCanvasSize = () => {
     if (videoRef.current && canvasRef.current) {
@@ -73,24 +61,19 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
       const hand = await net.estimateHands(video, true);
 
       if (hand.length > 0) {
-        const GE = new fp.GestureEstimator([
-          fp.Gestures.VictoryGesture,
-          fp.Gestures.ThumbsUpGesture,
-          handsUpGesture,
-          thumbsDownGesture,
-        ]);
+        const GE = new fp.GestureEstimator([thumbsUpGesture, handsUpGesture, thumbsDownGesture]);
         const gesture = GE.estimate(hand[0].landmarks, 4);
         if (gesture.gestures !== undefined && gesture.gestures.length > 0) {
           const score = gesture.gestures.map((prediction: any) => prediction.score);
           const maxConfidence = score.indexOf(Math.max.apply(null, score));
-          const threshold = 0.8;
+          const threshold = 0.7;
 
           if (gesture.gestures[maxConfidence].score >= threshold) {
             const gestureName = gesture.gestures[maxConfidence].name;
 
             if (gestureName === "thumbs_up") {
               setEmotion(1);
-            } else if (gestureName === "thumbs_dowm") {
+            } else if (gestureName === "thumbs_down") {
               setEmotion(2);
             } else if (gestureName === "hands_up") {
               setEmotion(3);
@@ -127,7 +110,7 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
   }, []);
 
   useEffect(() => {
-    console.log(emotion, "");
+    console.log(emotion, "콘솔");
   }, [emotion]);
 
   return (

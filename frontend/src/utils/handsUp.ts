@@ -44,7 +44,7 @@ thumbsUpGesture.addDirection(Finger.Thumb, FingerDirection.DiagonalUpLeft, 0.75)
 thumbsUpGesture.addDirection(Finger.Thumb, FingerDirection.DiagonalUpRight, 0.75);
 
 // Other fingers
-for (let finger of [Finger.Index, Finger.Middle, Finger.Ring, Finger.Pinky]) {
+for (const finger of [Finger.Index, Finger.Middle, Finger.Ring, Finger.Pinky]) {
   thumbsUpGesture.addCurl(finger, FingerCurl.FullCurl, 1.0);
   thumbsUpGesture.addDirection(finger, FingerDirection.HorizontalLeft, 0.5);
   thumbsUpGesture.addDirection(finger, FingerDirection.HorizontalRight, 0.5);
@@ -60,7 +60,7 @@ thumbsDownGesture.addDirection(Finger.Thumb, FingerDirection.DiagonalDownLeft, 0
 thumbsDownGesture.addDirection(Finger.Thumb, FingerDirection.DiagonalDownRight, 0.75);
 
 // Other fingers
-for (let finger of [Finger.Index, Finger.Middle, Finger.Ring, Finger.Pinky]) {
+for (const finger of [Finger.Index, Finger.Middle, Finger.Ring, Finger.Pinky]) {
   thumbsDownGesture.addCurl(finger, FingerCurl.FullCurl, 1.0);
   thumbsDownGesture.addDirection(finger, FingerDirection.HorizontalLeft, 0.5);
   thumbsDownGesture.addDirection(finger, FingerDirection.HorizontalRight, 0.5);

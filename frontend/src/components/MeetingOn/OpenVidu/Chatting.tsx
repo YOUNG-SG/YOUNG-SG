@@ -142,11 +142,6 @@ const Chatting = ({
         }
       });
 
-      stompClientRef.current.subscribe(`/sub/vote/${roomId}`, function (res) {
-        const data = JSON.parse(res.body);
-        console.log(data, "데이타");
-      });
-
       setPrevStatus(roomStatus);
     } else if (roomStatus === "2") {
       console.log("Unsubscribing from meeting chat for roomId:", roomId);
@@ -231,6 +226,11 @@ const Chatting = ({
         setOwner(data.owner);
         setRoomStatus(data.status);
         setUserList(data.members);
+      });
+
+      client.subscribe(`/sub/vote/${roomId}`, function (res) {
+        const data = JSON.parse(res.body);
+        console.log(data, "데이타");
       });
     };
 
