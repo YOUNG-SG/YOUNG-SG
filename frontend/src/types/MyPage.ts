@@ -61,9 +61,9 @@ export type TimelineMeetingProps = {
   day: MeetingData;
 };
 
-export type ExpandButtonProps = {
-  btnName: string;
-  handleExpand: () => void;
+export type AllToggleButtonProps = {
+  name: string;
+  handleToggle: () => void;
 };
 
 /*

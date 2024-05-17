@@ -22,7 +22,7 @@ const TimelineMeeting: React.FC<TimelineMeetingProps> = ({ month, day }) => {
 
   return (
     <div className="w-full h-[110px] flex gap-[20px] ml-[62px]">
-      <div className="w-[100px] h-full flex flex-col justify-center items-center">
+      <div className="w-[100px] h-full flex flex-col justify-center items-center cursor-default">
         <div className="text-[14px]">{month}월</div>
         <div className="text-[26px] font-bold">{day.createdDay}일</div>
       </div>
@@ -31,7 +31,7 @@ const TimelineMeeting: React.FC<TimelineMeetingProps> = ({ month, day }) => {
         style={{ width: "calc(100% - 182px)" }}
       >
         <div className="flex justify-between text-[#CCCCCC]">
-          <div className="text-[16px]">{day.folderTitle}</div>
+          <div className="text-[16px] cursor-default">{day.folderTitle}</div>
           <div
             className="text-[12px] cursor-pointer transition-all duration-100 ease-in-out hover:scale-[1.1] hover:text-red-500 hover:font-bold"
             onClick={() => {

@@ -6,7 +6,7 @@ const Folder: React.FC<FolderProps> = ({ folder }) => {
 
   return (
     <div
-      className="w-full min-h-[160px] p-[40px] rounded-2xl bg-e-20 cursor-pointer"
+      className="w-full min-h-[160px] p-[40px] rounded-2xl bg-[#EEEEEE] bg-opacity-20 cursor-pointer hover:bg-opacity-30"
       onClick={() => {
         setSelectFolder(folder.folderId);
       }}

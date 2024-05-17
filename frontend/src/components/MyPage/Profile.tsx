@@ -56,7 +56,7 @@ const Profile = () => {
         className="w-[140px] h-[140px] rounded-full object-cover mt-[15px] mb-[25px]"
       />
 
-      <div>
+      <div className="cursor-default">
         <span className="text-[24px] font-bold">
           {myProfile.nickName.length > 5
             ? myProfile.nickName.slice(0, 5) + "···"
