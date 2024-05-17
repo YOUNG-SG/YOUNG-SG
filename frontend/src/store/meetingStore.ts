@@ -24,7 +24,7 @@ interface MeetingState {
   setIsAudioEnabled: (isAudioEnabled: boolean) => void;
   setIsVideoEnabled: (isVideoEnabled: boolean) => void;
   setOV: (OV: OpenVidu | null) => void;
-  setScreenOV: (OV: OpenVidu | null) => void;
+  setScreenOV: (screenOV: OpenVidu | null) => void;
 }
 
 const useMeetingStore = create<MeetingState>((set) => ({

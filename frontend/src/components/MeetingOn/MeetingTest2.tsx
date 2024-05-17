@@ -176,17 +176,12 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
   // 유저 화면 세션
   useEffect(() => {
     if (session === null) return;
-
+  
     session.on("streamCreated", (event) => {
-      const subscriber = session.subscribe(event.stream, undefined);
-      console.log(event, "이벤트");
-
-      subscribers.push(subscriber);
-
-      console.log(event, "이벤트 2", subscribers);
-      // setSubscribers((prev: Subscriber[]) => [...prev, subscriber]);
+      const newSubscriber = session.subscribe(event.stream, "");
+      setSubscriber((prevSubscriber) => prevSubscriber ? [...prevSubscriber, newSubscriber] : [newSubscriber]);
     });
-
+  
     getToken()
       .then((token) => {
         session
@@ -201,7 +196,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
                 mirror: true,
                 insertMode: "APPEND",
               });
-
+  
               setPublisher(publishers);
               session
                 .publish(publishers)
@@ -213,38 +208,34 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
       })
       .catch(() => {});
   }, [session, OV, sessionId, OPENVIDU_SERVER_URL]);
+  
 
   // 화면 공유 세션
   useEffect(() => {
-    if (screenSession === null) return;
-
-    // screenSession.on("streamCreated", (event) => {
-    //   const screenSubscribers = screenSession.subscribe(event.stream, "");
-    //   setScreenSubscriber(screenSubscribers);
-    // });
-
+    if (session === null) return;
+  
+    session.on("streamCreated", (event) => {
+      const newSubscriber = session.subscribe(event.stream, "");
+      setSubscriber((prevSubscribers) => (prevSubscribers ? [...prevSubscribers, newSubscriber] : [newSubscriber]));
+    });
+  
     getToken()
       .then((token) => {
-        screenSession
+        session
           .connect(token)
           .then(() => {
-            if (screenOV) {
-              const screenPublishers = screenOV.initPublisher(undefined, {
-                videoSource: "screen",
+            if (OV) {
+              const publishers = OV.initPublisher(undefined, {
+                audioSource: undefined,
+                videoSource: undefined,
+                publishAudio: false,
+                publishVideo: true,
+                mirror: true,
               });
-              screenPublishers.once("accessAllowed", () => {
-                screenPublishers.stream
-                  .getMediaStream()
-                  .getVideoTracks()[0]
-                  .addEventListener("ended", () => {
-                    console.log("stop sharing button");
-                    screenSession.unpublish(screenPublishers);
-                  });
-              });
-
-              setScreenPublisher(screenPublishers);
-              screenSession
-                .publish(screenPublishers)
+  
+              setPublisher(publishers);
+              session
+                .publish(publishers)
                 .then(() => {})
                 .catch(() => {});
             }
@@ -252,7 +243,8 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
           .catch(() => {});
       })
       .catch(() => {});
-  }, [screenSession, screenOV, sessionId, OPENVIDU_SERVER_URL]);
+  }, [session, OV, sessionId, OPENVIDU_SERVER_URL]);
+  
 
   const toggleAudio = () => {
     if (publisher) {
