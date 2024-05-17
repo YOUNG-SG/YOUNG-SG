@@ -274,7 +274,7 @@ public class MemberServiceImpl implements MemberService{
 
             // meetingroom의 id 가 detail에 존재하지 않는다면 그냥 넘기기
             List<MeetingDetail> meetingDetail = meetingDetailRepository.findAllByMeetingRoom_Id(meeting.getRoomId());
-            if (meetingDetail == null) {
+            if (meetingDetail.isEmpty()) {
                 continue;  // MeetingDetail이 존재하지 않으면 다음 반복으로 넘어감
             }
 
