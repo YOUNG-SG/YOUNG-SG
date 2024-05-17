@@ -268,6 +268,10 @@ public class MemberServiceImpl implements MemberService{
         // treemap response 생성
         TreeMap<Integer, TreeMap<Integer, List<TimeLineDayDto>>> response =  new TreeMap<>(Comparator.reverseOrder());
         for (meetingListDto meeting:meetingList) {
+            if (meeting.getStartTime() == null) {
+                continue;  // 녹음 안하면 등록이안되요 그건 타임에 포함 ㄴㄴ;
+            }
+
             // meetingroom의 id 가 detail에 존재하지 않는다면 그냥 넘기기
             List<MeetingDetail> meetingDetail = meetingDetailRepository.findAllByMeetingRoom_Id(meeting.getRoomId());
             if (meetingDetail == null) {
