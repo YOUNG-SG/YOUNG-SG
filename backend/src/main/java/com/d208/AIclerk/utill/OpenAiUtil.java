@@ -29,10 +29,10 @@ public class OpenAiUtil {
         headers.set("Authorization", "Bearer " + API_KEY);
 
         // 텍스트 요약 및 제목 생성 요청 형식으로 페이로드 구성
-        String payload = String.format("{\"model\": \"gpt-3.5-turbo\", " +
+        String payload = String.format("{\"model\": \"gpt-4\", " +
                 "\"messages\": [{ " +
                 "\"role\": \"user\", " +
-                "\"content\": \"회의 내용을 자세하게 설명해줘 : %s\" " +
+                "\"content\": \"내용 자세하게 정리해줘. 글자수는 600자로 해줘 : %s\" " +
                 "}], " +
                 "\"max_tokens\": 4000}", inputText);
 
