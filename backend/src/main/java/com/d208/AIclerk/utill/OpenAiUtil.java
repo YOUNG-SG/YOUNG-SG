@@ -34,7 +34,7 @@ public class OpenAiUtil {
                 "\"role\": \"user\", " +
                 "\"content\": \"내용요약 해줘 : %s\" " +
                 "}], " +
-                "\"max_tokens\": 1000}", inputText);
+                "\"max_tokens\": 4000}", inputText);
 
         HttpEntity<String> request = new HttpEntity<>(payload, headers);
         RestTemplate restTemplate = new RestTemplate();
