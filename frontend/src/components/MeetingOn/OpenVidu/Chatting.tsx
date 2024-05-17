@@ -68,7 +68,7 @@ const Chatting = ({
   const [summaryMessages, setSummaryMessages] = useState<SummaryMessage[]>([]);
   const [senderInfo, setSenderInfo] = useState({ sender: "", profile: "", senderId: "" });
   const [connected, setConnected] = useState(false); // 연결 상태를 추적하는 상태 변수 추가
-  const { id, setId, setName, setProfile } = userStore();
+  const { id, emotion, setId, setName, setProfile } = userStore();
   const [userList, setUserList] = useState<Member[]>([]);
   const [prevStatus, setPrevStatus] = useState<string>("0");
 
@@ -144,7 +144,7 @@ const Chatting = ({
 
       stompClientRef.current.subscribe(`/sub/vote/${roomId}`, function (res) {
         const data = JSON.parse(res.body);
-        console.log(data);
+        console.log(data, "데이타");
       });
 
       setPrevStatus(roomStatus);
@@ -289,6 +289,27 @@ const Chatting = ({
       resetTranscript();
     }
   };
+
+  const sendEmotion = () => {
+    if (stompClientRef.current && connected) {
+      const data = JSON.stringify({
+        senderId: senderInfo.senderId,
+        sender: senderInfo.sender,
+        voteType: emotion,
+      });
+
+      stompClientRef.current.publish({
+        destination: `/pub/${roomId}/sendVote`,
+        body: data,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (connected) {
+      sendEmotion();
+    }
+  }, [emotion, connected]);
 
   return (
     <>

@@ -1,11 +1,9 @@
-import { useEffect } from "react";
 import Video from "./Video";
 import { Subscriber, Publisher } from "openvidu-browser";
 
 interface SessionProps {
   subscribers: Subscriber[];
   publisher: Publisher | undefined;
-  setSubscribers: (subscribers: Subscriber[] | undefined) => void;
 }
 
 function Session({ subscribers, publisher }: SessionProps) {
@@ -29,17 +27,13 @@ function Session({ subscribers, publisher }: SessionProps) {
     }
   };
 
-  useEffect(() => {
-    console.log("복", subscribers);
-  }, [subscribers]);
-
   const participantCount = subscribers.length + 1; // 퍼블리셔 + 구독자 수
   const gridClasses = calculateGridClasses(participantCount);
 
   return (
     <div className={gridClasses}>
       <Video
-        streamManager={publisher}
+        streamManager={publisher as Publisher}
         videoSizeClass={
           participantCount === 1 ? "max-w-screen max-h-screen p-2" : "p-2 w-full h-full"
         }

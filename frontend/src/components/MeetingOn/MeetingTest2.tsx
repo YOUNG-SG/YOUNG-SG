@@ -16,7 +16,7 @@ import bg from "../../assets/chattingIcons/bgImage.jpg";
 import record from "../../assets/chattingIcons/play-button.png";
 import stop from "../../assets/chattingIcons/stop.png";
 import pause from "../../assets/chattingIcons/pause.png";
-import { OpenVidu } from "openvidu-browser";
+import { OpenVidu, Subscriber } from "openvidu-browser";
 import axios, { AxiosError } from "axios";
 import createRoomStore from "@/store/createRoomStore";
 import SpeechRecognition from "react-speech-recognition";
@@ -59,6 +59,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
   const OPENVIDU_SERVER_URL = "https://youngseogi.duckdns.org";
   const OPENVIDU_SERVER_SECRET = "MYSECRET";
   const [isClickInvite, setIsClickInvite] = useState(false);
+  const [isFirstRecording, setIsFirstRecording] = useState(false);
 
   const leaveSession = useCallback(() => {
     if (session) session.disconnect();
@@ -66,7 +67,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     setOV(null);
     setSession(null);
     setSessionId("");
-    setSubscribers([]);
+    setSubscribers(() => []);
     setPublisher(undefined);
     setIsAudioEnabled(true);
     setIsVideoEnabled(true);
@@ -76,7 +77,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     setScreenOV(null);
     setScreenSession(null);
     setScreenPublisher(undefined);
-    setScreenSubscribers([]);
+    setScreenSubscribers(() => []);
   }, [session]);
 
   const joinSession = () => {
@@ -156,10 +157,9 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     if (session === null) return;
 
     session.on("streamDestroyed", (event) => {
-      if (subscribers && event.stream.streamId === subscribers.stream.streamId) {
-        console.log(event, "이벤트2");
-        setSubscribers(undefined);
-      }
+      setSubscribers((prevSubscribers: Subscriber[]): Subscriber[] =>
+        prevSubscribers.filter((sub) => sub.stream.streamId !== event.stream.streamId),
+      );
     });
   }, [session]);
 
@@ -167,9 +167,9 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     if (screenSession === null) return;
 
     screenSession.on("streamDestroyed", (event) => {
-      if (subscribers && event.stream.streamId === subscribers.stream.streamId) {
-        setSubscribers(undefined);
-      }
+      setScreenSubscribers((prevSubscribers: Subscriber[]): Subscriber[] =>
+        prevSubscribers.filter((sub) => sub.stream.streamId !== event.stream.streamId),
+      );
     });
   }, [screenSession]);
 
@@ -181,16 +181,18 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
       const subscriber = session.subscribe(event.stream, undefined);
       console.log(event, "이벤트");
 
-      subscribers.push(subscriber);
+      setSubscribers((prevSubscribers: Subscriber[]): Subscriber[] => [
+        ...prevSubscribers,
+        subscriber,
+      ]);
 
       console.log(event, "이벤트 2", subscribers);
-      // setSubscribers((prev: Subscriber[]) => [...prev, subscriber]);
     });
 
     getToken()
       .then((token) => {
         session
-          .connect(token)
+          .connect(token, { clientData: name })
           .then(() => {
             if (OV) {
               const publishers = OV.initPublisher(undefined, {
@@ -218,15 +220,15 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
   useEffect(() => {
     if (screenSession === null) return;
 
-    // screenSession.on("streamCreated", (event) => {
-    //   const screenSubscribers = screenSession.subscribe(event.stream, "");
-    //   setScreenSubscriber(screenSubscribers);
-    // });
+    screenSession.on("streamCreated", (event) => {
+      const screenSubscriber = screenSession.subscribe(event.stream, undefined);
+      setScreenSubscribers((prev: Subscriber[]): Subscriber[] => [...prev, screenSubscriber]);
+    });
 
     getToken()
       .then((token) => {
         screenSession
-          .connect(token)
+          .connect(token, { clientData: `${name} screen` })
           .then(() => {
             if (screenOV) {
               const screenPublishers = screenOV.initPublisher(undefined, {
@@ -279,6 +281,8 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
           setRoomStatus("1");
           listenContinuously();
           setIsRecording(true);
+          // 녹화 누른 적이 있는지 확인
+          setIsFirstRecording(true);
         }
       } catch (err) {
         console.error(err);
@@ -325,14 +329,19 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
   };
 
   const leaveMeetingRoom = async () => {
-    try {
+    if (isFirstRecording) {
+      try {
+        leaveSession();
+        // 상태 확인 필요
+        await leaveRoom(roomId);
+      } catch (err) {
+        console.log(err);
+      }
+      navigate(`/meeting/off/${sessionId}`);
+    } else {
       leaveSession();
-      // 상태 확인 필요
-      await leaveRoom(roomId);
-    } catch (err) {
-      console.log(err);
+      navigate(`/`);
     }
-    navigate(`/meeting/off/${sessionId}`);
   };
 
   const toggleInvite = () => {
@@ -355,13 +364,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
             {/* 세션 연결 후 화면 */}
             <div className="col-span-9 grid grid-rows-12">
               <div className="row-span-10 items-center justify-center">
-                {session && (
-                  <Session
-                    publisher={publisher}
-                    subscribers={subscribers}
-                    setSubscribers={setSubscribers}
-                  />
-                )}
+                {session && <Session publisher={publisher} subscribers={subscribers} />}
               </div>
 
               {/* 버튼들 */}

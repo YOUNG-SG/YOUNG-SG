@@ -1,16 +1,17 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { StreamManager } from "openvidu-browser";
 import * as tf from "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl";
 import * as handpose from "@tensorflow-models/handpose";
 import { drawHand } from "@/utils/handlePose";
 import * as fp from "fingerpose";
-import victory from "../../../assets/chattingIcons/victory.png";
-import thumbs_up from "../../../assets/chattingIcons/thumbs_up.png";
-import hands_up from "../../../assets/chattingIcons/hello.png";
-import thumbs_dowm from "../../../assets/chattingIcons/thumbs-down.png";
+// import victory from "../../../assets/chattingIcons/victory.png";
+// import thumbs_up from "../../../assets/chattingIcons/thumbs_up.png";
+// import hands_up from "../../../assets/chattingIcons/hello.png";
+// import thumbs_dowm from "../../../assets/chattingIcons/thumbs-down.png";
 import { handsUpGesture } from "@/utils/handsUp";
 import { thumbsDownGesture } from "@/utils/thumbsDown";
+import userStore from "@/store/userStore";
 
 interface Props {
   streamManager: StreamManager;
@@ -22,16 +23,7 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const autoplay = true;
-  const [emoji, setEmoji] = useState<keyof typeof images | null>(null);
-  // const [gestureStartTime, setGestureStartTime] = useState<number | null>(null);
-  // const [isGestureDetected, setIsGestureDetected] = useState(false);
-
-  const images = {
-    thumbs_up: thumbs_up,
-    victory: victory,
-    hands_up: hands_up,
-    thumbs_dowm: thumbs_dowm,
-  };
+  const { emotion, setEmotion } = userStore();
 
   const updateCanvasSize = () => {
     if (videoRef.current && canvasRef.current) {
@@ -52,7 +44,7 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
     // Loop and detect hands
     setInterval(() => {
       detect(net);
-    }, 10000000);
+    }, 500);
   };
 
   const detect = async (net: any) => {
@@ -80,35 +72,28 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
         if (gesture.gestures !== undefined && gesture.gestures.length > 0) {
           const score = gesture.gestures.map((prediction: any) => prediction.score);
           const maxConfidence = score.indexOf(Math.max.apply(null, score));
-          console.log(gesture.gestures);
-          const threshold = 0.95;
+          const threshold = 0.8;
 
           if (gesture.gestures[maxConfidence].score >= threshold) {
-            const gestureName = gesture.gestures[maxConfidence].name as keyof typeof images;
-
-            // if (gestureStartTime === null) {
-            //   setGestureStartTime(Date.now());
-            // } else {
-            //   const elapsedTime = Date.now() - gestureStartTime;
-            //   if (elapsedTime >= 3000) {
-            //     setIsGestureDetected(true);
-            setEmoji(gestureName);
-            //   }
-            // }
+            const gestureName = gesture.gestures[maxConfidence].name;
+            console.log(gestureName, "이모셔");
+            if (gestureName === "thumbs_up") {
+              setEmotion(1);
+            } else if (gestureName === "thumbs_dowm") {
+              setEmotion(2);
+            } else if (gestureName === "hands_up") {
+              setEmotion(3);
+            } else {
+              setEmotion(0);
+            }
           } else {
-            // setGestureStartTime(null);
-            // setIsGestureDetected(false);
-            setEmoji(null); // 제스처 인식 못하면 이모지 설정하지 않음
+            setEmotion(0);
           }
         } else {
-          // setGestureStartTime(null);
-          // setIsGestureDetected(false);
-          setEmoji(null); // 신뢰도가 임계값보다 낮으면 이모지 설정하지 않음
+          setEmotion(0);
         }
       } else {
-        // setGestureStartTime(null);
-        // setIsGestureDetected(false);
-        setEmoji(null); // 손이 감지되지 않으면 이모지 설정하지 않음
+        setEmotion(0);
       }
 
       const ctx = canvasRef.current.getContext("2d");
@@ -130,6 +115,10 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
     }
   }, []);
 
+  useEffect(() => {
+    console.log(emotion, "이모셔");
+  }, [emotion]);
+
   return (
     <>
       <div className={` ${videoSizeClass} flex items-center justify-center relative`}>
@@ -146,13 +135,6 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
           ref={canvasRef}
           className="absolute aspect-video top-0 z-10 left-0 w-full h-full max-w-full max-h-full"
         ></canvas>
-        {emoji !== null && (
-          <img
-            src={images[emoji]}
-            alt="gesture emoji"
-            className="absolute bottom-4 right-4 h-24 "
-          />
-        )}
       </div>
     </>
   );
