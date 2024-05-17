@@ -9,8 +9,12 @@ import ErrorMessage from "@/components/@common/ErrorMessage";
 
 const FolderDetail = () => {
   // 선택된 폴더
-  const { selectFolder } = selectFolderStore();
+  const { selectFolder, setSelectFolder } = selectFolderStore();
   const [folder, setFolder] = useState({ folderId: -1, title: "", date: "0000.00.00" });
+
+  useEffect(() => {
+    setSelectFolder(-1);
+  }, []);
 
   // 폴더 목록에서 선택된 폴더 id 사용해 title, createAt 받아오기
   const { data: folders } = useQuery({
