@@ -198,7 +198,7 @@ const MeetingTest2 = ({ roomId, sessionId, username }: MeetingTestProps) => {
               const publishers = OV.initPublisher(undefined, {
                 audioSource: undefined,
                 videoSource: undefined,
-                publishAudio: false,
+                publishAudio: true,
                 publishVideo: true,
                 mirror: true,
                 insertMode: "APPEND",
