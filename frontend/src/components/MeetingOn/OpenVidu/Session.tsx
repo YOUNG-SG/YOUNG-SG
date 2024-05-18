@@ -31,11 +31,13 @@ function Session({ subscribers, publisher }: SessionProps) {
   const gridClasses = calculateGridClasses(participantCount);
 
   return (
-    <div className={gridClasses}>
+    <div className={`${gridClasses} h-full`}>
       <Video
         streamManager={publisher as Publisher}
         videoSizeClass={
-          participantCount === 1 ? "max-w-screen max-h-screen p-2" : "p-2 w-full h-full"
+          participantCount === 1
+            ? "max-w-screen max-h-screen p-2"
+            : "p-2 max-w-screen max-h-screen h-full w-full"
         }
         isPublisher={true} // 퍼블리셔임을 표시
       />
