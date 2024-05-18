@@ -24,4 +24,34 @@ const userStore = create<UserState>((set) => ({
   setEmotion: (emotion) => set({ emotion }),
 }));
 
-export default userStore;
+interface User {
+  id: number;
+  nickname: string;
+  profile: string;
+  emotion: number;
+}
+
+interface userListState {
+  users: User[];
+
+  setUsers: (users: User[]) => void;
+  updateUserEmotion: (id: number, emotion: number) => void;
+  // updateUser: (user: User) => void;
+}
+
+const useUserListStore = create<userListState>((set) => ({
+  users: [],
+  setUsers: (users) => set({ users }),
+  updateUserEmotion: (id, emotion) =>
+    set((state) => ({
+      users: state.users.map((user) => (user.id === id ? { ...user, emotion } : user)),
+    })),
+  // updateUser: (updatedUser) =>
+  //   set((state) => ({
+  //     users: state.users.map((user) =>
+  //       user.id === updatedUser.id ? { ...user, ...updatedUser } : user,
+  //     ),
+  //   })),
+}));
+
+export { useUserListStore, userStore };

@@ -1,15 +1,16 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { StreamManager } from "openvidu-browser";
+import { useUserListStore } from "@/store/userStore";
 import * as tf from "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl";
 import * as handpose from "@tensorflow-models/handpose";
 import { drawHand } from "@/utils/handlePose";
 import * as fp from "fingerpose";
-// import thumbs_up from "../../../assets/chattingIcons/thumbs_up.png";
-// import hands_up from "../../../assets/chattingIcons/hello.png";
-// import thumbs_dowm from "../../../assets/chattingIcons/thumbs-down.png";
+import thumbs_up from "../../../assets/chattingIcons/thumbs_up.png";
+import hands_up from "../../../assets/chattingIcons/hello.png";
+import thumbs_dowm from "../../../assets/chattingIcons/thumbs-down.png";
 import { handsUpGesture, thumbsDownGesture, thumbsUpGesture } from "@/utils/handsUp";
-import userStore from "@/store/userStore";
+import { userStore } from "@/store/userStore";
 
 interface Props {
   streamManager: StreamManager;
@@ -21,8 +22,10 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const autoplay = true;
-  const { emotion, setEmotion } = userStore();
-  // const [emoji, setEmoji] = useState<keyof typeof images | null>(null);
+  const { setEmotion } = userStore();
+  const { users } = useUserListStore();
+
+  const [user, setUser] = useState<any>(null); // State to store user information
 
   const updateCanvasSize = () => {
     if (videoRef.current && canvasRef.current) {
@@ -100,18 +103,20 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
   useEffect(() => {
     if (streamManager && videoRef.current) {
       streamManager.addVideoElement(videoRef.current);
+
+      const metadata = streamManager.stream.connection.data;
+      const userMetadata = JSON.parse(metadata);
+      const userName = userMetadata.clientData;
+      const foundUser = users.find((user) => user.nickname === userName);
+      setUser(foundUser);
     }
-  }, [streamManager]);
+  }, [streamManager, users]);
 
   useEffect(() => {
     if (isPublisher) {
       runHandpose();
     }
   }, []);
-
-  useEffect(() => {
-    console.log(emotion, "콘솔");
-  }, [emotion]);
 
   return (
     <>
@@ -129,6 +134,14 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
           ref={canvasRef}
           className="absolute aspect-video top-0 z-10 left-0 w-full h-full max-w-full max-h-full"
         ></canvas>
+
+        {user && user.emotion !== 0 && (
+          <img
+            src={user.emotion === 1 ? thumbs_up : user.emotion === 2 ? thumbs_dowm : hands_up}
+            alt="emotion"
+            className="absolute bottom-4 right-4 w-10 h-10 z-20"
+          />
+        )}
       </div>
     </>
   );

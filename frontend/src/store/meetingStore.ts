@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { OpenVidu, Session as OVSession, Publisher, Subscriber } from "openvidu-browser";
 
 interface MeetingState {
+  username: string | null;
   session: OVSession | null;
   screenSession: OVSession | null;
   // sessionId: string;
@@ -14,6 +15,7 @@ interface MeetingState {
   OV: OpenVidu | null;
   screenOV: OpenVidu | null;
 
+  setUsername: (username: string | null) => void;
   setSession: (session: OVSession | null) => void;
   setScreenSession: (session: OVSession | null) => void;
   // setSessionId: (sessionId: string) => void;
@@ -28,6 +30,7 @@ interface MeetingState {
 }
 
 const useMeetingStore = create<MeetingState>((set) => ({
+  username: null,
   session: null,
   screenSession: null,
   // sessionId: "",
@@ -40,6 +43,7 @@ const useMeetingStore = create<MeetingState>((set) => ({
   OV: null,
   screenOV: null,
 
+  setUsername: (username) => set({ username }),
   setSession: (session) => set({ session }),
   setScreenSession: (screenSession) => set({ screenSession }),
   // setSessionId: (sessionId) => set({ sessionId }),

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { joinRoom } from "@/services/Room";
-import userStore from "@/store/userStore";
+import { userStore } from "@/store/userStore";
 import createRoomStore from "@/store/createRoomStore";
 import UserList from "./Chatting/UserList";
 import ChatRoom from "./Chatting/ChatRoom";
@@ -12,6 +12,7 @@ import { useSpeechRecognition } from "react-speech-recognition";
 import chat from "../../../assets/chattingIcons/messenger.png";
 import people from "../../../assets/chattingIcons/people.png";
 import { tokenStore } from "@/store/tokenStore";
+import { useUserListStore } from "@/store/userStore";
 
 interface Command {
   command: string;
@@ -71,7 +72,7 @@ const Chatting = ({
   const { id, emotion, setId, setName, setProfile } = userStore();
   const [userList, setUserList] = useState<Member[]>([]);
   const [prevStatus, setPrevStatus] = useState<string>("0");
-
+  const { setUsers, updateUserEmotion } = useUserListStore();
   const { setRoomStatus, setOwner } = createRoomStore();
   const { token } = tokenStore();
 
@@ -222,15 +223,22 @@ const Chatting = ({
       // 상태 갱신 소켓 구독
       client.subscribe(`/sub/room/update/${roomId}`, function (res) {
         const data = JSON.parse(res.body);
-        console.log(data);
         setOwner(data.owner);
         setRoomStatus(data.status);
         setUserList(data.members);
+        setUsers(
+          data.members.map((member: any) => ({
+            id: member.id,
+            nickname: member.nickname,
+            profile: member.profile,
+            emotion: 0, // 초기값 설정
+          })),
+        );
       });
 
       client.subscribe(`/sub/vote/${roomId}`, function (res) {
         const data = JSON.parse(res.body);
-        console.log(data, "데이타");
+        updateUserEmotion(data.senderId, data.voteType);
       });
     };
 
@@ -308,6 +316,7 @@ const Chatting = ({
   useEffect(() => {
     if (connected) {
       sendEmotion();
+      console.log(emotion);
     }
   }, [emotion, connected]);
 

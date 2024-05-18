@@ -23,15 +23,15 @@ import SpeechRecognition from "react-speech-recognition";
 import useDictaphoneStore from "@/store/dictaphoneStore";
 import { meetingRecordStart, meetingRecordEnd, meetingRecordPause } from "@/services/Chatting";
 import { useNavigate } from "react-router-dom";
-import userStore from "@/store/userStore";
 
 interface MeetingTestProps {
   roomId: number;
   sessionId: string;
+  username: string | null;
 }
 
-const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
-  const { name } = userStore();
+const MeetingTest2 = ({ roomId, sessionId, username }: MeetingTestProps) => {
+  // const { username } = useMeetingStore();
   const { setSessionId, roomStatus, setRoomStatus, owner } = createRoomStore();
   const {
     session,
@@ -192,7 +192,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     getToken()
       .then((token) => {
         session
-          .connect(token, { clientData: name })
+          .connect(token, { clientData: username })
           .then(() => {
             if (OV) {
               const publishers = OV.initPublisher(undefined, {
@@ -228,7 +228,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     getToken()
       .then((token) => {
         screenSession
-          .connect(token, { clientData: `${name} screen` })
+          .connect(token, { clientData: `${username} screen` })
           .then(() => {
             if (screenOV) {
               const screenPublishers = screenOV.initPublisher(undefined, {
@@ -378,7 +378,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
                     <img className="h-7 w-7" src={invite} alt="" />
                   </button>
                   {/* 녹음 시작 */}
-                  {name === owner ? (
+                  {username === owner ? (
                     <>
                       <button
                         onClick={toggleRecord}
