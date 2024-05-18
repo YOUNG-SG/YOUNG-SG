@@ -6,6 +6,7 @@ interface Message {
   senderId?: number;
   contentType?: string;
   profile?: string;
+  sender?: string;
   sent_time?: string;
 }
 
@@ -48,6 +49,7 @@ const ChatRoom = ({ id, messages, message, setMessage, sendMessage }: ChattingPr
                   className="inline-block max-w-xs px-4 py-2 rounded-lg"
                   style={{ background: msg.senderId === id ? "#005c99" : "#333" }}
                 >
+                  {msg.senderId !== id && <div className="text-sm text-gray-300">{msg.sender}</div>}
                   <div>{msg.content}</div>
                   <div className="text-sm text-gray-300">{msg.sent_time}</div>
                 </div>

@@ -1,30 +1,12 @@
-import { useEffect, useState } from "react";
 import Video from "./Video";
-import { Publisher, Subscriber } from "openvidu-browser";
+import { Subscriber, Publisher } from "openvidu-browser";
 
 interface SessionProps {
-  subscriber: Subscriber;
-  publisher: Publisher;
+  subscribers: Subscriber[];
+  publisher: Publisher | undefined;
 }
 
-function Session({ subscriber, publisher }: SessionProps) {
-  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
-
-  useEffect(() => {
-    if (subscriber) {
-      setSubscribers((prevSubscribers) => {
-        // 새로운 subscriber가 이미 배열에 있는지 확인
-        const isAlreadyAdded = prevSubscribers.some(
-          (sub) => sub.stream.streamId === subscriber.stream.streamId,
-        );
-        if (!isAlreadyAdded) {
-          return [...prevSubscribers, subscriber];
-        }
-        return prevSubscribers;
-      });
-    }
-  }, [subscriber]);
-
+function Session({ subscribers, publisher }: SessionProps) {
   // 참가자 수에 따라 그리드 레이아웃을 계산
   const calculateGridClasses = (count: number) => {
     switch (count) {
@@ -51,20 +33,21 @@ function Session({ subscriber, publisher }: SessionProps) {
   return (
     <div className={gridClasses}>
       <Video
-        streamManager={publisher}
+        streamManager={publisher as Publisher}
         videoSizeClass={
           participantCount === 1 ? "max-w-screen max-h-screen p-2" : "p-2 w-full h-full"
         }
         isPublisher={true} // 퍼블리셔임을 표시
       />
-      {subscribers.map((subscriber, index) => (
-        <Video
-          key={index}
-          streamManager={subscriber}
-          videoSizeClass="w-full h-full p-2"
-          isPublisher={false} // 구독자임을 표시
-        />
-      ))}
+      {subscribers &&
+        subscribers.map((subscriber, index) => (
+          <Video
+            key={index}
+            streamManager={subscriber}
+            videoSizeClass="w-full h-full p-2"
+            isPublisher={false} // 구독자임을 표시
+          />
+        ))}
     </div>
   );
 }

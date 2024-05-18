@@ -1,6 +1,6 @@
 import crown from "../../../../assets/chattingIcons/crown.png";
 import { meetingChangeOwner } from "@/services/Chatting";
-import userStore from "@/store/userStore";
+import useMeetingStore from "@/store/meetingStore";
 interface Member {
   id: number;
   nickname: string;
@@ -14,8 +14,8 @@ interface ChatTestProps {
 }
 
 const UserList = ({ userList, roomId, owner }: ChatTestProps) => {
-  const { name } = userStore();
-  const isOwner = owner === name;
+  const { username } = useMeetingStore();
+  const isOwner = owner === username;
 
   const clickOwnerChange = async (ownerId: number) => {
     const confirmChange = confirm("방장의 권한을 넘기시겠습니까?");
@@ -38,7 +38,7 @@ const UserList = ({ userList, roomId, owner }: ChatTestProps) => {
           {userList &&
             userList.map((user, index) => (
               <div key={index} className="flex flex-row items-center">
-                {user.nickname === name ? (
+                {user.nickname === username ? (
                   <div>{user.nickname}</div>
                 ) : (
                   <div

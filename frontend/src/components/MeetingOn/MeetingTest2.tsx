@@ -16,31 +16,31 @@ import bg from "../../assets/chattingIcons/bgImage.jpg";
 import record from "../../assets/chattingIcons/play-button.png";
 import stop from "../../assets/chattingIcons/stop.png";
 import pause from "../../assets/chattingIcons/pause.png";
-import { OpenVidu, Publisher, Subscriber } from "openvidu-browser";
+import { OpenVidu, Subscriber } from "openvidu-browser";
 import axios, { AxiosError } from "axios";
 import createRoomStore from "@/store/createRoomStore";
 import SpeechRecognition from "react-speech-recognition";
 import useDictaphoneStore from "@/store/dictaphoneStore";
 import { meetingRecordStart, meetingRecordEnd, meetingRecordPause } from "@/services/Chatting";
 import { useNavigate } from "react-router-dom";
-import userStore from "@/store/userStore";
 
 interface MeetingTestProps {
   roomId: number;
   sessionId: string;
+  username: string | null;
 }
 
-const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
-  const { name } = userStore();
+const MeetingTest2 = ({ roomId, sessionId, username }: MeetingTestProps) => {
+  // const { username } = useMeetingStore();
   const { setSessionId, roomStatus, setRoomStatus, owner } = createRoomStore();
   const {
     session,
     setSession,
     screenSession,
     setScreenSession,
-    subscriber,
-    setSubscriber,
-    setScreenSubscriber,
+    subscribers,
+    setSubscribers,
+    setScreenSubscribers,
     publisher,
     setPublisher,
     setScreenPublisher,
@@ -59,6 +59,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
   const OPENVIDU_SERVER_URL = "https://youngseogi.duckdns.org";
   const OPENVIDU_SERVER_SECRET = "MYSECRET";
   const [isClickInvite, setIsClickInvite] = useState(false);
+  const [isFirstRecording, setIsFirstRecording] = useState(false);
 
   const leaveSession = useCallback(() => {
     if (session) session.disconnect();
@@ -66,8 +67,8 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     setOV(null);
     setSession(null);
     setSessionId("");
-    setSubscriber(null);
-    setPublisher(null);
+    setSubscribers(() => []);
+    setPublisher(undefined);
     setIsAudioEnabled(true);
     setIsVideoEnabled(true);
 
@@ -75,8 +76,8 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
 
     setScreenOV(null);
     setScreenSession(null);
-    setScreenPublisher(null);
-    setScreenSubscriber(null);
+    setScreenPublisher(undefined);
+    setScreenSubscribers(() => []);
   }, [session]);
 
   const joinSession = () => {
@@ -156,9 +157,9 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     if (session === null) return;
 
     session.on("streamDestroyed", (event) => {
-      if (subscriber && event.stream.streamId === subscriber.stream.streamId) {
-        setSubscriber(null);
-      }
+      setSubscribers((prevSubscribers: Subscriber[]): Subscriber[] =>
+        prevSubscribers.filter((sub) => sub.stream.streamId !== event.stream.streamId),
+      );
     });
   }, [session]);
 
@@ -166,9 +167,9 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     if (screenSession === null) return;
 
     screenSession.on("streamDestroyed", (event) => {
-      if (subscriber && event.stream.streamId === subscriber.stream.streamId) {
-        setSubscriber(null);
-      }
+      setScreenSubscribers((prevSubscribers: Subscriber[]): Subscriber[] =>
+        prevSubscribers.filter((sub) => sub.stream.streamId !== event.stream.streamId),
+      );
     });
   }, [screenSession]);
 
@@ -177,14 +178,21 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     if (session === null) return;
 
     session.on("streamCreated", (event) => {
-      const subscribers = session.subscribe(event.stream, "");
-      setSubscriber(subscribers);
+      const subscriber = session.subscribe(event.stream, undefined);
+      console.log(event, "이벤트");
+
+      setSubscribers((prevSubscribers: Subscriber[]): Subscriber[] => [
+        ...prevSubscribers,
+        subscriber,
+      ]);
+
+      console.log(event, "이벤트 2", subscribers);
     });
 
     getToken()
       .then((token) => {
         session
-          .connect(token)
+          .connect(token, { clientData: username })
           .then(() => {
             if (OV) {
               const publishers = OV.initPublisher(undefined, {
@@ -193,6 +201,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
                 publishAudio: false,
                 publishVideo: true,
                 mirror: true,
+                insertMode: "APPEND",
               });
 
               setPublisher(publishers);
@@ -212,14 +221,14 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
     if (screenSession === null) return;
 
     screenSession.on("streamCreated", (event) => {
-      const screenSubscribers = screenSession.subscribe(event.stream, "");
-      setScreenSubscriber(screenSubscribers);
+      const screenSubscriber = screenSession.subscribe(event.stream, undefined);
+      setScreenSubscribers((prev: Subscriber[]): Subscriber[] => [...prev, screenSubscriber]);
     });
 
     getToken()
       .then((token) => {
         screenSession
-          .connect(token)
+          .connect(token, { clientData: `${username} screen` })
           .then(() => {
             if (screenOV) {
               const screenPublishers = screenOV.initPublisher(undefined, {
@@ -272,6 +281,8 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
           setRoomStatus("1");
           listenContinuously();
           setIsRecording(true);
+          // 녹화 누른 적이 있는지 확인
+          setIsFirstRecording(true);
         }
       } catch (err) {
         console.error(err);
@@ -300,8 +311,8 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
       }
     } catch (err) {
       console.log(err);
+      await sendText(roomId);
     }
-    await sendText(roomId);
   };
 
   const listenContinuously = () => {
@@ -318,14 +329,19 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
   };
 
   const leaveMeetingRoom = async () => {
-    try {
+    if (isFirstRecording) {
+      try {
+        leaveSession();
+        // 상태 확인 필요
+        await leaveRoom(roomId);
+      } catch (err) {
+        console.log(err);
+      }
+      navigate(`/meeting/off/${sessionId}`);
+    } else {
       leaveSession();
-      // 상태 확인 필요
-      await leaveRoom(roomId);
-    } catch (err) {
-      console.log(err);
+      navigate(`/`);
     }
-    navigate(`/meeting/off/${sessionId}`);
   };
 
   const toggleInvite = () => {
@@ -348,12 +364,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
             {/* 세션 연결 후 화면 */}
             <div className="col-span-9 grid grid-rows-12">
               <div className="row-span-10 items-center justify-center">
-                {session && (
-                  <Session
-                    publisher={publisher as Publisher}
-                    subscriber={subscriber as Subscriber}
-                  />
-                )}
+                {session && <Session publisher={publisher} subscribers={subscribers} />}
               </div>
 
               {/* 버튼들 */}
@@ -367,11 +378,11 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
                     <img className="h-7 w-7" src={invite} alt="" />
                   </button>
                   {/* 녹음 시작 */}
-                  {name === owner ? (
+                  {username === owner ? (
                     <>
                       <button
                         onClick={toggleRecord}
-                        className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-600 flex justify-center items-center"
+                        className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center"
                       >
                         {!listening ? (
                           <img className="pl-1 h-7 w-7" src={record} alt="" />
@@ -380,7 +391,7 @@ const MeetingTest2 = ({ roomId, sessionId }: MeetingTestProps) => {
                         )}
                       </button>
                       <button
-                        className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-600 flex justify-center items-center"
+                        className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center"
                         onClick={endRecord}
                         disabled={roomStatus === "0" || roomStatus === "2"}
                       >

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { joinRoom } from "@/services/Room";
-import userStore from "@/store/userStore";
+import { userStore } from "@/store/userStore";
 import createRoomStore from "@/store/createRoomStore";
 import UserList from "./Chatting/UserList";
 import ChatRoom from "./Chatting/ChatRoom";
@@ -12,6 +12,7 @@ import { useSpeechRecognition } from "react-speech-recognition";
 import chat from "../../../assets/chattingIcons/messenger.png";
 import people from "../../../assets/chattingIcons/people.png";
 import { tokenStore } from "@/store/tokenStore";
+import { useUserListStore } from "@/store/userStore";
 
 interface Command {
   command: string;
@@ -68,10 +69,10 @@ const Chatting = ({
   const [summaryMessages, setSummaryMessages] = useState<SummaryMessage[]>([]);
   const [senderInfo, setSenderInfo] = useState({ sender: "", profile: "", senderId: "" });
   const [connected, setConnected] = useState(false); // 연결 상태를 추적하는 상태 변수 추가
-  const { id, setId, setName, setProfile } = userStore();
+  const { id, emotion, setId, setName, setProfile } = userStore();
   const [userList, setUserList] = useState<Member[]>([]);
   const [prevStatus, setPrevStatus] = useState<string>("0");
-
+  const { setUsers, updateUserEmotion } = useUserListStore();
   const { setRoomStatus, setOwner } = createRoomStore();
   const { token } = tokenStore();
 
@@ -141,6 +142,7 @@ const Chatting = ({
           }
         }
       });
+
       setPrevStatus(roomStatus);
     } else if (roomStatus === "2") {
       console.log("Unsubscribing from meeting chat for roomId:", roomId);
@@ -204,6 +206,7 @@ const Chatting = ({
       console.log("Connected: " + frame);
       setConnected(true);
 
+      // 채팅 메시지 구독
       client.subscribe(`/sub/chat/${roomId}`, function (message) {
         console.log("Message received:", message.body);
         const contentType = message.headers["content-type"];
@@ -217,12 +220,25 @@ const Chatting = ({
         }
       });
 
+      // 상태 갱신 소켓 구독
       client.subscribe(`/sub/room/update/${roomId}`, function (res) {
         const data = JSON.parse(res.body);
-        console.log(data);
         setOwner(data.owner);
         setRoomStatus(data.status);
         setUserList(data.members);
+        setUsers(
+          data.members.map((member: any) => ({
+            id: member.id,
+            nickname: member.nickname,
+            profile: member.profile,
+            emotion: 0, // 초기값 설정
+          })),
+        );
+      });
+
+      client.subscribe(`/sub/vote/${roomId}`, function (res) {
+        const data = JSON.parse(res.body);
+        updateUserEmotion(data.senderId, data.voteType);
       });
     };
 
@@ -282,6 +298,28 @@ const Chatting = ({
     }
   };
 
+  const sendEmotion = () => {
+    if (stompClientRef.current && connected) {
+      const data = JSON.stringify({
+        senderId: senderInfo.senderId,
+        sender: senderInfo.sender,
+        voteType: emotion,
+      });
+
+      stompClientRef.current.publish({
+        destination: `/pub/${roomId}/sendVote`,
+        body: data,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (connected) {
+      sendEmotion();
+      console.log(emotion);
+    }
+  }, [emotion, connected]);
+
   return (
     <>
       <div className="h-screen grid grid-rows-12 pt-4">
@@ -336,13 +374,13 @@ const Chatting = ({
         <div className="row-span-2 flex gap-2 justify-end items-center">
           <button
             onClick={handleIsSubscribers}
-            className="w-10 h-10 rounded-full bg-gray-400 flex justify-center items-center"
+            className="w-10 h-10 rounded-full bg-gray-400 hover:bg-gray-300 flex justify-center items-center"
           >
             <img className="w-6 h-6" src={people} alt="" />
           </button>
           <button
             onClick={handleIsChatting}
-            className="w-10 h-10 rounded-full bg-gray-400 flex justify-center items-center"
+            className="w-10 h-10 rounded-full bg-gray-400 hover:bg-gray-300 flex justify-center items-center"
           >
             <img className="w-6 h-6" src={chat} alt="" />
           </button>

@@ -1,19 +1,16 @@
 import { Navigate, useLocation } from "react-router-dom";
-
-// import MeetingTest from "../../components/MeetingOn/MeetingTest";
-// import SelectFolder from "../../components/MeetingOn/MeetingOff/SelectFolders";
-
 import { tokenStore } from "@/store/tokenStore";
 import createRoomStore from "@/store/createRoomStore";
 import { useEffect } from "react";
 import { getRoomId } from "@/services/Room";
 import MeetingTest2 from "@/components/MeetingOn/MeetingTest2";
-// import Meeting from "@/components/MeetingOn/OpenViduTest/Meeting";
+import { fetchMyProfile } from "@/services/MyPage";
+import useMeetingStore from "@/store/meetingStore";
 
 const MeetingOn = () => {
   const { token } = tokenStore();
   const { setSessionId, sessionId, roomId, setRoomId } = createRoomStore();
-
+  const { username, setUsername } = useMeetingStore();
   const location = useLocation();
   const segments = location.pathname.split("/");
   const code = segments.length > 3 ? segments[3] : null;
@@ -23,6 +20,19 @@ const MeetingOn = () => {
       setSessionId(code);
     }
   }, [code]);
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        const { email, nickName, profileImg } = await fetchMyProfile();
+        setUsername(nickName);
+        console.log(email, profileImg);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchUsername();
+  }, []);
 
   useEffect(() => {
     const fetchRoomId = async () => {
@@ -44,13 +54,7 @@ const MeetingOn = () => {
   }
 
   return (
-    <>
-      {/* <Meeting /> */}
-      {/* {roomId && <MeetingTest roomId={roomId} />} */}
-      {roomId && <MeetingTest2 roomId={roomId} sessionId={sessionId} />}
-      {/* {roomId && <Meeting />} */}
-      {/* <SelectFolder /> */}
-    </>
+    <>{roomId && <MeetingTest2 roomId={roomId} sessionId={sessionId} username={username} />}</>
   );
 };
 
