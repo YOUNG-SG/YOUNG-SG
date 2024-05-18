@@ -346,125 +346,115 @@ const MeetingTest2 = ({ roomId, sessionId, username }: MeetingTestProps) => {
   };
   return (
     <>
-      <div>
-        {/* <h1>진행화면</h1> */}
-        <>
-          <div
-            className="h-screen grid grid-cols-12 pr-2"
-            style={{
-              backgroundImage: `url(${bg})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            }}
-          >
-            {/* 세션 연결 후 화면 */}
-            <div className="col-span-9 grid grid-rows-12">
-              <div className="row-span-10 items-center justify-center">
-                {session && <Session publisher={publisher} subscribers={subscribers} />}
-              </div>
+      {/* <h1>진행화면</h1> */}
+      <div
+        className="h-screen grid grid-cols-12 pr-2"
+        style={{
+          backgroundImage: `url(${bg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        {/* 세션 연결 후 화면 */}
+        <div className="col-span-9 grid grid-rows-12 h-full">
+          <div className="row-span-10 items-center justify-center h-full">
+            {session && <Session publisher={publisher} subscribers={subscribers} />}
+          </div>
 
-              {/* 버튼들 */}
-              <div className="row-span-2 flex items-center justify-center w-full">
-                <div className="justify-items-start pr-5 flex gap-5">
-                  {/* 초대코드 */}
+          {/* 버튼들 */}
+          <div className="row-span-2 flex items-center justify-center w-full">
+            <div className="justify-items-start pr-5 flex gap-5">
+              {/* 초대코드 */}
+              <button
+                onClick={toggleInvite}
+                className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center"
+              >
+                <img className="h-7 w-7" src={invite} alt="" />
+              </button>
+              {/* 녹음 시작 */}
+              {username === owner ? (
+                <>
                   <button
-                    onClick={toggleInvite}
+                    onClick={toggleRecord}
                     className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center"
                   >
-                    <img className="h-7 w-7" src={invite} alt="" />
+                    {!listening ? (
+                      <img className="pl-1 h-7 w-7" src={record} alt="" />
+                    ) : (
+                      <img className="h-7 w-7" src={pause} alt="" />
+                    )}
                   </button>
-                  {/* 녹음 시작 */}
-                  {username === owner ? (
-                    <>
-                      <button
-                        onClick={toggleRecord}
-                        className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center"
-                      >
-                        {!listening ? (
-                          <img className="pl-1 h-7 w-7" src={record} alt="" />
-                        ) : (
-                          <img className="h-7 w-7" src={pause} alt="" />
-                        )}
-                      </button>
-                      <button
-                        className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center"
-                        onClick={endRecord}
-                        disabled={roomStatus === "0" || roomStatus === "2"}
-                      >
-                        <img className="h-7 w-7" src={stop} alt="녹화종료" />
-                      </button>
-                    </>
-                  ) : null}
-                </div>
-                {
-                  // publisher &&
-                  <>
-                    <div className="flex gap-5 justify-items-center self-center">
-                      {/* 음소거 */}
-                      <button
-                        className={`h-10 w-10 rounded-full flex justify-center items-center ${isAudioEnabled ? "bg-red-500 hover:bg-red-400" : "bg-sky-500 hover:bg-sky-400"}`}
-                        onClick={toggleAudio}
-                      >
-                        {isAudioEnabled ? (
-                          <img className="h-7 w-7" src={mute} alt="" />
-                        ) : (
-                          <img className="h-7 w-7" src={mic} alt="" />
-                        )}
-                      </button>
-                      {/* 화면 on, off */}
-                      <button
-                        className={`h-10 w-10 rounded-full flex justify-center items-center ${isVideoEnabled ? "bg-red-500 hover:bg-red-400" : "bg-sky-500 hover:bg-sky-400"}`}
-                        onClick={toggleVideo}
-                      >
-                        {isVideoEnabled ? (
-                          <img className="h-7 w-7" src={monitorOff} alt="" />
-                        ) : (
-                          <img className="h-7 w-7" src={monitorOn} alt="" />
-                        )}
-                      </button>
-                      {/* 화면 공유 */}
-                      <button
-                        className={`h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center`}
-                        onClick={joinScreenSession}
-                      >
-                        <img className="h-7 w-7" src={screen} alt="" />
-                      </button>
-                      {/* 연결 끊기 (나가기) */}
-                      <button
-                        onClick={leaveMeetingRoom}
-                        className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center"
-                      >
-                        <img className="h-7 w-7" src={disconnect} alt="" />
-                      </button>
-                    </div>
-                  </>
-                }
-              </div>
-              {isClickInvite ? (
-                <>
-                  <InviteModal sessionId={sessionId} toggleInvite={toggleInvite} />
+                  <button
+                    className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center"
+                    onClick={endRecord}
+                    disabled={roomStatus === "0" || roomStatus === "2"}
+                  >
+                    <img className="h-7 w-7" src={stop} alt="녹화종료" />
+                  </button>
                 </>
               ) : null}
             </div>
-            <div className="col-span-3">
-              {
-                roomId && (
-
-                  <Chatting 
-                    roomId={roomId}
-                    roomStatus={roomStatus}
-                    listenContinuously={listenContinuously}
-                    setIsRecording={setIsRecording}
-                    listenStop={listenStop}
-                    owner={owner}
-                  />
-                )
-                
-              }
-            </div>
+            {
+              // publisher &&
+              <>
+                <div className="flex gap-5 justify-items-center self-center">
+                  {/* 음소거 */}
+                  <button
+                    className={`h-10 w-10 rounded-full flex justify-center items-center ${isAudioEnabled ? "bg-red-500 hover:bg-red-400" : "bg-sky-500 hover:bg-sky-400"}`}
+                    onClick={toggleAudio}
+                  >
+                    {isAudioEnabled ? (
+                      <img className="h-7 w-7" src={mute} alt="" />
+                    ) : (
+                      <img className="h-7 w-7" src={mic} alt="" />
+                    )}
+                  </button>
+                  {/* 화면 on, off */}
+                  <button
+                    className={`h-10 w-10 rounded-full flex justify-center items-center ${isVideoEnabled ? "bg-red-500 hover:bg-red-400" : "bg-sky-500 hover:bg-sky-400"}`}
+                    onClick={toggleVideo}
+                  >
+                    {isVideoEnabled ? (
+                      <img className="h-7 w-7" src={monitorOff} alt="" />
+                    ) : (
+                      <img className="h-7 w-7" src={monitorOn} alt="" />
+                    )}
+                  </button>
+                  {/* 화면 공유 */}
+                  <button
+                    className={`h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center`}
+                    onClick={joinScreenSession}
+                  >
+                    <img className="h-7 w-7" src={screen} alt="" />
+                  </button>
+                  {/* 연결 끊기 (나가기) */}
+                  <button
+                    onClick={leaveMeetingRoom}
+                    className="h-10 w-10 rounded-full bg-gray-500 hover:bg-gray-400 flex justify-center items-center"
+                  >
+                    <img className="h-7 w-7" src={disconnect} alt="" />
+                  </button>
+                </div>
+              </>
+            }
           </div>
-        </>
+          {isClickInvite ? (
+            <>
+              <InviteModal sessionId={sessionId} toggleInvite={toggleInvite} />
+            </>
+          ) : null}
+        </div>
+        <div className="col-span-3">
+          <Chatting
+            roomId={roomId}
+            roomStatus={roomStatus}
+            listenContinuously={listenContinuously}
+            setIsRecording={setIsRecording}
+            listenStop={listenStop}
+            owner={owner}
+          />
+        </div>
       </div>
     </>
   );
