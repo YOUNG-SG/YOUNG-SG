@@ -68,7 +68,7 @@ const Chatting = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [summaryMessages, setSummaryMessages] = useState<SummaryMessage[]>([]);
   const [senderInfo, setSenderInfo] = useState({ sender: "", profile: "", senderId: "" });
-  const [connected, setConnected] = useState(false); // 연결 상태를 추적하는 상태 변수 추가
+  const [connected, setConnected] = useState(false);
   const { id, emotion, setId, setName, setProfile } = userStore();
   const [userList, setUserList] = useState<Member[]>([]);
   const [prevStatus, setPrevStatus] = useState<string>("0");
@@ -363,7 +363,7 @@ const Chatting = ({
           </div>
         )}
         {/* 참가자 목록 */}
-        {!isChatting && (
+        {!isChatting && userList && (
           <>
             <div className="row-span-10 w-full flex flex-col border rounded-xl bg-black bg-opacity-70">
               <UserList userList={userList} roomId={roomId} owner={owner} />
