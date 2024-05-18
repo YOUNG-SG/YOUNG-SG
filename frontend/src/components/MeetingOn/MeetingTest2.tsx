@@ -179,14 +179,11 @@ const MeetingTest2 = ({ roomId, sessionId, username }: MeetingTestProps) => {
 
     session.on("streamCreated", (event) => {
       const subscriber = session.subscribe(event.stream, undefined);
-      console.log(event, "이벤트");
 
       setSubscribers((prevSubscribers: Subscriber[]): Subscriber[] => [
         ...prevSubscribers,
         subscriber,
       ]);
-
-      console.log(event, "이벤트 2", subscribers);
     });
 
     getToken()
