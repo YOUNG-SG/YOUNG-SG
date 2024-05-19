@@ -311,14 +311,10 @@ public class MemberServiceImpl implements MemberService{
         // memberid 체크 -> 아니면 권한 없음 띄우기 : usermeetingId로 가능
         Member member = commonUtil.getMember();
         // 회의 목록 조회
-        MemberMeeting memberMeeting = memberMeetingRepository.findById(usermeetingId)
+        MemberMeeting memberMeeting = memberMeetingRepository.findByRoomIdAndMember(usermeetingId, member)
                 .orElseThrow(MemberException::memberMeetingNotFound);
-        // 회의 목록 멤버 일치 확인
-        if (!member.getId().equals(memberMeeting.getMember().getId())) {
-            throw MemberException.memberMeetingNotEqualException();
-        }
-
-        memberMeetingRepository.deleteById(usermeetingId);
+        
+        memberMeetingRepository.deleteByRoomIdAndMember(usermeetingId, member);
 
         return ResponseEntity.status(HttpStatus.OK).body("회의가 삭제되었습니다.");
     }

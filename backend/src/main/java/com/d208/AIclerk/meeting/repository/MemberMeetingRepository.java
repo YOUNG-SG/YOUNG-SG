@@ -4,6 +4,7 @@ import com.d208.AIclerk.entity.Folder;
 import com.d208.AIclerk.entity.Member;
 import com.d208.AIclerk.entity.MemberMeeting;
 import com.d208.AIclerk.meeting.dto.meetingListDto;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,6 +13,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MemberMeetingRepository extends JpaRepository<MemberMeeting, Long > {
+
+    Optional<MemberMeeting> findByRoomIdAndMember(Long roomId, Member member);
+
+    @Transactional
+    void deleteByRoomIdAndMember(Long roomId, Member member);
 
     List<MemberMeeting> findAllByFolder_Id(Long folderId);
 
