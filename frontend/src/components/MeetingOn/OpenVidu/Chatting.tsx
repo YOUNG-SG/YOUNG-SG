@@ -194,9 +194,9 @@ const Chatting = ({
       connectHeaders: {
         Authorization: `Bearer ${token}`,
       },
-      debug: function (str) {
-        console.log(str, "버그라고?");
-      },
+      // debug: function (str) {
+      //   console.log(str, "버그라고?");
+      // },
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
@@ -316,7 +316,7 @@ const Chatting = ({
   useEffect(() => {
     if (connected) {
       sendEmotion();
-      console.log(emotion);
+      // console.log(emotion);
     }
   }, [emotion, connected]);
 
