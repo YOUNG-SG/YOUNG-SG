@@ -119,11 +119,11 @@ function Video({ streamManager, isPublisher }: Props) {
 
   return (
     <>
-      <div className="relative flex items-center justify-center">
+      <div className="relative flex items-center justify-center w-full h-full">
         <video
           autoPlay={autoplay}
           ref={videoRef}
-          className="aspect-video h-full w-full object-contain"
+          className="aspect-video h-[90%] w-[90%] object-contain"
           onLoadedMetadata={updateCanvasSize}
           onPlay={updateCanvasSize}
         >
@@ -131,7 +131,7 @@ function Video({ streamManager, isPublisher }: Props) {
         </video>
         <canvas
           ref={canvasRef}
-          className="absolute aspect-video top-0 z-10 left-0 w-full h-full"
+          className="absolute aspect-video top-0 z-10 left-0 h-[90%] w-[90%]"
         ></canvas>
 
         {user && user.emotion !== 0 && (
