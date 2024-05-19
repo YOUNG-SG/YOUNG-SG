@@ -59,7 +59,6 @@ const MeetingTest2 = ({ roomId, sessionId, username }: MeetingTestProps) => {
   const OPENVIDU_SERVER_URL = "https://youngseogi.duckdns.org";
   const OPENVIDU_SERVER_SECRET = "MYSECRET";
   const [isClickInvite, setIsClickInvite] = useState(false);
-  const [isFirstRecording, setIsFirstRecording] = useState(false);
 
   const leaveSession = useCallback(() => {
     if (session) session.disconnect();
@@ -279,7 +278,6 @@ const MeetingTest2 = ({ roomId, sessionId, username }: MeetingTestProps) => {
           listenContinuously();
           setIsRecording(true);
           // 녹화 누른 적이 있는지 확인
-          setIsFirstRecording(true);
         }
       } catch (err) {
         console.error(err);
@@ -326,7 +324,7 @@ const MeetingTest2 = ({ roomId, sessionId, username }: MeetingTestProps) => {
   };
 
   const leaveMeetingRoom = async () => {
-    if (isFirstRecording) {
+    if (roomStatus !== "0") {
       try {
         leaveSession();
         // 상태 확인 필요
