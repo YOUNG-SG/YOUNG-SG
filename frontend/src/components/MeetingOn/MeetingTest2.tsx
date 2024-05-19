@@ -197,6 +197,7 @@ const MeetingTest2 = ({ roomId, sessionId, username }: MeetingTestProps) => {
                 publishAudio: true,
                 publishVideo: true,
                 mirror: true,
+                frameRate: 30,
                 insertMode: "APPEND",
               });
 
@@ -303,10 +304,10 @@ const MeetingTest2 = ({ roomId, sessionId, username }: MeetingTestProps) => {
         setRoomStatus("2");
         listenStop();
         setIsRecording(false);
+        await sendText(roomId);
       }
     } catch (err) {
       console.log(err);
-      await sendText(roomId);
     }
   };
 
