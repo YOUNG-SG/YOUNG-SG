@@ -27,6 +27,7 @@ const MeetingOn = () => {
         const { email, nickName, profileImg } = await fetchMyProfile();
         setUsername(nickName);
         console.log(email, profileImg);
+        console.log(nickName, "유저 네임");
       } catch (err) {
         console.log(err);
       }
