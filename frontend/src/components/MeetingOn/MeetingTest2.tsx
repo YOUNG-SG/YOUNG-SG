@@ -363,7 +363,7 @@ const MeetingTest2 = ({ roomId, sessionId, username }: MeetingTestProps) => {
           </div>
 
           {/* 버튼들 */}
-          <div className="row-span-2 flex items-center justify-center w-full">
+          <div className="row-span-2 flex items-center justify-center w-full h-full">
             <div className="justify-items-start pr-5 flex gap-5">
               {/* 초대코드 */}
               <button

@@ -5,53 +5,49 @@ interface SessionProps {
   subscribers: Subscriber[];
   publisher: Publisher | undefined;
 }
+const calculateFlexClasses = (count: number) => {
+  if (count <= 2) {
+    return "flex flex-col justify-center items-center";
+  } else if (count <= 4) {
+    return "flex flex-wrap justify-center items-center";
+  } else if (count <= 6) {
+    return "flex flex-wrap justify-center items-center";
+  } else {
+    return "flex flex-wrap justify-center items-center";
+  }
+};
 
+const calculateWidth = (count: number) => {
+  if (count === 1) {
+    return "w-full h-full";
+  } else if (count === 2) {
+    return "w-1/2 h-full";
+  } else if (count <= 4) {
+    return "w-1/2 h-1/2";
+  } else if (count <= 6) {
+    return "w-1/3 h-1/2";
+  } else {
+    return "w-1/3 h-1/3";
+  }
+};
 function Session({ subscribers, publisher }: SessionProps) {
-  // 참가자 수에 따라 그리드 레이아웃을 계산
-  const calculateGridClasses = (count: number) => {
-    switch (count) {
-      case 1:
-        return "grid grid-cols-1 grid-rows-1 place-items-center w-full h-full";
-      case 2:
-        return "grid grid-cols-2 grid-rows-1 place-items-center w-full h-full";
-      case 3:
-        return "grid grid-cols-2 grid-rows-2 place-items-center w-full h-full";
-      case 4:
-        return "grid grid-cols-2 grid-rows-2 place-items-center w-full h-full";
-      case 5:
-        return "grid grid-cols-3 grid-rows-[1fr_1fr] place-items-center w-full h-full";
-      case 6:
-        return "grid grid-cols-3 grid-rows-[1fr_1fr] place-items-center w-full h-full";
-      default:
-        return "grid grid-cols-3 grid-rows-[1fr_1fr] place-items-center w-full h-full";
-    }
-  };
-
   const participantCount = subscribers.length + 1; // 퍼블리셔 + 구독자 수
-  const gridClasses = calculateGridClasses(participantCount);
+  const flexClasses = calculateFlexClasses(participantCount);
+  const widthClass = calculateWidth(participantCount);
 
   return (
-    <div className={`${gridClasses} h-full`}>
-      <Video
-        streamManager={publisher as Publisher}
-        videoSizeClass={
-          participantCount === 1
-            ? "max-w-screen max-h-screen p-2"
-            : "p-2 max-w-screen max-h-screen h-full w-full"
-        }
-        isPublisher={true} // 퍼블리셔임을 표시
-      />
-      {subscribers &&
-        subscribers.map((subscriber, index) => (
-          <Video
-            key={index}
-            streamManager={subscriber}
-            videoSizeClass="w-full h-full p-2"
-            isPublisher={false} // 구독자임을 표시
-          />
-        ))}
+    <div className={`flex flex-wrap ${flexClasses} w-full h-full`}>
+      {publisher && (
+        <div className={`flex items-center justify-center p-2 ${widthClass}`}>
+          <Video streamManager={publisher} isPublisher={true} />
+        </div>
+      )}
+      {subscribers.map((subscriber, index) => (
+        <div key={index} className={`flex items-center justify-center p-2 ${widthClass}`}>
+          <Video streamManager={subscriber} isPublisher={false} />
+        </div>
+      ))}
     </div>
   );
 }
-
 export default Session;

@@ -4,7 +4,7 @@ import { useUserListStore } from "@/store/userStore";
 import * as tf from "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl";
 import * as handpose from "@tensorflow-models/handpose";
-import { drawHand } from "@/utils/handlePose";
+// import { drawHand } from "@/utils/handlePose";
 import * as fp from "fingerpose";
 import thumbs_up from "../../../assets/chattingIcons/thumbs_up.png";
 import hands_up from "../../../assets/chattingIcons/hello.png";
@@ -14,11 +14,10 @@ import { userStore } from "@/store/userStore";
 
 interface Props {
   streamManager: StreamManager;
-  videoSizeClass: string;
   isPublisher: boolean;
 }
 
-function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
+function Video({ streamManager, isPublisher }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const autoplay = true;
@@ -46,7 +45,7 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
     // Loop and detect hands
     setInterval(() => {
       detect(net);
-    }, 500);
+    }, 100);
   };
 
   const detect = async (net: any) => {
@@ -93,10 +92,10 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
         setEmotion(0);
       }
 
-      const ctx = canvasRef.current.getContext("2d");
-      if (ctx) {
-        drawHand(hand, ctx);
-      }
+      // const ctx = canvasRef.current.getContext("2d");
+      // if (ctx) {
+      // drawHand(hand, ctx);
+      // }
     }
   };
 
@@ -120,11 +119,11 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
 
   return (
     <>
-      <div className={` ${videoSizeClass} flex items-center justify-center relative`}>
+      <div className="relative flex items-center justify-center">
         <video
           autoPlay={autoplay}
           ref={videoRef}
-          className="aspect-video max-w-full max-h-full h-full w-full"
+          className="aspect-video h-full w-full object-contain"
           onLoadedMetadata={updateCanvasSize}
           onPlay={updateCanvasSize}
         >
@@ -132,14 +131,14 @@ function Video({ streamManager, videoSizeClass, isPublisher }: Props) {
         </video>
         <canvas
           ref={canvasRef}
-          className="absolute aspect-video top-0 z-10 left-0 w-full h-full max-w-full max-h-full"
+          className="absolute aspect-video top-0 z-10 left-0 w-full h-full"
         ></canvas>
 
         {user && user.emotion !== 0 && (
           <img
             src={user.emotion === 1 ? thumbs_up : user.emotion === 2 ? thumbs_dowm : hands_up}
             alt="emotion"
-            className="absolute bottom-4 right-4 w-10 h-10 z-20"
+            className="absolute bottom-4 right-4 w-8 h-8 z-20"
           />
         )}
       </div>
