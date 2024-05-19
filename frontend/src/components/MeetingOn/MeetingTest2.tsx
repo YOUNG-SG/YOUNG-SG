@@ -196,6 +196,7 @@ const MeetingTest2 = ({ roomId, sessionId, username }: MeetingTestProps) => {
                 videoSource: undefined,
                 publishAudio: true,
                 publishVideo: true,
+                frameRate: 30,
                 mirror: true,
                 insertMode: "APPEND",
               });
