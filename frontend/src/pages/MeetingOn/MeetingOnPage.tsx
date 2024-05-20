@@ -41,7 +41,6 @@ const MeetingOn = () => {
         try {
           const { roomid } = await getRoomId(sessionId);
           setRoomId(roomid);
-          console.log("roomid", roomid);
         } catch (err) {
           console.log("roomId 에러", err);
         }
@@ -55,7 +54,11 @@ const MeetingOn = () => {
   }
 
   return (
-    <>{roomId && <MeetingTest2 roomId={roomId} sessionId={sessionId} username={username} />}</>
+    <>
+      {roomId && username && (
+        <MeetingTest2 roomId={roomId} sessionId={sessionId} username={username} />
+      )}
+    </>
   );
 };
 
