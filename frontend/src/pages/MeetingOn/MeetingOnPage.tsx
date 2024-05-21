@@ -3,7 +3,7 @@ import { tokenStore } from "@/store/tokenStore";
 import createRoomStore from "@/store/createRoomStore";
 import { useEffect } from "react";
 import { getRoomId } from "@/services/Room";
-import MeetingTest2 from "@/components/MeetingOn/MeetingTest2";
+import Meeting from "@/components/MeetingOn/Meeting";
 import { fetchMyProfile } from "@/services/MyPage";
 import useMeetingStore from "@/store/meetingStore";
 
@@ -55,9 +55,7 @@ const MeetingOn = () => {
 
   return (
     <>
-      {roomId && username && (
-        <MeetingTest2 roomId={roomId} sessionId={sessionId} username={username} />
-      )}
+      {roomId && username && <Meeting roomId={roomId} sessionId={sessionId} username={username} />}
     </>
   );
 };

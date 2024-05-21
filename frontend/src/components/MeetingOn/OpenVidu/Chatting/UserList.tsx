@@ -7,13 +7,13 @@ interface Member {
   profile: string;
 }
 
-interface ChatTestProps {
+interface ChatProps {
   userList?: Member[];
   roomId: number;
   owner: string | null;
 }
 
-const UserList = ({ userList, roomId, owner }: ChatTestProps) => {
+const UserList = ({ userList, roomId, owner }: ChatProps) => {
   const { username } = useMeetingStore();
   const isOwner = owner === username;
 
