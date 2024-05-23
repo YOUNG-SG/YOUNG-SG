@@ -47,12 +47,12 @@ YOUNG 서기는 회의 내용을 자동으로 정리 및 요약하고 회의록 
       <td><strong>2. 메인화면</strong><br/>회의 생성</td>
     </tr>
     <tr align="center">
-      <td><img src="./README/서비스화면/1-로그인-1-로그인.gif" width="390px" /></td>
-      <td><img src="./README/서비스화면/2-메인-1-회의생성.gif" width="390px" /></td>
+      <td><img src="./README/서비스화면/1-로그인-1-로그인.gif" width="380px" /></td>
+      <td><img src="./README/서비스화면/2-메인-1-회의생성.gif" width="380px" /></td>
     </tr>
     <tr align="center">
-      <td width="395px">카카오 로그인을 통해 회원가입 및 로그인을 진행합니다.</td>
-      <td width="395px">회의명을 입력해 회의를 시작합니다. 회의를 시작한 사람이 방장이 됩니다.</td>
+      <td width="390px">카카오 로그인을 통해 회원가입 및 로그인을 진행합니다.</td>
+      <td width="390px">회의명을 입력해 회의를 시작합니다. 회의를 시작한 사람이 방장이 됩니다.</td>
     </tr>
     <!---------- 2 ---------->
     <tr align="center">
@@ -60,12 +60,12 @@ YOUNG 서기는 회의 내용을 자동으로 정리 및 요약하고 회의록 
       <td><strong>3. 회의진행</strong><br/>모션 인식</td>
     </tr>
     <tr align="center">
-      <td><img src="./README/서비스화면/3-회의진행-1-회의초대, 채팅.gif" width="390px" /></td>
-      <td><img src="./README/서비스화면/3-회의진행-2-모션인식.gif" width="390px" /></td>
+      <td><img src="./README/서비스화면/3-회의진행-1-회의초대, 채팅.gif" width="380px" /></td>
+      <td><img src="./README/서비스화면/3-회의진행-2-모션인식.gif" width="380px" /></td>
     </tr>
     <tr align="center">
-      <td width="395px">회의 링크 복사 및 공유를 통해 초대를 할 수 있습니다. 회의를 진행하며 녹음, 실시간 채팅, 화면 공유를 할 수 있습니다.</td>
-      <td width="395px">모션 인식을 통해 손동작(🖐, 👍, 👎)을 인식할 수 있습니다.</td>
+      <td width="390px">회의 링크 복사 및 공유를 통해 초대를 할 수 있습니다. 회의를 진행하며 녹음, 실시간 채팅, 화면 공유를 할 수 있습니다.</td>
+      <td width="390px">모션 인식을 통해 손동작(🖐, 👍, 👎)을 인식할 수 있습니다.</td>
     </tr>
     <!---------- 3 ---------->
     <tr align="center">
@@ -73,12 +73,12 @@ YOUNG 서기는 회의 내용을 자동으로 정리 및 요약하고 회의록 
       <td><strong>3. 회의진행</strong><br/>방장 위임 및 회의종료</td>
     </tr>
     <tr align="center">
-      <td><img src="./README/서비스화면/3-회의진행-3-녹음시작, 요약화면.gif" width="390px" /></td>
-      <td><img src="./README/서비스화면/3-회의진행-4-방장위임 후 회의종료.gif" width="390px" /></td>
+      <td><img src="./README/서비스화면/3-회의진행-3-녹음시작, 요약화면.gif" width="380px" /></td>
+      <td><img src="./README/서비스화면/3-회의진행-4-방장위임 후 회의종료.gif" width="380px" /></td>
     </tr>
     <tr align="center">
-      <td width="395px">녹음이 시작되면 STT를 통해 회의 참가자들이 나눈 내용을 글로 기록할 수 있습니다. 회의 내용이 저장된 DB를 조회하여 OpenAI로 요약 요청을 보냅니다. 요약 완료된 내용은 S3에서 불러온 회의록 양식에 맞춰 새로 작성된 후 S3와 DB에 저장됩니다.</td>
-      <td width="395px">방장은 회의 종료 전 방장을 위임할 수 있습니다.</td>
+      <td width="390px">녹음이 시작되면 STT를 통해 회의 참가자들이 나눈 내용을 글로 기록할 수 있습니다. 회의 내용이 저장된 DB를 조회하여 OpenAI로 요약 요청을 보냅니다. 요약 완료된 내용은 S3에서 불러온 회의록 양식에 맞춰 새로 작성된 후 S3와 DB에 저장됩니다.</td>
+      <td width="390px">방장은 회의 종료 전 방장을 위임할 수 있습니다.</td>
     </tr>
     <!---------- 4 ---------->
     <tr align="center">
@@ -86,12 +86,12 @@ YOUNG 서기는 회의 내용을 자동으로 정리 및 요약하고 회의록 
       <td><strong>5. 마이페이지</strong><br/>프로필 수정</td>
     </tr>
     <tr align="center">
-      <td><img src="./README/서비스화면/4-회의종료-폴더추가, 저장.gif" width="390px" /></td>
-      <td><img src="./README/서비스화면/5-마이페이지-1-프로필수정.gif" width="390px" /></td>
+      <td><img src="./README/서비스화면/4-회의종료-폴더추가, 저장.gif" width="380px" /></td>
+      <td><img src="./README/서비스화면/5-마이페이지-1-프로필수정.gif" width="380px" /></td>
     </tr>
     <tr align="center">
-      <td width="395px">회의가 종료된 후, 폴더 추가 및 선택을 통해 회의를 저장할 수 있습니다.</td>
-      <td width="395px">프로필 사진과 닉네임을 수정할 수 있습니다.</td>
+      <td width="390px">회의가 종료된 후, 폴더 추가 및 선택을 통해 회의를 저장할 수 있습니다.</td>
+      <td width="390px">프로필 사진과 닉네임을 수정할 수 있습니다.</td>
     </tr>
     <!---------- 5 ---------->
     <tr align="center">
@@ -99,12 +99,12 @@ YOUNG 서기는 회의 내용을 자동으로 정리 및 요약하고 회의록 
       <td><strong>5. 마이페이지</strong><br/>시간별 회의목록 조회 및 삭제</td>
     </tr>
     <tr align="center">
-      <td><img src="./README/서비스화면/5-마이페이지-2-회의목록.gif" width="390px" /></td>
-      <td><img src="./README/서비스화면/5-마이페이지-3-타임라인.gif" width="390px" /></td>
+      <td><img src="./README/서비스화면/5-마이페이지-2-회의목록.gif" width="380px" /></td>
+      <td><img src="./README/서비스화면/5-마이페이지-3-타임라인.gif" width="380px" /></td>
     </tr>
     <tr align="center">
-      <td width="395px">폴더 목록과 폴더에 저장된 회의 목록을 조회할 수 있습니다.</td>
-      <td width="395px">폴더 목록과 폴더에 저장된 회의 목록을 조회할 수 있습니다.</td>
+      <td width="390px">폴더 목록과 폴더에 저장된 회의 목록을 조회할 수 있습니다.</td>
+      <td width="390px">폴더 목록과 폴더에 저장된 회의 목록을 조회할 수 있습니다.</td>
     </tr>
     <!---------- 6 ---------->
     <tr align="center">
@@ -112,12 +112,12 @@ YOUNG 서기는 회의 내용을 자동으로 정리 및 요약하고 회의록 
       <td><strong>6. 회의상세</strong><br/>회의록 파일 다운로드</td>
     </tr>
     <tr align="center">
-      <td><img src="./README/서비스화면/6-회의상세-1-요약, 댓글.gif" width="390px" /></td>
-      <td><img src="./README/서비스화면/6-회의상세-2-파일다운로드.gif" width="390px" /></td>
+      <td><img src="./README/서비스화면/6-회의상세-1-요약, 댓글.gif" width="380px" /></td>
+      <td><img src="./README/서비스화면/6-회의상세-2-파일다운로드.gif" width="380px" /></td>
     </tr>
     <tr align="center">
-      <td width="395px">회의 요약, 참여자, 같은 폴더 내 이전/다음 회의 조회, 댓글 작성 및 삭제를 할 수 있습니다.</td>
-      <td width="395px">회의록 파일을 다운로드 받을 수 있습니다.</td>
+      <td width="390px">회의 요약, 참여자, 같은 폴더 내 이전/다음 회의 조회, 댓글 작성 및 삭제를 할 수 있습니다.</td>
+      <td width="390px">회의록 파일을 다운로드 받을 수 있습니다.</td>
     </tr>
   </table>
 </div>
