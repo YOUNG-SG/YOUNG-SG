@@ -21,11 +21,11 @@
 - [🎞️ 영상](https://github.com/YOUNG-SG/YOUNG-SG?tab=readme-ov-file#%EF%B8%8F-%EC%98%81%EC%83%81)
 - [👪 팀원](https://github.com/YOUNG-SG/YOUNG-SG?tab=readme-ov-file#-%ED%8C%80%EC%9B%90)
 
-### 📆 기간
+## 📆 기간
 
 2024.04.08 ~ 2024.05.20 (6주)
 
-### 💡 서비스 소개
+## 💡 서비스 소개
 
 ```
 회의록 작성에 집중하느라 회의에 소홀해지거나
@@ -37,7 +37,7 @@ YOUNG 서기는 회의 내용을 자동으로 정리 및 요약하고 회의록 
 "회의 참여도를 높이고 편리함을 제공하는 회의록 관리 서비스, YOUNG 서기"
 ```
 
-### 💻 주요 기능 및 서비스 화면
+## 💻 주요 기능 및 서비스 화면
 
 <div align="middle">
   <table>
@@ -122,7 +122,7 @@ YOUNG 서기는 회의 내용을 자동으로 정리 및 요약하고 회의록 
   </table>
 </div>
 
-### 🛠 주요 기술
+## 🛠 주요 기술
 
 > **Frontend**
 
@@ -165,11 +165,11 @@ YOUNG 서기는 회의 내용을 자동으로 정리 및 요약하고 회의록 
   - Jenkins `2.443`
 - Docker Hub
 
-### 🏗️ 아키텍처
+## 🏗️ 아키텍처
 
 <img src="./README/아키텍처.png" width="600px" />
 
-### 📂 프로젝트 구조
+## 📂 프로젝트 구조
 
 > Frontend
 
@@ -252,7 +252,7 @@ src
 └─ test
 ```
 
-### 📃 산출물
+## 📃 산출물
 
 1. [기능 명세서](https://www.notion.so/05d2f7bc704b4f5798c5979dbd3fb4f5?pvs=21)
 2. [API 명세서](https://www.notion.so/API-7ccc244356d743e8b1e610b4071f6c98?pvs=21)
@@ -260,17 +260,17 @@ src
 4. [ER 다이어그램](https://www.erdcloud.com/d/P5YahL9LgoEt3C7AY)
 5. [포팅 메뉴얼](https://www.notion.so/4e175b588e9048fa8642f700efd8be9a?pvs=21)
 
-### 📋 발표자료
+## 📋 발표자료
 
 1. [중간 발표자료](https://www.canva.com/design/DAGC1ZF_I8A/VY0Av0xvN-PKo2_yf-2mlQ/edit)
 2. [최종 발표자료](https://www.canva.com/design/DAGFWbjkb_M/EjsFo5Ou-7CaRaAuaarz-w/edit)
 
-### 🎞️ 영상
+## 🎞️ 영상
 
 - [UCC](https://www.youtube.com/watch?v=H4bQvtNhQTA&feature=youtu.be)
 - [시연영상]()
 
-### 👪 팀원
+## 👪 팀원
 
 <div align="middle">
   <table>
