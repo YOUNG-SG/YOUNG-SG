@@ -367,6 +367,9 @@ src
       <td>
         <ul>
           <li>Infra</li>
+          <li>회원 정보 수정 API 구현</li>
+          <li>회의 삭제 API 구현</li>
+          <li>타임라인 API 구현</li>
         </ul>
       </td>
       <td>
